@@ -1,0 +1,18 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title 'Ваш ПОДАРОК | MegaBod.ru' %}
+{% block metatitle 'Ваш ПОДАРОК | MegaBod.ru' %}
+{% block description 'Ваш ПОДАРОК на MegaBod.ru' %}
+{% block keywords 'подарок' %}
+
+{% block content %}    
+
+	<div class="clearfix">
+        <div class="col-md-12 padding-5 text-center" id="main">            
+			<img src="/images/gift.jpg" alt="Подарок">
+			<h1 itemprop="name">Ваш ПОДАРОК</h1>
+			<p class="lead"><b>{{ name }}</b>, Вы успешно восстановили все Ваши объявления!{% if bonus %}<br>На Ваш бонусный счет начислено <b>{{ bonus }} рублей</b>,<br>которые можно потратить на продвижение любого объявления.{% endif %}</p>
+			<a class="btn btn-lg btn-add" href="{{ path('user_cabinet_page', { region: top_panel.url_region}) }}">Перейти в Личный кабинет</a>					
+        </div>
+    </div>
+{% endblock %}

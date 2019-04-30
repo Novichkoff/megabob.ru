@@ -1,0 +1,524 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block stylesheets %}
+  {{ parent() }}  
+  <link href="{{ asset('bundles/sitefirstpage/css/ZeroClipboard.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block title 'Мои объявления' %}
+
+    {% block content %}
+        <div class="clearfix">
+
+            {# Объявления #}
+            <div class="col-md-9 padding-5" id="my_advs">
+              <div id="main">
+                {% include 'SiteFirstPageBundle:Cabinet:user_menu.html.twig' %}
+                <h1>Мои объявления</h1>
+
+                {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                    class="sr-only">Закрыть</span></button>
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+                {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                    class="sr-only">Закрыть</span></button>
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+
+                {# Таблица объявлений #}
+                <div class="clearfix">                  
+					
+						<ul class="nav nav-tabs" role="tablist" id="myTab">
+						  <li role="presentation" class="active"><a href="#active" aria-controls="active" role="tab" data-toggle="tab">Активные{% if advs_active|length %} <span class="label label-primary">{{advs_active|length}}</span>{% endif %}</a></li>
+						  <li role="presentation"><a href="#non-active" aria-controls="non-active" role="tab" data-toggle="tab">Неактивные{% if advs_inactive|length %} <span class="label label-primary">{{advs_inactive|length}}</span>{% endif %}</a></li>						  
+						</ul>
+
+						<div class="tab-content">
+						  <div role="tabpanel" class="tab-pane active table-responsive" id="active">
+							{# Активные объявления #}
+								{% if advs_active|length %}
+									<h3>Активные объявления</h3>
+									<form method="post">
+									<table class="table advs-table">
+										<thead>
+										<tr>
+											<th>№</th>
+											<th class="hidden-xs"></th>
+											<th colspan="2">Объявления</th>
+											<th class="hidden-xs"><i class="fa fa-eye"></i></th>
+											<th class="hidden-xs">Цена</th>
+											<th><i class="fa fa-cogs"></i></th>
+										</tr>
+										</thead>
+										<tbody>
+										{% for adv in advs_active %}
+											<tr{% if adv.AdvPacketss.Data[0].PacketId != 3 and not adv.AdvPacketss.Data[0].Paid %} class="danger"{% else %}{% if loop.index is even %} class="color"{% endif %}{% endif %}>
+												<td>
+													<strong><small>{{ adv.id }}</small></strong><br>
+													<input type="checkbox" name="adv[{{ adv.id }}]" id="check_{{ adv.id }}">
+												</td>
+												<td class="hidden-xs">
+													{% if adv.image %}
+														<a target="_blank" href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}">
+															<img class="img-responsive"
+																 src="{{ asset('images/a/images/') }}{{ adv.image.thumb }}"
+																 alt="{{ adv.name }}" title="{{ adv.name }}">
+														</a>
+													{% endif %}
+												</td>
+												<td colspan="2" class="text-left">
+													<a class="line-name" target="_blank"
+													   href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}">{{ adv.name }}</a></a>
+													<div class="grey small">
+														{% if adv.Shops.id is defined %}<span class="label label-warning" title="Объявление в компании {{ adv.Shops.name }}">Компания: {{ adv.Shops.name }}</span><br>{% endif %}
+                            {% if adv.parent_parent_category %}
+															{{ adv.parent_parent_category.name }}&nbsp;/&nbsp;
+														{% endif %}
+														{% if adv.parent_category %}
+															{{ adv.parent_category.name }}&nbsp;/&nbsp;
+														{% endif %}
+														{{ adv.category.name }}, {{ adv.Regions.Name }}
+													</div>
+                          <div class="clearfix"><i class="fa fa-calendar fa-fw" title="Размещено"></i> Размещено: {% if adv.createDate|date("d.m.y") == "now"|date("d.m.y") %}сегодня{% elseif adv.createDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}вчера{% else %}{{ adv.createDate|date("d.m.y") }}{% endif %}{% if adv.publishDate|date("d.m.y") != adv.createDate|date("d.m.y") %}   <i class="fa fa-refresh fa-fw" title="Обновлено"></i> Обновлено: {% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}сегодня{% elseif adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}вчера{% else %}{{ adv.publishDate|date("d.m.y") }}{% endif %}{% endif %}</div>
+													{% set days = adv.publishBeforeDate|time_ago_in_words(false,false)*100/90 %}
+													<div class="progress">
+													  <div class="progress-bar progress-bar-{% if days > 25 %}success{% elseif days > 15 %}warning{% else %}danger{% endif %}" role="progressbar" aria-valuenow="{{ days }}" aria-valuemin="0" aria-valuemax="90" style="width: {{ days }}%" title="Публикация - осталось дней: {{ adv.publishBeforeDate|time_ago_in_words(false,false) }}"></div>                            
+													</div>
+													{% if adv.AdvPacketss.Data[0] is defined %}
+														{% if adv.AdvPacketss.Data[0].PacketId == 2 %}
+															{% if adv.AdvPacketss.Data[0].Paid %}																
+                                Пакет <strong
+																	class="green">{{ adv.AdvPacketss.Data[0].Packets.name }}</strong> до {{ adv.AdvPacketss.Data[0].UseBefore|date("d.m.Y") }}
+																<br>
+                                {% set pdays = adv.AdvPacketss.Data[0].UseBefore|time_ago_in_words(false,false)*100/adv.AdvPacketss.Data[0].Packets.days %}
+                                <div class="progress">
+                                  <div class="progress-bar progress-bar-{% if pdays > 50 %}success{% elseif pdays > 25 %}warning{% else %}danger{% endif %}" role="progressbar" aria-valuenow="{{ pdays }}" aria-valuemin="0" aria-valuemax="{{ adv.AdvPacketss.Data[0].Packets.days }}" style="width: {{ pdays }}%" title="Пакет {{ adv.AdvPacketss.Data[0].Packets.name }} - осталось дней: {{ adv.AdvPacketss.Data[0].UseBefore|time_ago_in_words(false,false) }}"></div>                            
+                                </div>
+															{% else %}
+																Пакет <strong
+																	class="green">{{ adv.AdvPacketss.Data[0].Packets.name }}</strong> не оплачен -
+																<a class="btn btn-danger btn-xs"
+																   href="{{ path('paid_adv_page', { 'id' : adv.AdvPacketss.Data[0].id, region:top_panel.url_region }) }}"
+																   title="Оплатить пакет">оплатить</a>
+                                 <a class="btn btn-primary btn-xs"
+																   href="{{ path('free_adv_page', { 'id' : adv.AdvPacketss.Data[0].id, region:top_panel.url_region }) }}"
+																   title="Отменить">отменить</a><br>
+															{% endif %}
+														{% endif %}
+														{% if adv.AdvPacketss.Data[0].PacketId == 1 %}
+															{% if adv.AdvPacketss.Data[0].Paid %}
+																{% set pdays = adv.AdvPacketss.Data[0].UseBefore|time_ago_in_words(false,false)*100/adv.AdvPacketss.Data[0].Packets.days %}
+                                <div class="progress">
+                                  <div class="progress-bar progress-bar-{% if pdays > 50 %}success{% elseif pdays > 25 %}warning{% else %}danger{% endif %}" role="progressbar" aria-valuenow="{{ pdays }}" aria-valuemin="0" aria-valuemax="{{ adv.AdvPacketss.Data[0].Packets.days }}" style="width: {{ pdays }}%" title="Пакет {{ adv.AdvPacketss.Data[0].Packets.name }} - осталось дней: {{ adv.AdvPacketss.Data[0].UseBefore|time_ago_in_words(false,false) }}"></div>                            
+                                </div>
+                                Пакет <strong
+																	class="red">{{ adv.AdvPacketss.Data[0].Packets.name }}</strong> до {{ adv.AdvPacketss.Data[0].UseBefore|date("d.m.Y") }}
+																<br>
+															{% else %}
+																Пакет <strong
+																	class="red">{{ adv.AdvPacketss.Data[0].Packets.name }}</strong> не оплачен -
+																<a class="btn btn-danger btn-xs"
+																   href="{{ path('paid_adv_page', { 'id' : adv.AdvPacketss.Data[0].id, region:top_panel.url_region }) }}"
+																   title="Оплатить пакет">оплатить</a>
+                                 <a class="btn btn-primary btn-xs"
+																   href="{{ path('free_adv_page', { 'id' : adv.AdvPacketss.Data[0].id, region:top_panel.url_region }) }}"
+																   title="Отменить">отменить</a><br>
+															{% endif %}
+														{% endif %}
+													{% endif %}
+													
+													{# Пакеты #}
+                          {% for packet in packets %}
+                            {% if packet.id != 3 and adv.AdvPacketss.Data[0].PacketId == 3 %}
+                              <a class="a_to_{% if packet.id == 1 %}premium{% elseif packet.id == 2 %}lite{% endif %} text-nowrap" data-id="{{ adv.id }}" title="Пакет {{ packet.name }}"><img class="use-up-adv" src="/bundles/sitefirstpage/images/{% if packet.id == 1 %}vip{% elseif packet.id == 2 %}turbo{% endif %}.png" alt="Пакет {{ packet.name }}" title="Пакет {{ packet.name }}"> {{ packet.name }} ({{ packet.price }} р.)</a>
+                            {% endif %}
+                          {% endfor %}                          
+                          
+                          {# Поднять в ТОП #}																								
+														<a class="a_to_top text-nowrap" data-toggle="modal" data-target="#topModal" data-id="{{ adv.id }}" title="Поднятие в ТОП"><img class="use-up-adv" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Поднятие в ТОП"> Поднять (49 р.)</a>
+													
+													{# Выделить цветом #}
+													<a class="a_highlight text-nowrap" data-toggle="modal" data-target="#highlightModal" data-id="{{ adv.id }}" title="Выделить цветом"><img class="use-up-adv" src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделение" title="Выделить цветом"> Выделить (49 р.)</a>
+                          
+                          {# В компанию #}
+                          {% if app.user.Shopss|length and adv.Shops.id is not defined %}
+                            <a class="a_company text-nowrap" data-toggle="modal" data-target="#companyModal" data-id="{{ adv.id }}" title="Разместить в компании"><img class="use-up-adv" src="{{ asset('bundles/sitefirstpage/images/company.png') }}" alt="Компания" title="Разместить в компании"> В компанию</a>
+													{% endif %}
+                          
+												</td>
+												<td class="hidden-xs text-nowrap">													                          
+                          <small title="Просмотров всего">{{ adv.cnt }}</small> <small title="Просмотров сегодня">({{ adv.cntToday }})</small>
+                          <div class="clearfix">{% if adv.googleDate %}<img width="12" src="/images/google.png" alt="Google" title="Проиндексировано Google {{ adv.googleDate|date('d.m.Y') }}">{% endif %}{% if adv.yandexDate %}<img width="12" src="/images/yandex.png" alt="Яндекс" title="Проиндексировано Яндекс {{ adv.yandexDate|date('d.m.Y') }}">{% endif %}</div>
+													{% if adv.UpDate|date() != adv.CreateDate|date() %}<img src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП {{adv.UpDate|date('d.m.Y')}}">{% endif %}
+													{% if adv.HlDate > date() %}<img src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделение" title="Использовано Выделение до {{adv.HlDate|date('d.m.Y')}}">{% endif %}
+												</td>
+												<td class="hidden-xs"><strong
+															class="line_price text-nowrap red">{% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</strong>
+                          {% if adv.moderApproved == 0 %}
+														<br><span class="label label-warning">На модерации</span>
+                          {% elseif adv.enabled %}
+														<br><span class="label label-success">Активно</span>
+													{% endif %}                              
+												</td>												
+												<td class="text-left action_adv">
+													<span class="text-nowrap"><i class="fa fa-pencil fa-fw"></i> <a
+																href="{{ path('edit_adv_page', { 'id' : adv.id, region:top_panel.url_region }) }}">Изменить</a></span><br>
+													<span class="text-nowrap"><i class="fa fa-refresh fa-fw"></i> <a
+																href="{{ path('update_adv_page', { 'id' : adv.id, region:top_panel.url_region }) }}">Обновить</a></span><br>
+													<span class="text-nowrap"><i class="fa fa-power-off fa-fw"></i> <a
+																href="{{ path('off_adv_page', { 'id' : adv.id, region:top_panel.url_region }) }}">Выключить</a></span><br>
+													<span class="text-nowrap"><i class="fa fa-trash-o fa-fw"></i> <a
+																href="{{ path('delete_adv_page', { 'id' : adv.id, region:top_panel.url_region }) }}">В архив</a></span>
+                          {#<br>
+													<span class="text-nowrap"><i class="fa fa-times fa-fw"></i> <a
+																class="confirm-delete" data-toggle="modal" data-target="#deleteModal" data-id="{{ adv.id }}">Удалить</a></span>#}
+												</td>
+											</tr>
+										{% endfor %}
+										</tbody>
+									</table>
+									<div class="padding-0 clearfix">
+										<button class="pull-left btn btn-primary" onclick="update_all_advs()">Обновить все</button>
+									</div><br><hr>
+									<div class="alert alert-default" role="alert"><strong>Полезно!</strong> Используйте платные пакеты услуг,
+										чтобы ваше объявление располагалось на приоритетных местах. К оплате принимаются банковские карты, Яндекс.Деньги. Для того чтобы применить пакет услуг, выберите объявление галочкой слева, выберите нужный пакет и нажмите кнопку Применить к выбранным. Можно выбрать сразу несколько объявлений.
+									</div>
+									<div class="form-group form-site padding-0 clearfix packets">
+										<label class="col-sm-2 control-label text-right">Пакет услуг:</label>
+
+										<div class="col-sm-10 padding-0">
+											
+												{% for packet in packets %}
+													<div class="col-sm-4 padding-5">
+														<div class="alert {% if packet.id == 3 %}alert-free{% elseif packet.id == 2 %}alert-turbo{% elseif packet.id == 1 %}alert-vip{% endif %} packet_info show"
+														 id="packet_info_{{ packet.id }}" role="alert">
+															<div class="clearfix">
+															{% if packet.id == 1 %}
+																<img class="img-packet-adv" src="/bundles/sitefirstpage/images/vip.png" title="{{ packet.name }}">
+															{% elseif packet.id == 2 %}
+																<img class="img-packet-adv" src="/bundles/sitefirstpage/images/turbo.png" title="{{ packet.name }}">
+															{% endif %}
+															<input id="packet_{{ packet.id }}" type="radio" name="packet" value="{{ packet.id }}"
+																{% if packet.id == 3 %}checked{% endif %}><label for="packet_{{ packet.id }}" class="padding-5"><h4 class="padding-5"><strong>{{ packet.name }}</strong></h4></label>
+																</div>												
+														{{ packet.description|raw }}
+														<div>Срок размещения: <strong>1 год</strong></div>
+														{% if packet.id == 3 %}
+															<hr><h4>БЕСПЛАТНО</h4>
+														{% else %}
+															<hr><h4>{{ packet.price }} р. на {{ packet.days }} дней</h4>{% endif %}
+														</div>
+													</div>
+												{% endfor %}
+										</div>
+									</div>
+									<div class="clearfix text-right padding-5">
+										<button class="btn btn-success" type="submit">Применить к выбранным объявлениям</button>
+									</div>
+								</form>
+								{% else %}
+									<h5>Нет активных объявлений</h5>
+                  <a class="btn btn-addnew" href="{{ path('add_adv_page', { region: top_panel.url_region }) }}" title="Подать бесплатное объявление">Подать объявление</a>
+								{% endif %}
+						  </div>
+						  <div role="tabpanel" class="tab-pane" id="non-active">
+							{# Неактивные объявления #}
+								{% if advs_inactive|length %}
+									<h3>Неактивные объявления</h3>
+									<table class="table advs-table">
+										<thead>
+										<tr>
+											<th>№</th>
+											<th class="hidden-xs"></th>
+											<th colspan="2">Объявления</th>
+											<th class="hidden-xs"><i class="fa fa-eye"></i></th>
+											<th class="hidden-xs">Цена</th>
+											<th><i class="fa fa-cogs"></i></th>
+										</tr>
+										</thead>
+										<tbody>
+										{% for adv in advs_inactive %}
+											<tr {% if loop.index is even %}class="color"{% endif %}>
+												<td>
+													<strong>{{ adv.id }}</strong>
+												</td>
+												<td class="hidden-xs">
+													{% if adv.image %}
+														<a target="_blank" href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}">
+															<img class="img-responsive"
+																 src="{{ asset('images/a/images/') }}{{ adv.image.thumb }}"
+																 alt="{{ adv.name }}" title="{{ adv.name }}">
+														</a>
+													{% else %}
+														<a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}">
+															<img class="img-responsive"
+																 src="{{ asset('/images/no_image.png') }}"
+																 alt="Нет фото" title="Нет фото">
+														</a>
+													{% endif %}
+												</td>
+												<td colspan="2" class="text-left">
+													<a target="_blank" class="line-name"
+													   href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}">{{ adv.name }}</a></a>
+													<div class="grey small">
+														{% if adv.Shops.id is defined %}<span class="label label-warning" title="Объявление принадлежит к компании {{ adv.Shops.name }}">Компания: {{ adv.Shops.name }}</span><br>{% endif %}
+                            {% if adv.parent_parent_category %}
+															{{ adv.parent_parent_category.name }}&nbsp;/&nbsp;
+														{% endif %}
+														{% if adv.parent_category %}
+															{{ adv.parent_category.name }}&nbsp;/&nbsp;
+														{% endif %}
+														{{ adv.category.name }}, {{ adv.Regions.Name }}
+													</div>													
+													<span class="visible-xs">До {% if adv.publish_b %}{{ adv.publish_b }}{% endif %}</span>
+													{% if adv.AdvPacketss.Data[0] is defined %}
+														{% if adv.AdvPacketss.Data[0].PacketId == 2 %}
+															{% if adv.AdvPacketss.Data[0].Paid %}
+																пакет "{{ adv.AdvPacketss.Data[0].Packets.name }}": {{ adv.AdvPacketss.Data[0].PaidDate|date("d.m.Y") }}-{{ adv.AdvPacketss.Data[0].UseBefore|date("d.m.Y") }}
+																<br>
+															{% else %}
+																пакет "{{ adv.AdvPacketss.Data[0].Packets.name }}" не оплачен
+																<br>
+															{% endif %}
+														{% endif %}
+														{% if adv.AdvPacketss.Data[0].PacketId == 1 %}
+															{% if adv.AdvPacketss.Data[0].Paid %}
+																пакет "{{ adv.AdvPacketss.Data[0].Packets.name }}": {{ adv.AdvPacketss.Data[0].PaidDate|date("d.m.Y") }}-{{ adv.AdvPacketss.Data[0].UseBefore|date("d.m.Y") }}
+																<br>
+															{% else %}
+																пакет "{{ adv.AdvPacketss.Data[0].Packets.name }}" не оплачен
+																<br>
+															{% endif %}
+														{% endif %}
+													{% endif %}
+												</td>
+												<td class="hidden-xs text-nowrap text-center">{{ adv.cnt }} ({{ adv.cntToday }})<br>
+													{% if adv.deleted == 1 %}
+														<span class="label label-danger">В архиве</span>
+													{% elseif adv.enabled == 0 %}
+														<span class="label label-primary">Выключено</span>													
+													{% endif %}
+												</td>
+												<td class="hidden-xs"><strong
+															class="text-nowrap red">{% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</strong>
+												</td>												
+												<td class="text-left action_adv">													
+													{% if adv.enabled == 0 %}
+														<span class="text-nowrap"><i class="fa fa-power-off fa-fw"></i> <a
+																	href="{{ path('on_adv_page', { 'id' : adv.id, region:top_panel.url_region }) }}">Включить</a></span>
+														<br>
+													{% endif %}
+													<span class="text-nowrap"><i class="fa fa-pencil fa-fw"></i> <a
+																href="{{ path('edit_adv_page', { 'id' : adv.id, region:top_panel.url_region }) }}">Изменить</a></span>
+													<br>
+													{% if adv.deleted == 0 %}
+														<span class="text-nowrap"><i class="fa fa-trash-o fa-fw"></i> <a
+																href="{{ path('delete_adv_page', { 'id' : adv.id, region:top_panel.url_region }) }}">В архив</a></span><br>
+													{% endif %}
+													<span class="text-nowrap"><i class="fa fa-times fa-fw"></i> <a
+																class="confirm-delete" data-toggle="modal" data-target="#deleteModal" data-id="{{ adv.id }}">Удалить</a></span>												
+												</td>
+											</tr>
+										{% endfor %}
+										</tbody>
+									</table>
+								{% else %}
+									<p><h5>Нет неактивных объявлений</h5></p>                
+								{% endif %}
+						  </div>		  
+						</div>
+					<br>
+                </div>                	
+                {# Баннер #}
+                {% if banner_bottom and user.roles[1] is not defined %}
+                  <br><div class="clearfix padding-0 text-center banner" onclick="set_click({{ banner_bottom.id }})">
+                    <div style="width: {% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                      {{ banner_bottom.code|raw }}
+                    </div>
+                  </div>
+                {% endif %}
+                {% if not user.Shopss|length %}
+                  <br><div class="alert alert-info" role="alert">                      
+                      <h4>Размещение информации о компании</h4>
+                      <b>Компания на {{ top_panel.settings.name }}</b> - эффективный сервис, который позволит выделить ваши товары или услуги среди множества конкурентов, позволит заявить о себе, а так же найти и расширить новые каналы сбыта и коммуникации с клиентами. Создав компанию, вы сможете предоставить полный спектр ваших товаров или услуг, создать лояльную аудиторию, свою клиентскую базу, которая постоянно будет расширяться, а клиенты смогут узнать вас и ваши товары или услуги среди конкурентов. Вы сможете указать все контактные данные компании и разместить ссылку на сайт.<br>
+                      <br><a class="btn btn-primary" href="{{ path('site_add_shop_page', { region: 'russia'}) }}" title="Разместить компанию">Разместить компанию</a>
+                  </div>
+                {% endif %}
+                
+                <br>
+                <h4 class="padding-5">Хотите разместить свое бесплатное объявление?</h4>
+                <p class="padding-5">Чтобы подать бесплатное объявление необходимо заполнить простую форму
+                    размещения бесплатного объявления, выбрать регион, рубрику, придумать привлекательный заголовок и полный текст своего
+                    объявления, максимально заполнить характеристики и указать адекватную стоимость, свой e-mail
+                    и телефон. Добавьте фотографии — они помогут привлечь больше просмотров вашего объявления.
+                </p>
+                <p class="padding-5">
+                  <a class="btn btn-addnew" href="{{ path('add_adv_page') }}"
+                    title="Подать бесплатное объявление">Подать объявление</a>
+                 </p>
+                
+            </div>
+			
+			{# Modal #}
+			<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h3 class="modal-title" id="myModalLabel">Удаление</h3>
+						</div>
+						<div class="modal-body">
+							Вы действительно хотите удалить объявление навсегда?
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+							<button type="button" class="btn btn-danger" id="btnDeleteAdvForever">Удалить</button>
+						</div>
+					</div>
+				</div>
+			</div></div>
+
+            {# Правая сторона страницы #}
+            <div class="col-md-3 padding-5">
+
+                {% if user.account.balance > packets[1].price %}
+                    <div class="col-sm-6 col-md-12 padding-5">
+						<div class="alert alert-info" role="alert">							
+							<img class="pull-right" src="/bundles/sitefirstpage/images/turbo.png" title="{{ packets[1].name }}" alt="{{ packets[1].name }}">
+							<strong>Внимание!</strong><br>Средств в вашем кошелке достаточно для использования дополнительных пакетов услуг.
+						</div>
+					</div>
+        {% endif %}        
+        {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+
+        {# Баннер в правой колонке #}
+        
+        {% if banner_right and user.roles[1] is not defined %}
+          <div class="col-xs-12 padding-5 hidden-xs">					
+            <aside>
+              <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+                <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+              </div>
+            </aside>					
+          </div>
+        {% endif %}          
+				
+				{# Поднять в ТОП #}
+				<div class="modal fade" id="topModal" role="dialog"
+					 aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<form class="form-horizontal" role="form" method="POST" action="{{ path('adv_to_top_page', { region:top_panel.url_region }) }}">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span
+											aria-hidden="true">&times;</span></button>
+									<h4 class="modal-title"><img class="use-up-adv" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Поднятие в ТОП"> Поднять в ТОП</h4></div>
+								<div class="modal-body">									
+									<div>Объявление один раз поднимется наверх в результатах поиска.</div><hr>
+									Стоимость: <strong>49 р.</strong><br><br>
+									<div id="form">
+										<input type="hidden" id="form_id" name="form[id]" value="">
+										<input type="hidden" id="form_sum" name="form[sum]" value="49">
+										<div class="padding-5">
+											<div id="form_paid_type" class="paid_checkbox">
+												<input type="radio" id="form_paid_type_0" name="form[paid_type]" required="required" value="1"{% if app.user.UserAccounts[0].balance<49 %} disabled="disabled"{% else %} checked="checked"{% endif %}>&nbsp;
+												<label for="form_paid_type_0" class="">из кошелька ( {{ app.user.UserAccounts[0].balance|number_format(0, '.', ' ') }} р. )</label><br>												
+											</div>
+										</div>
+										<div></div>
+									</div>									
+								</div>
+								<div class="modal-footer">
+									<a class="btn btn-default"
+									  href="{{ path('user_balance_page', { region: top_panel.url_region}) }}"
+									  title="Пополнить баланс">Пополнить баланс</a>
+									<button type="submit" id="form_save"{% if app.user.UserAccounts[0].balance<49 %} disabled="disabled"{% endif %} name="form[save]" class="btn btn-success">Оплатить</button>							
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+				
+				{# Выделить цветом #}
+				<div class="modal fade" id="highlightModal" role="dialog"
+					 aria-labelledby="highlightModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<form class="form-horizontal" role="form" method="POST" action="{{ path('adv_highlight_page', { region:top_panel.url_region }) }}">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span
+											aria-hidden="true">&times;</span></button>
+									<h4 class="modal-title"><img class="use-up-adv" src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделить цветом" title="Выделить цветом"> Выделить цветом</h4></div>
+								<div class="modal-body">									
+									<div>Объявление будет выделено цветом в результатах поиска на <strong>14 дней</strong>.</div><hr>
+									Стоимость: <strong>49 р.</strong><br><br>
+									<div id="form">
+										<input type="hidden" id="forms_id" name="forms[id]" value="">
+										<input type="hidden" id="forms_sum" name="forms[sum]" value="49">
+										<div class="padding-5">
+											<div id="form_paid_type" class="paid_checkbox">
+												<input type="radio" id="forms_paid_type_0" name="forms[paid_type]" required="required" value="1"{% if app.user.UserAccounts[0].balance<49 %} disabled="disabled"{% else %} checked="checked"{% endif %}>&nbsp;
+												<label for="forms_paid_type_0" class="">из кошелька ( {{ app.user.UserAccounts[0].balance|number_format(0, '.', ' ') }} р. )</label><br>												
+											</div>
+										</div>
+										<div></div>
+									</div>									
+								</div>
+								<div class="modal-footer">
+									<a class="btn btn-default"
+									  href="{{ path('user_balance_page', { region: top_panel.url_region}) }}"
+									  title="Пополнить баланс">Пополнить баланс</a>
+									<button type="submit" id="form_save"{% if app.user.UserAccounts[0].balance<49 %} disabled="disabled"{% endif %} name="form[save]" class="btn btn-success">Оплатить</button>							
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+        
+        {# В Компанию #}
+				<div class="modal fade" id="companyModal" role="dialog"
+					 aria-labelledby="highlightModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-sm">
+						<div class="modal-content">
+							<form class="form-horizontal" role="form" method="POST" action="{{ path('adv_company_page', { region:top_panel.url_region }) }}">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span
+											aria-hidden="true">&times;</span></button>
+									<h4 class="modal-title"><img class="use-up-adv" src="{{ asset('bundles/sitefirstpage/images/company.png') }}" alt="В компанию" title="Разместить в компанию"> Разместить в компанию</h4></div>
+								<div class="modal-body">									
+									<div>Выберите компанию на странице которой будет размещено объявление</div><br>
+									<div id="form">
+										<input type="hidden" id="forms_id" name="forms[id]" value="">										
+										<div class="padding-5">
+                      <select name="forms[shop_id]" class="form-control">
+                        {% for option in app.user.Shopss %}
+                          <option value="{{ option.id }}">{{ option.name }}</option>
+                        {% endfor %}
+                      </select>											
+										</div>
+										<div></div>
+									</div>									
+								</div>
+								<div class="modal-footer">									
+									<button type="submit" id="form_save" name="form[save]" class="btn btn-success">Разместить</button>							
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+
+            </div>
+        </div>
+    {% endblock %}
+    
+{% block javascripts %}
+	{{ parent() }}	
+	<script src="{{ asset('bundles/sitefirstpage/js/ZeroClipboard.min.js') }}"></script>
+  <script>$(document).ready(function(){var clip = new ZeroClipboard($("#copy-button"));});</script>	  
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'AdminAdminBundle::mail.html.twig' %}
+{% block content_first %}
+  <font color="#222" face="Arial" size="3">
+    <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222 !important;line-height:22px;text-align:center;margin:0;" align="center">Здравствуйте, <strong>{{ username }}</strong>!<br>
+    Вы разместили на сайте MegaBob.ru свои объявления:<br><br>
+      {% for adv in advs if adv %}
+        <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="Перейти к объявлению">{{ adv.name }}</a><br>
+      {% endfor %}<br>
+      Мы проверили содержимое вашего объявления<br> и обнаружили нарушение правил размещения.<br>
+    </p>
+  </font>
+{% endblock %}
+{% block content_second %}
+  <div>
+    <font color="#808080" face="Arial" size="2">
+      <ul style="font-size:14px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#808080 !important;line-height:16px;text-align:left;margin:0;padding:10px;" align="left">
+        <li>Запрещено подавать несколько раз одно и тоже объявление</li>
+        <li>Имя, указанное в объявлении, должно соответствовать действительности</li>
+        <li>Название и описание объявления пишите только на русском языке, исключением является марка товара</li>
+        <li>Можно указать только один контактный номер телефона</li>
+        <li>Не указывайте номер телефона, электронный адрес или другие контактные данные другого лица</li>
+        <li>Не указывайте в названии город подачи объявления, мы добавляем его автоматически</li>
+        <li>Запрещено подавать объявления с объектами недвижимости в других городах. Вы вводите людей в заблуждение</li>
+        <li>Не используйте в названии одни заглавные буквы, символы, слова: Внимание, Недорого, Срочно, Акция, Распродажа и т.д., а также другие средства привлечения внимания в заголовке объявления, на фотографии и на логотипе Компании</li>
+        <li>В названии объявления должно быть исключительно название товара, всё остальное указывайте в описании</li>
+        <li>Не указывайте телефон, e-mail, skype или адрес сайта в названии или описании объявления, для этого есть специальные поля</li>
+        <li>Указывайте ту цену, по которой вы продадите товар. Стоимость товара может быть указана только целым числом и только в рублях. Если вы ввели цену с пробелами или запятыми - она могла отобразиться неверно. Проверьте это!</li>                        
+        <li>Фото не должно содержать названия компании, сайта компании или любую другую рекламную информацию, а так же контактную информацию: телефон, e-mail и т.д.</li>
+      </ul>                      
+    </font>
+  </div>
+  <p style="font-size:15px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#808080 !important;line-height:22px;text-align:center;margin:0;" align="center">
+    Пожалуйста, перейдите в свой <a href="{{ url('user_cabinet_page') }}" target="_blank" style="color:#0077cc;text-decoration:none;" title="Перейти в Личный кабинет">Личный кабинет</a> на сайте,<br>
+    исправьте ошибки в объявлении и включите его снова.
+  </p>
+  <br>&nbsp;<br>  
+{% endblock %}

@@ -1,0 +1,106 @@
+{# Похожие объявления #}           
+{% if similar_advs|length and not adv.Shops %}
+  <div class="adv_similar padding-5 clearfix">
+    <h3>Похожие объявления {{adv.Regions.pagetitle}}:</h3>
+    <table class="table advs-table">        
+      {% for adv in similar_advs if adv %}         
+        <tr>
+          <td{% if adv.HlDate > date() %} class="hl_td"{% endif %}>
+            <div class="col-xs-4 col-sm-2 padding-0 text-center a-image">
+              {% if adv.Youtube %}
+                <div class="youtube-count" title="В объявлении есть видеоролик"></div>
+              {% endif %}
+              {% if adv.virtualColumns.thumb %}
+                <a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="{{ adv.name }}">
+                  <img class="img-rounded" src="{{ asset('images/a/images/') }}{{ adv.virtualColumns.thumb }}"
+                     alt="{{ adv.name }}"
+                     title="{{ adv.name }}">
+                  {% if adv.AdvImagess|length > 1 %}
+                    <span class="photo-count"><span title="{{ adv.AdvImagess|length }} фото">{{ adv.AdvImagess|length }}</span></span>
+                  {% endif %}                    
+                </a>
+              {% elseif adv.Shops is defined and adv.Shops.icon is defined and adv.Shops.icon and adv.userType == 2 %}
+                <a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="{{ adv.name }}">
+                  <img class="img-rounded" src="{{ asset('images/shops/images/') }}{{ adv.Shops.icon }}"
+                    alt="{{ adv.name }}"
+                    title="{{ adv.name }}">
+                </a>
+              {% else %}
+                  <a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="{{ adv.name }}">
+                    <img class="img-rounded" src="/images/no_image.png" alt="Нет изображения" title="{{ adv.name }}">
+                  </a>              
+              {% endif %}
+
+              <div class="visible-xs text-center">
+                <span class="line_price red">
+                  {% if adv.AdvPrices|reverse[0] is defined %}						
+                    {% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+                      <i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                    {% endif %}
+                  {% endif %}
+                  {% if adv.dogovor %}
+                    Договорная
+                  {% else %}
+                    {% if adv.price %}
+                      {{ adv.price|number_format(0, '.', ' ') }} р.
+                    {% else %}
+                      Бесплатно
+                    {% endif %}
+                  {% endif %}								
+                </span><br><small>
+                {% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}
+                  Сегодня
+                {% elseif adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}
+                  Вчера
+                {% else %}
+                  {{ adv.publishDate|date("d.m.y") }}
+                {% endif %}
+                в {{ adv.publishDate|date("H:i") }}</small><br>
+                {% if adv.UpDate|date() != adv.CreateDate|date() %}<img class="use-up" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+            {% if adv.HlDate > date() %}<img class="use-highlight" src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделение" title="Использовано Выделение">{% endif %}
+              </div>
+            </div>
+            <div class="col-xs-8 col-sm-8 padding-5 adv-descr">						
+              {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                {% if adv.UserFavorites.Data[0] is defined and adv.UserFavorites.Data[0].fosUserId == user.id %}
+                  <a class="text-nowrap" id="fav_{{ adv.id }}"
+                     onclick="delete_from_favorite({{ adv.id }})"
+                     title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+                {% else %}
+                  <a class="text-nowrap" id="fav_{{ adv.id }}"
+                     onclick="add_to_favorite({{ adv.id }})"
+                     title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+                {% endif %}
+              {% else %}
+                {% if top_panel.favorites is defined and adv.id in top_panel.favorites %}
+                  <a class="text-nowrap" id="fav_{{ adv.id }}"
+                     onclick="delete_from_favorite_n({{ adv.id }})"
+                     title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+                {% else %}
+                  <a class="text-nowrap" id="fav_{{ adv.id }}"
+                     onclick="add_to_favorite_n({{ adv.id }})"
+                     title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+                {% endif %}
+              {% endif %}
+              <a class="line-name" href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="{{ adv.name }}">{{ adv.name }}</a>
+              <br><span class="grey">{{ adv.AdCategories.name }} {{ adv.Regions.pagetitle }}</span><br>{{ adv.description|truncate(150, true, ' ...') }}
+              </div>
+            <div class="hidden-xs col-sm-2 padding-0 text-center"><span
+                  class="line_price red">
+                  {% if adv.AdvPrices|reverse[0] is defined %}						
+                    {% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+                      <i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                    {% endif %}
+                  {% endif %}
+                  {% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</span><br>
+              <small>{% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}Сегодня{% elseif adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}Вчера{% else %}{{ adv.publishDate|date("d.m.y") }}{% endif %}
+              в {{ adv.publishDate|date("H:i") }}</small><br>
+              {% if adv.UpDate|date() != adv.CreateDate|date() %}<img class="use-up" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+            {% if adv.HlDate > date() %}<img class="use-highlight" src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделение" title="Использовано Выделение">{% endif %}
+              </div>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endif %}

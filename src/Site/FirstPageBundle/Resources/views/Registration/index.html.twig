@@ -1,0 +1,62 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% form_theme form 'SiteFirstPageBundle:Form:fields_fos.html.twig' %}
+{% block title %}Регистрация{% endblock %}
+{% block description %}Зарегистрируйтесь на {{ top_panel.settings.name }} - сайте бесплатных объявлений {% if top_panel.in_town %}{{ top_panel.in_town }}{% else %}в вашем городе{% endif %}.{% endblock %}
+{% block content %}
+    <div class="clearfix">
+        
+
+        {% trans_default_domain 'FOSUserBundle' %}
+        <div class="col-sm-9 clearfix">
+            {# Хлебные крошки #}
+            <div class="clearfix" xmlns:v="http://rdf.data-vocabulary.org/#">
+              <ol class="breadcrumb" itemprop="breadcrumb">
+                <li>
+                  <a href="{{ path('site_first_page_homepage') }}"
+                     title="Главная"
+                     rel="v:url"
+                     property="v:title">Все объявления</a>
+                </li>                
+                <li typeof="v:Breadcrumb">Регистрация</li>            
+              </ol>      
+            </div>            
+            <h1>Регистрация на сайте</h1>
+            <div class="alert alert-warning" role="alert"><b>Внимание!</b> После регистрации на ваш электронный адрес будет отправлено письмо, содержащее ссылку для подтвеждения email.</div>
+            <div class="clearfix">
+              {% if form %}
+                  <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }} onSubmit="fill_form()">
+                      {{ form_widget(form) }}
+                      <div class="padding-5"><button class="btn btn-add pull-right"
+                              type="{{ type|default('submit') }}" {{ block('button_attributes') }} >{{ 'registration.submit'|trans }}</button></div>
+                  </form>
+              {% endif %}
+            </div>
+            <br>
+            {#
+            <hr><br>
+            <h2>Быстрая регистрация через соц.сети</h2>
+            <div class="alert alert-info" role="alert">После автоматической регистрации, необходимо будет заполнить <b>номер телефона</b> в настройках Профиля</div>
+            <div class="clearfix text-center">
+              {% block hwi_oauth_content %}{% for owner in hwi_oauth_resource_owners() %}
+              <span class="social_link link" onclick="get_page('{{ hwi_oauth_login_url(owner) }}')" title="Войти через аккаунт в соц.сети">
+                <img class="autorization_social" src="{{ asset('bundles/sitefirstpage/images/'~owner~'.png') }}" alt="Войти" title="Войти">
+              </span>{% endfor %}{% endblock hwi_oauth_content %}
+            </div>
+            #}
+			<br><br>
+        </div>
+        <div class="col-sm-3">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Информация</h3>
+                </div>
+                <div class="panel-body">
+                    При регистрации укажите свой действующий электронный адрес - он будет вашим логином для входа на
+                    сайт. На этот адрес мы вышлем инструкции в случае утери пароля, а также всю информацию о ваших
+                    объявлениях. Email необходимо подтвердить перейдя по ссылке в приветственном письме. Это позволит вам получать сообщения от посетителей сайта на электронную почту. Укажите ваше имя, чтобы к вам было удобно обращаться. Укажите действительный номер
+                    телефона чтобы пользователи могли связаться с вами.
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

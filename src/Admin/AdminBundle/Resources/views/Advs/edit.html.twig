@@ -1,0 +1,205 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% form_theme form 'AdminAdminBundle:Form:fields.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/adminadmin/css/jquery.fancybox.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/adminadmin/css/jquery.fancybox-thumbs.css') }}" rel="stylesheet">    
+{% endblock %}
+    
+{% block content %}
+    <h1>Редактирование объявления</h1>
+    <div class="clearfix"><br></div>
+    {% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage|raw }}
+        </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('alert1') %}
+        <div class="alert alert-danger">
+            {{ flashMessage|raw }}
+        </div>
+    {% endfor %}
+	{% for flashMessage in app.session.flashbag.get('alert_similar') %}
+        <div class="alert alert-danger">
+            {{ flashMessage|raw }}
+        </div>
+    {% endfor %}
+	{% if similar_adv %}
+		<div class="alert alert-danger" role="alert">
+			{{ similar_adv|raw }}
+		</div>
+	{% endif %}
+
+    <div class="clearfix">
+        {% for complaine in adv.AdvComplaines if complaine %}
+            <div class="alert alert-danger" role="alert">
+                <a href="{{ path('admin_admin_userdetailpage',{'id': complaine.FosUserId }) }}" title="Перейти к странице пользователя">Пользователь</a> {{ complaine.date|date("d.m.Y") }} пожаловался: "{{ complaine.complaine }}"
+                <a class="btn btn-default" href="{{ path('admin_admin_delcomplainepage',{'id': complaine.id}) }}">Удалить жалобу</a>
+            </div>
+        {% endfor %}
+        {% if form %}
+            <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+                {{ form_errors(form) }}
+                {{ form_row(form.deleted) }}
+                {{ form_row(form.enabled) }}
+                {{ form_row(form.moder_approved) }}
+				{% if adv.AdCategories.id == 133 %}<div class="form-group"><div class="col-sm-offset-3 col-sm-9"><strong class="red">Вакансия!</strong> Необходима тщательная проверка. В случае сомнений отключить от партнерки Яндекса</div></div>{% endif %}
+				{% if adv.AdCategories.id == 22 %}<div class="form-group"><div class="col-sm-offset-3 col-sm-9"><strong class="red">Авто!</strong> Необходима тщательная проверка. В случае сомнений отключить от партнерки Яндекса</div></div>{% endif %}
+				{% if adv.AdCategories.id == 29 %}<div class="form-group"><div class="col-sm-offset-3 col-sm-9"><strong class="red">Квартира!</strong> Необходима тщательная проверка. В случае сомнений отключить от партнерки Яндекса</div></div>{% endif %}
+				{% if adv.AdCategories.id == 125 %}<div class="form-group"><div class="col-sm-offset-3 col-sm-9"><strong class="red">Комната!</strong> Необходима тщательная проверка. В случае сомнений отключить от партнерки Яндекса</div></div>{% endif %}
+				{{ form_row(form.yandex_partner) }}
+                <div class="form-group"><div class="col-sm-offset-3 col-sm-9"><button type="submit" id="advs_save" class="btn btn-primary">Сохранить</button> <button type="button" id="advs_town_delete" class="btn btn-default" data-town="{{ adv.Regions.name }}" data-in="{{ adv.Regions.PageTitle }}"><i class="fa fa-fw fa-magic"></i> Убрать город</button> <button type="button" id="adv_approve_button" class="btn btn-success">Одобрить</button></div></div>
+                {{ form_row(form.name) }}
+                {{ form_row(form.description) }}
+				{{ form_row(form.site) }}
+                {{ form_row(form.price) }}
+				{{ form_row(form.area_id) }}
+                {{ form_row(form.region_id) }}
+                {{ form_row(form.user_id) }}
+                {{ form_row(form.id) }}
+                {{ form_row(form.cnt) }}
+                {{ form_row(form.create_date) }}
+                {{ form_row(form.publish_date) }}
+                {{ form_row(form.publish_before_date) }}                
+                {{ form_row(form.user_name) }}
+                {{ form_row(form.user_email) }}
+                {{ form_row(form.user_type) }}
+                {{ form_row(form.company_name) }}
+                {{ form_row(form.shop_id) }}                
+                {{ form_row(form.phone) }}
+				{{ form_row(form.skype) }}
+                {{ form_row(form.category_id) }}                
+                {{ form_row(form.dogovor) }}
+                {{ form_row(form.torg) }}
+                <div class="form-group">
+                    {% if images %}
+                        <label class="col-sm-3 control-label">Изображения</label>
+                        <div class="col-sm-9 adv_images">
+                            {% for image in images %}
+                                <div class="upload_img">
+                                    <a class="fancybox-thumb" rel="fancybox-thumb" href="/images/a/images/{{ image.path }}" title="{{ image.id }}">
+                                      <img src="/images/a/images/{{ image.thumb }}" alt="{{ image.id }}">
+                                    </a>                                    
+                                </div>                                
+                            {% endfor %}
+                            {% if videos %}
+                                {% for video in videos %}
+                                    <div class="upload_img">
+                                        <a href="javascript:void(0);" onclick="$('#img_{{ video.id }}').modal('show')">
+                                            <img src="/images/video_upload.png">
+                                        </a>
+                                    </div>
+                                    <div class="modal fade" id="img_{{ video.id }}" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog image_modal">
+                                            <div class="modal-content">
+                                                <video controls="controls" width="400" height="300"><source src="/images/advs/videos/{{ video.path }}" type="video/mp4" /></video>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="form-group"><div class="col-sm-offset-3 col-sm-9"><button type="submit" class="btn btn-primary">Сохранить</button></div></div>
+                <hr>
+                <h4>Дополнительные поля:</h4>
+                {{ form_rest(form) }}
+                <hr>
+                <div class="form-group"><div class="col-sm-offset-3 col-sm-9"><button type="submit" class="btn btn-primary">Сохранить</button></div></div>
+                <h4>Пакет услуг:</h4>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Название пакета:</label>
+                    <div class="col-sm-9">
+                        <h5>{% if adv.AdvPacketss[0] is defined %}{{ adv.AdvPacketss[0].Packets.Name }}{% endif %}</h5>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Статус оплаты:</label>
+                    <div class="col-sm-9">
+                        <h5>{% if adv.AdvPacketss[0] is defined %}{% if adv.AdvPacketss[0].Paid == 0 %}Не оплачено{% else %}Оплачено {{ adv.AdvPacketss[0].PaidDate|date("d.m.Y") }}{% endif %}{% endif %}</h5>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Окончание действия:</label>
+                    <div class="col-sm-9">
+                        <h5>{% if adv.AdvPacketss[0] is defined %}{{ adv.AdvPacketss[0].UseBefore|date("d.m.Y") }}{% endif %}</h5>
+                    </div>
+                </div>
+                <hr>
+                <div class="form-group"><div class="col-sm-offset-3 col-sm-9"><button type="submit" class="btn btn-primary">Сохранить</button></div></div>
+            </form>
+        {% endif %}
+    </div>
+	<div class="highlight clearfix">
+        <div class="col-sm-4">
+			<h2>График просмотров</h2>
+			<div id="area-chart"></div>
+		</div>
+		<div class="col-sm-4">
+			<h2>Статистика просмотров</h2>
+			<table class="table table-hover">
+				<thead><tr><th>Дата</th><th>Просмотров</th><th>Кликов</th></tr></thead><tbody>
+				{% for data in adv.stats if data %}                
+					<tr>
+						<td>{{ data.statDate|date_modify("-1 day")|date('d.m.Y') }}</td><td>{{ data.shows }}</td><td>{{ data.clicks }}</td>
+					</tr>
+				  {% endfor %}
+				  </tbody>
+			</table>
+		</div>
+		<div class="col-sm-4">
+			<h2>Операции</h2>
+			<table class="table table-hover">
+				<thead><tr><th>Дата</th><th>Редактор</th><th>Операция</th></tr></thead><tbody>
+				{% for data in adv.advsModerStats if data %}                
+					<tr>
+						<td>{{ data.statDate|date('d.m.Y H:i') }}</td><td>{{ data.User.realname }}</td><td>{{ data.operation }}</td>
+					</tr>
+				  {% endfor %}
+				  </tbody>
+			</table>
+		</div>
+	</div>     
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_advspage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+    <div class="clearfix"><br></div>
+	
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/adminadmin/js/jquery.fancybox.js') }}"></script>
+    <script src="{{ asset('bundles/adminadmin/js/jquery.fancybox-thumbs.js') }}"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("[rel='fancybox-thumb']").fancybox({
+          helpers : {
+            thumbs : true
+          }
+        });
+      });
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="{{ asset('bundles/adminadmin/js/morris.min.js') }}"></script>
+    <script>
+      Morris.Line({
+        element: 'area-chart',
+        data: [
+          {% for data in adv.stats if data %}                
+            { 'period': "{{ data.statDate|date_modify("-1 day")|date('Y-m-d') }}", 'Кликов': {{ data.clicks }}, 'Просмотров': {{ data.shows }} },
+          {% endfor %}
+          { 'period': "{{ "now"|date('Y-m-d') }}", 'Кликов': {{ adv.cntTelToday }}, 'Просмотров': {{ adv.cntToday }} }
+        ],
+        xkey: "period",
+        ykeys: ['Кликов', 'Просмотров'],
+        labels: ['Кликов','Просмотров'],
+        lineColors: ['#F44336','#4CAF50'],
+        hideHover: 'auto',
+        fillOpacity: 0.5,
+        resize:true
+      });
+    </script>
+{% endblock %}

@@ -1,0 +1,304 @@
+{% extends ['::base.html.twig', 'HWIOAuthBundle::layout.html.twig'] %}
+
+{% block meta %}  
+  <meta property="og:url" content="{{ top_panel.settings.url }}" />
+  <title>{% block title %}{{ top_panel.settings.title }}{% endblock %} | {{ top_panel.settings.name }}</title>
+    <meta name="keywords" content="{% block keywords %}{{ top_panel.settings.keywords }}{% endblock %}" />
+    <meta name="description" property="og:description" content="{% block description %}{{ top_panel.settings.description }}{% endblock %}" />    
+    <meta name="author" content="{{ top_panel.settings.name }}">
+    <meta name="copyright" content="{{ top_panel.settings.name }}">
+    <meta property="og:title" content="{% block metatitle %}{{ top_panel.settings.title }}{% endblock %} | {{ top_panel.settings.name }}" />
+    <meta property="og:image" content="{% block metaimage %}{{ top_panel.settings.url }}/favicon-96x96.png{% endblock %}"/>
+    <meta property="og:site_name" content="{{ top_panel.settings.name }}" />    
+    <meta name="apple-mobile-web-app-title" content="{{ top_panel.settings.name }}">
+    <link href="{{ top_panel.settings.url }}/open_search_ru.xml" rel="search" type="application/opensearchdescription+xml" title="{{ top_panel.settings.name }}" />
+    <script type="application/ld+json">{"@context": "http://schema.org", "@type": "WebSite", "url": "{{ top_panel.settings.url }}", "name" : "{{ top_panel.settings.name }}", "alternateName" : "{{ top_panel.settings.title }} {{ top_panel.settings.name }}", "sameAs" : ["{{ top_panel.settings.fb }}", "{{ top_panel.settings.twitter }}", "{{ top_panel.settings.vk }}" ], "potentialAction": {"@type": "SearchAction", "target": "{{ top_panel.settings.url }}/russia/search?sq={search_query}", "query-input": "required name=search_query"}}</script>
+    <script type="application/ld+json">{"@context": "http://schema.org", "@type": "Organization", "url": "{{ top_panel.settings.url }}", "logo": "{{ top_panel.settings.url }}/icon.png", "sameAs" : ["{{ top_panel.settings.fb }}", "{{ top_panel.settings.twitter }}", "{{ top_panel.settings.vk }}"]}</script>
+{% endblock %}
+
+{% block stylesheets %}	
+  {{ parent() }}  
+  <link href="{{ asset('bundles/sitefirstpage/css/style.css') }}" rel="stylesheet">
+  <link href="{{ asset('bundles/sitefirstpage/css/bootstrap-select.min.css') }}" rel="stylesheet">
+{% endblock %}
+{% block stylesheets_ext %}
+  {{ parent() }}
+  {#<link href="{{ asset('bundles/sitefirstpage/css/bootstrap-select.min.css') }}" rel="stylesheet">#}
+{% endblock %}
+
+	{% block body %}
+		<div class="top_p">
+      <div class="container">
+        <div class="loading" id="page_loading">
+          <span></span>
+        </div>
+        <div class="to_top"><a href="#" title="Вернуться наверх"><img width="30" height="30" src="/images/up.svg" alt="Наверх" title="Наверх"></a></div>
+        {% block content_header %}          			
+          {# Меню сайта #}          
+          <nav class="navbar navbar-default navbar-static-top">
+            <div class="clearfix">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                  <span class="sr-only">Навигация</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                </button>                
+                <button type="button" class="navbar-toggle mmap collapsed" data-toggle="modal" data-target="#townModal">
+                  <img width="25" height="25" src="/images/location.svg" alt="Выбрать регион" title="Выбрать регион">
+                </button>
+                {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                  <a class="navbar-toggle mmap" href="{{ path('user_cabinet_page') }}" title="Настройки моего профиля">
+                    {% if app.user.photo %}
+                      <img width="25" height="25" class="img-circle" src="/images/users/photos/{{ app.user.photo }}" alt="{{ app.user.realname }}" title="{{ app.user.realname }}">
+                    {% else %}
+                      <img width="25" height="25" src="/images/user.svg" alt="{{ app.user.realname }}" title="{{ app.user.realname }}">
+                    {% endif %}
+                  </a>
+                {% else %}
+                  <a class="navbar-toggle mmap" data-title="Войти" data-toggle="modal" data-target="#login-form" title="Войти">
+                    <img width="25" height="25" src="/images/user.svg" alt="Войти" title="Войти">
+                  </a>
+                {% endif %}
+                <a class="navbar-toggle mmap" href="{{ url('add_adv_page', { region: top_panel.url_region }) }}" title="Подать объявление{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}"><img width="25" height="25" src="/images/add.svg" alt="Подать объявление" title="Подать объявление"></a>                
+                <span id="current_town">{% if top_panel.current_region %}{{ top_panel.current_region }}{% endif %}</span>
+                <span id="current_area">{% if top_panel.current_area %}{{ top_panel.current_area }}{% endif %}</span>
+                <a class="navbar-brand" href="{{ url('site_first_page_homepage', {region: top_panel.url_region}) }}">
+                  <img class="logo" src="/images/{{ top_panel.settings.logo }}" alt="{{ top_panel.settings.name }}" title="{{ top_panel.settings.title }} {{ top_panel.settings.name }}">
+				</a>						
+              </div>
+              <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">                  							
+                  <li{% if app.request.attributes.get('_route') == 'site_shops_homepage' or app.request.attributes.get('_route') == 'site_shop_advspage' %} class="active"{% endif %}>
+                    <a href="{{ path('site_shops_homepage',{ region: top_panel.url_region }) }}" title="Компании и магазины{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}"><img width="25" height="25" src="/images/business.svg" alt="Компании и магазины" title="Компании и магазины"> Компании и магазины</a></li>							
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                  {% if is_granted("ROLE_ADMIN") %}
+                    <li><a href="{{ path('admin_admin_homepage') }}"><img width="25" height="25" src="/images/admin.svg" alt="Администрирование" title="Администрирование"> Администрирование</a></li>
+                  {% endif %}                  
+                  {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                    {% if app.user.UserMessagess|length %}
+                      {% set msg_cnt = 0 %}
+                      {% for msg in app.user.UserMessagess %}
+                        {% if not msg.viewed %}{% set msg_cnt = msg_cnt+1 %}{% endif %}
+                      {% endfor %}                    
+                      {% if msg_cnt %}<li><a href="{{ path('user_messages_page') }}"><img width="25" src="/images/email.svg" alt="Непрочитанные сообщения" title="Непрочитанных сообщений: {{ msg_cnt }}"></a></li>{% endif %}
+                    {% endif %}
+                    <li><a id="fav_advs_head" href="{{ path('user_favorites_page') }}" title="В избранное" rel="nofollow"><img width="25" src="/images/bookmark.svg" alt="Избранное" title="Избранное"><span class="hidden-sm"> Избранное</span>{% if app.user.UserFavorites|length %} <span class="label label-default" id="fav_count_m">{{ app.user.UserFavorites|length}}</span>{% endif %}</a></li>
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                        {% if app.user.photo %}
+                          <img width="30" class="img-circle" src="/images/users/photos/{{ app.user.photo }}" alt="{{ app.user.realname }}" title="{{ app.user.realname }}">
+                        {% else %}
+                          <img alt="{{ app.user.realname }}" title="{{ app.user.realname }}" width="25" height="25" src="/images/user.svg">
+                        {% endif %} <span class="hidden-sm">{{ app.user.realname }}</span> <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a href="{{ path('user_cabinet_page') }}" title="Настройки моего профиля"><img width="20" height="20" src="/images/profile.svg" alt="Профиль" title="Профиль"> Профиль</a></li>
+                        <li><a href="{{ path('user_balance_page') }}" title="Кошелек"><img width="20" height="20" src="/images/wallet.svg" alt="Кошелек" title="Кошелек"> Кошелек</a></li>										
+                        <li><a href="{{ path('user_advs_page') }}" title="Мои объявления"><img width="20" height="20" src="/images/ob.svg" alt="Объявления" title="Объявления"> Объявления</a></li>
+                        {% if app.user.Shopss|length %}
+                          <li><a href="{{ path('user_companies_page') }}" title="Мои компании"><img width="20" height="20" src="/images/business.svg" alt="Компании" title="Компании"> Компании</a></li>
+                        {% endif %}
+                        <li><a href="{{ path('user_messages_page') }}"><img width="20" height="20" src="/images/messages.svg" alt="Сообщения" title="Сообщения"> Сообщения</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="{{ path('fos_user_security_logout') }}" title="Выход"><img width="20" height="20" src="/images/logout.svg" alt="Выход" title="Выход"> Выход</a></li>
+                      </ul>
+                    </li>								
+                  {% else %}
+                    <li><a id="fav_advs_head" href="{{ path('favorites_page') }}" title="В избранное"><img width="25" height="25" src="/images/bookmark.svg" alt="Избранное" title="Избранное"><span class="hidden-sm"> Избранное</span>{% if top_panel.favorites|length %} <span class="label label-default" id="fav_count_m">{{ top_panel.favorites|length}}</span>{% endif %}</a></li>
+                    <li><a class="link" data-title="Войти" data-toggle="modal" data-target="#login-form" title="Войти"><img width="25" height="25" src="/images/user.svg" alt="Войти" title="Войти"> <span class="hidden-sm">Войти</span></a></li>
+                  {% endif %}
+                  <li class="hidden-xs"><a class="btn btn-addnew" href="{{ url('add_adv_page', { region: top_panel.url_region }) }}" title="Подать объявление{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">Подать объявление</a></li>
+                </ul>
+              </div>					
+            </div>
+          </nav>          
+          {# Строка поиска #}
+          <div class="search-l">
+            <div class="search_line clearfix">
+              {% if search_form %}{% embed "SiteFirstPageBundle:Default:advs_search_form.html.twig" %}{% endembed %}{% endif %}
+            </div>
+          </div>
+        {% endblock %}
+      </div>
+    </div>
+    {% block pre_content %}{% endblock %}
+    <div class="lpage">
+    <div class="container">
+    {# Основной блок сайта #}
+    <div id="content">{% block content %}{% endblock %}</div>
+		
+		{# Авторизация #}
+    <!--noindex-->
+		<div class="modal fade login-form" id="login-form" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+						<h4 class="modal-title"><img width="25" height="25" src="/images/user.svg" alt="Вход на сайт" title="Вход на сайт"> Вход на сайт</h4>
+          </div>
+					<div class="modal-body clearfix">{% if error is defined and error %}
+						<span>{{ error }}</span>{% endif %}
+						<form action="{{ path("fos_user_security_check") }}" method="post">
+							<input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
+							<div class="form-group">
+								<input class="form-control" placeholder="Email" type="text" id="username" size="40" name="_username" value="{{ last_username }}" required="required"/>
+						    </div>
+							<div class="form-group">
+								<input class="form-control" type="password" placeholder="Пароль" id="password" size="40" name="_password" required="required" autofocus/>
+							</div>              
+							{% if error %}<div class="alert alert-danger">{{ error|trans({}, 'FOSUserBundle') }}</div><br>{% endif %}
+							<button class="btn btn-addnew pull-right" type="submit"><i class="fa fa-sign-in"></i>&nbsp;{{ 'security.login.submit'|trans({}, 'FOSUserBundle') }}</button>
+							<span title="Сброс пароля" class="pass_forgot link blue" onclick="get_page('{{ path('fos_user_resetting_request') }}')">Забыли пароль?</span><br>
+							<a class="link" href="{{ path('user_registration_register', { region: top_panel.url_region}) }}" title="Регистрация">Регистрация</a>
+						</form>
+					</div>
+					
+          <div class="modal-footer text-center">{% block hwi_oauth_content %}{% for owner in hwi_oauth_resource_owners() %}
+						<span class="social_link link" onclick="get_page('{{ hwi_oauth_login_url(owner) }}')" title="Войти через аккаунт в соц.сети">
+							<img class="autorization_social" width="40" height="40" src="{{ asset('bundles/sitefirstpage/images/'~owner~'.png') }}" alt="Войти" title="Войти">
+						</span>{% endfor %}{% endblock hwi_oauth_content %}
+					</div>
+          
+				</div>
+			</div>
+		</div>
+    <!--/noindex-->
+		
+		{# Сообщения пользователям #}
+    <!--noindex-->
+		<div class="modal fade" id="postModal" tabindex="-1" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+						<strong class="modal-title" id="exampleModalLabel"><img width="25" height="25" src="/images/messages.svg" alt="Отправить сообщение" title="Отправить сообщение"> Отправить сообщение</strong>
+					</div>
+					<form action="{{ path('send_mail_page') }}" method="POST">
+						<div class="modal-body">
+							<input class="recipient_id" type="hidden" hidden name="recipient_id">
+							<input class="adv_id" type="hidden" hidden name="adv_id">
+							<div class="form-group">
+								<label class="control-label">Ваше имя:</label>
+								<input type="text" class="form-control" name="sender_name" required{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %} value="{{ app.user.realname }}"{% endif %}>
+							</div>
+							<div class="form-group"><label class="control-label">Ваша электронная почта:</label>
+								<input type="text" class="form-control" name="sender_email" required{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %} value="{{ app.user.email }}"{% endif %}>
+							</div>
+              <div class="form-group"><label class="control-label">Ваш телефон:</label>
+								<input type="text" class="form-control" name="sender_phone"{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %} value="{{ app.user.phone }}"{% endif %}>
+							</div>
+							<div class="form-group"><label class="control-label">Текст сообщения:</label>
+								<textarea class="form-control" name="message_text" required rows="4"></textarea>
+							</div>
+						</div>
+						<div class="modal-footer">
+              <button type="submit" class="btn btn-addnew"><i class="fa fa-paper-plane fa-fw"></i> Отправить</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>							
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+    <!--/noindex-->
+		
+		{# Сообщения пользователям от Администрации #}
+		{% if is_granted("ROLE_ADMIN") or is_granted("ROLE_MODER") %}
+      <!--noindex-->
+			<div class="modal fade" id="postAdminModal" tabindex="-1" role="dialog" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+							<strong class="modal-title" id="exampleModalLabel">Отправить сообщение</strong>
+						</div>
+						<form action="{{ path('send_mail_admin_page') }}" method="POST">
+							<div class="modal-body">
+								<input class="recipient_id" type="hidden" hidden name="recipient_id">
+								<input class="adv_id" type="hidden" hidden name="adv_id">
+								<div class="form-group">
+									<label class="control-label">Текст сообщения:</label>
+									<textarea class="form-control" name="message_text" required></textarea>
+								</div>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+								<button type="submit" class="btn btn-default">Отправить</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		<!--/noindex--> 
+		{% endif %}
+		
+		{# Выбор региона #}
+		<!--noindex-->
+		<div class="modal fade region_select" id="townModal" role="dialog" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span aria-hidden="true">&times;</span></button>						            						
+						<h3 class="modal-title"><img width="25" height="25" src="/images/location.svg" alt="Выбрать регион" title="Выбрать регион"> Выбор региона</h3>
+          </div>
+					<div class="modal-body clearfix">						
+						<div class="clearfix"><div class="col-sm-6 padding-5"><select id="area_select" class="form-control filter_params"><option>Выберите регион</option>{% for area in top_panel.areas %}<option value="{{ area.id }}"{% if top_panel.current_area and area.id == top_panel.current_area.id %} selected {% endif %}>{{ area.name }}</option>{% endfor %}</select></div><div class="col-sm-6 padding-5"><select id="region_select" class="form-control filter_params">{% if top_panel.area_regions %}<option value="{{ top_panel.current_area.alias }}">Выберите город</option><option value="{{ top_panel.current_area.alias }}">Весь регион</option>{% for area_region in top_panel.area_regions %}<option value="{{ area_region.alias }}"{% if top_panel.current_region and area_region.id == top_panel.current_region.id %} selected {% endif %}>{{ area_region.name }}</option>{% endfor %}{% else %}<option>Выберите город</option>{% endif %}</select></div></div>
+            <div class="clearfix towns_r">
+							{% for town in top_panel.regions if town %}<div class="padding-5"><a{% if town.type == 1 %} class="big_t"{% endif %} onclick="get_page('{{ path('site_first_page_homepage',{region: town.alias}) }}')" title="Объявления {{ town.net }}">{{ town.name }}</a></div>{% endfor %}
+						</div>	
+					</div>
+          <div class="modal-footer text-center">
+            <a class="btn btn-addnew" onclick="get_page('/');" title="Все регионы и города">Все регионы и города</a>
+          </div>					
+				</div>
+			</div>
+		</div>
+    <!--/noindex-->
+			
+		{# Symphony #}    
+		{% if code is defined %}
+      <!--noindex-->
+        <h2>Code behind this page</h2>
+        <div class="block"><div class="symfony-content">{{ code|raw }}</div></div>
+      <!--/noindex-->
+		{% endif %}    
+	</div>
+  </div>
+{% endblock %}
+
+{% block footer %}
+	{# Подвал сайта #}
+	<footer class="footer">
+		<div class="container">
+			<div class="col-sm-9 padding-5">
+				{% if menu is defined %}
+					<div class="clearfix">
+						<ul>
+							<li><a href="{{ url('add_adv_page', { region: 'russia'}) }}" title="Подать объявление бесплатно{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">Подать объявление</a></li>
+							{% for menu_item in menu if menu_item %}<li><a href="{{ url('site_pages_page', {'alias' : menu_item.path} ) }}" title="{{ menu_item.name }}">{{ menu_item.name }}</a></li>{% endfor %}
+							{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}<li><a href="{{ url('site_add_shop_page', { region: 'russia'}) }}" title="Размещение компании на сайте{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">Компаниям</a></li>{% else %}<li><a href="{{ url('site_pages_page', {'alias' : 'razmecshenie-kompanii-na-sajte'} ) }}" title="Размещение компании на сайте{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">Компаниям</a></li>{% endif %}							
+						</ul>
+					</div>
+				{% endif %} 
+        {% if not is_granted("ROLE_ADMIN") %}
+          <div class="clearfix padding-5">{{ top_panel.settings.counters|raw }}</div>
+        {% endif %}        
+			</div>      
+			<div class="col-sm-3 clearfix padding-5 text-left">
+				{% if top_panel.settings.fb %}<a href="{{ top_panel.settings.fb }}" title="{{ top_panel.settings.name }} в Facebook" target="_blank"><i class="fa fa-facebook fa-2x fa-fw"></i></a>&nbsp;{% endif %}
+				{% if top_panel.settings.vk %}<a href="{{ top_panel.settings.vk }}" title="{{ top_panel.settings.name }} в ВКонтакте" target="_blank"><i class="fa fa-vk fa-2x fa-fw"></i></a>&nbsp;{% endif %}
+				{% if top_panel.settings.twitter %}<a href="{{ top_panel.settings.twitter }}" title="{{ top_panel.settings.name }} в Twitter" target="_blank"><i class="fa fa-twitter fa-2x fa-fw"></i></a>{% endif %}        
+        
+			</div>      
+		</div>
+	</footer>
+	<div id="fb-root"></div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}	
+	<script src="{{ asset('bundles/sitefirstpage/js/form.js?1') }}"></script>
+	<script src="{{ asset('bundles/sitefirstpage/js/bootstrap-typeahead.js') }}"></script>
+	<script src="{{ asset('bundles/sitefirstpage/js/bootstrap-select.min.js') }}"></script>
+	{% if not top_panel.current_region and app.request.attributes.get('_route') == 'site_first_page_homepage' %}{% if top_panel.geo_town %}{% if top_panel.current_area.id is not defined or top_panel.geo_town.Areas.id == top_panel.current_area.id %}<script>$(window).load(function(){if(!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){var url='{{ path('site_first_page_homepage',{region: top_panel.geo_town.alias}) }}'; var town='{{ top_panel.geo_town.name }}';$('#ttown').popover({content:'<img width="25" height="25" src="/images/my_location.svg" class="first_page_img pull-right" alt="Ваше местонахождение" title="Ваше местонахождение">Ваш город:<br><strong>'+town+'</strong><hr><a class="btn btn-xs btn-success" href="'+url+'">Да, верно!</a> <a class="btn btn-xs btn-default" href="#" data-toggle="modal" data-target="#townModal">Нет, другой</a>',placement:'bottom',html:'true'}).popover('show');}});</script>{% endif %}{% endif %}{% endif %}
+	<script>$(document).ready(function(){var town=$('#region').val();var area=$('#area').val();$('#sq').typeahead({source:function(query,process){return $.post('/all_advs',{area:area,town:town,sq:query},function(data){return process(data);});}});});</script>
+	  
+{% endblock %}

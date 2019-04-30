@@ -1,0 +1,57 @@
+{% form_theme form 'SiteFirstPageBundle:Form:edit.html.twig' %}
+{% use 'SimpleThingsFormExtraBundle:Form:field_type_help.html.twig' %}
+
+        {% trans_default_domain 'FOSUserBundle' %}
+
+        {% if form %}            
+                <div id="add_adv" class="clearfix">
+                    <form class="padding-0 clearfix" id="add_adv_form" role="form" method="POST" {{ form_enctype(form) }}>
+                        {{ form_errors(form) }}
+                        {{ form_row(form.id) }}                        
+                        {{ form_row(form.enabled) }}
+                        <br>
+                        {{ form_row(form.name) }}
+                        {% if form.shop_id is defined %}{{ form_row(form.shop_id) }}{% endif %}
+                        {{ form_row(form.phone) }}
+                        {{ form_row(form.skype) }}
+                        {{ form_row(form.category_id) }}
+                        <div id="area">
+                            {% if form.area_id is defined %}{{ form_row(form.area_id) }}{% endif %}
+                        </div>
+                        <div id="town">
+                            {% if form.region_id is defined %}{{ form_row(form.region_id) }}{% endif %}
+                        </div>
+                        {{ form_row(form.description) }}
+                        {{ form_row(form.site) }}
+                        {{ form_row(form.price) }}
+                        {{ form_row(form.dogovor) }}
+                        {{ form_row(form.torg) }}
+                        <div class="form-group form-site">
+                            {{ form_label(form.image) }}
+                            {% if images %}
+                                <div class="col-sm-7 adv_images padding-5 clearfix">                                    
+                                  {{ form_widget(form.image) }}<br>
+                                    {% for image in images %}
+                                        <div class="upload_img">
+                                            <img id="img_{{ image.id }}"
+                                                 src="/images/a/images/{{ image.path }}?timestamp={{ "now"|date("His") }}">
+                                            <span class="image_delete link" onclick="imgDelete({{ image.id }})"
+                                                  title="удалить изображение"><i class="fa fa-trash-o"></i></span>
+                                            {% if image.tempId != 0 %}<span class="image_rotate link"
+                                                                            onclick="imgRotate({{ image.id }})"
+                                                                            title="повернуть изображение"><i class="fa fa-repeat"></i></span>{% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {{ form_row(form.youtube) }}
+                        {{ form_rest(form) }}                        
+                        <div class="form-group form-site clearfix">
+                            <div class="col-sm-offset-5 col-sm-7 padding-5">
+                                <button type="submit" class="btn btn-add pull-right" id="advs_save">Сохранить</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+        {% endif %}

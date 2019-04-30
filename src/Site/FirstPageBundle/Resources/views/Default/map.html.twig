@@ -1,0 +1,133 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title %}Объявления на карте: {{ category.pagetitle }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% endblock %}
+{% block metatitle %}Объявления на карте: {{ category.pagetitle }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% endblock %}
+{% block description %}{% if category.CatchPhrase %}{{ category.CatchPhrase }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% else %}{{ category.pagetitle }} - объявления на карте о продаже, покупке и предложении услуг от частных лиц и компаний{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% endif %}{% endblock %}
+{% block keywords category.pagetitle~',объявления,купить,продать' %}
+    {% block metaimage asset('images/categories/')~category.parent.icon %}
+
+        {% block content %}
+            <div class="clearfix" xmlns:v="http://rdf.data-vocabulary.org/#">
+                <ol class="breadcrumb">
+                    <li typeof="v:Breadcrumb"><a
+                                href="{{ path('site_first_page_homepage', { region: top_panel.url_region }) }}"
+                                title="Все объявления{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}"
+                                rel="v:url" property="v:title">Все
+                            объявления{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}</a></li>
+                    {% if category.parent and category.parent.alias != category.alias %}
+                        <li typeof="v:Breadcrumb"><a
+                                    href="{{ path('site_category_page', { alias: category.parent.alias, region: top_panel.url_region }) }}"
+                                    title="{{ category.parent.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}"
+                                    rel="v:url" property="v:title">{{ category.parent.name }}</a></li>
+                    {% endif %}
+                    <li class="active" typeof="v:Breadcrumb"><a
+                                href="{{ path('site_category_page', { alias: category.alias, region: top_panel.url_region }) }}"
+                                title="{{ category.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}"
+                                rel="v:url" property="v:title">{{ category.name }}</a></li>
+                </ol>
+            </div>
+            <div class="clearfix">
+                <h1 class="map-small">Объявления на
+                    карте: {{ category.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}</h1>
+            </div>
+            <div class="map clearfix">
+
+                <div class="advs_map">
+
+                    <div id="imap"></div>
+
+                </div>
+            </div>
+            <div class="clearfix">
+                <br>
+
+                <div class="clearfix">
+                    <span class="map_sale">Продажа</span>
+                    <span class="map_arend">Аренда</span><br class="visible-xs"><br class="visible-xs">
+                    <span class="map_sale">3</span> - количество комнат
+                </div>
+                <br>
+
+                <p class="padding-5">При нажатии на объект - краткая информация об объекте и ссылка на объявление</p>
+                <hr>
+                {% if category.CatchPhrase is defined %}
+                    {% if category.CatchPhrase %}
+                        <p class="padding-0">{{ category.CatchPhrase }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ parent() }}
+            <script src="//api-maps.yandex.ru/2.1/?lang=ru-RU&load=package.full" type="text/javascript"></script>
+            {#
+            <script type="text/javascript">
+                ymaps.ready(init);
+
+                function init() {
+                    if ( $('#current_town').text() ) { var city = $('#current_town').text(); var zoom=11; } else { var city='Россия'; var zoom=4; }
+                    ymaps.geocode(city, { results: 1 }).then(function (res) {
+                        var firstGeoObject = res.geoObjects.get(0),
+                                myMap = new ymaps.Map("imap", {
+                                    center: firstGeoObject.geometry.getCoordinates(),
+                                    zoom: zoom,
+                                    type: 'yandex#map',
+                                    behaviors: ['default', 'scrollZoom'],
+                                    controls: ['largeMapDefaultSet']
+                                }),
+                          clusterer = new ymaps.Clusterer({
+                            preset: 'islands#invertedDarkBlueClusterIcons',
+                            groupByCoordinates: false,
+                            clusterDisableClickZoom: true,
+                            clusterHideIconOnBalloonOpen: false,
+                            geoObjectHideIconOnBalloonOpen: false
+                        });
+                          myMap.geoObjects.add(clusterer);
+                        //myMap.container.fitToViewport();
+                        addAdvs(clusterer);
+                    });
+
+                    function addAdvs(clusterer) {
+
+                        {% for adv in advs %}
+                            {% if adv.coordinates %}
+                                clusterer
+                                    .add(new ymaps.Placemark({{ adv.coordinates }}[0], {
+                                            balloonContentHeader: "{{ adv.name|upper }}<hr>",
+                                            balloonContentBody: "<div class='text-center'>{% if adv.AdvImagess.Data[0] is defined %}<img class='pull-left' src='{{ asset('images/a/images/') }}{{ adv.AdvImagess.Data[0].Thumb }}' alt='{{ adv.name }}' title='{{ adv.name }}'>{% endif %}<h4>{{ adv.price|number_format(0, '.', ' ') }} руб.</h4><a class='btn btn-primary' href='{{ path('site_adv_page',{ 'id' : adv.id }) }}' title='Перейти к объявлению'>Перейти к объявлению</a></div>",
+                                            hintContent: "{{ adv.name|upper }}"
+                                        }, {
+                                            preset: 'islands#nightDotIcon',
+                                        }));
+                            {% endif %}
+                            {% if adv.address %}
+
+                                var area = '{{ adv.Regions.Areas.Name }}';
+                                var city = '{{ adv.Regions.Name }}';
+                                var address = '{{ adv.address }}';
+                                var fulladress = 'Россия, ' + area + ' ' + city + '' + address;
+
+                                ymaps.geocode(fulladress, {
+                                    results: 1
+                                }).then(function (res) {
+                                    var firstGeoObject = res.geoObjects.get(0),
+                                    coords = firstGeoObject.geometry.getCoordinates();
+                                    clusterer
+                                            .add(new ymaps.Placemark(coords, {
+                                                balloonContentHeader: "{{ adv.name|upper }}<hr>",
+                                                balloonContentBody: "<div class='text-center'>{% if adv.AdvImagess.Data[0] is defined %}<img class='pull-left' src='{{ asset('images/a/images/') }}{{ adv.AdvImagess.Data[0].Thumb }}' alt='{{ adv.name }}' title='{{ adv.name }}'>{% endif %}<h4>{{ adv.price|number_format(0, '.', ' ') }} руб.</h4><a class='btn btn-primary' href='{{ path('site_adv_page',{ 'id' : adv.id }) }}' title='Перейти к объявлению'>Перейти к объявлению</a></div>",
+                                                hintContent: "{{ adv.name|upper }}",
+                                                iconContent: '{{ adv.AdvParamss.Data[4].AdCategoriesFieldsValues }}'
+                                            }, {
+                                                preset: 'islands#{% if adv.color %}{{ adv.color }}{% else %}darkBlue{% endif %}StretchyIcon'
+                                            }));
+                                });
+                            {% endif %}
+                        {% endfor %}
+                    }
+                }
+
+            </script>
+            #}
+        {% endblock %}

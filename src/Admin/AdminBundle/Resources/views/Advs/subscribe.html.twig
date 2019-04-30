@@ -1,0 +1,47 @@
+{% extends 'AdminAdminBundle::mail.html.twig' %}
+{% block content_first %}
+  <font color="#222222" face="Arial" size="3">
+    <h4>Здравствуйте!</h4>
+    <p style="font-size:14px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:22px;text-align:center;margin:0;" align="center">
+      Вы просили сообщить Вам о появлении<br> на сайте <strong>{{ top_panel.settings.name }}</strong> новых объявлений.<br>
+      Мы выполняем вашу просьбу - вот они:<br>
+    </p>
+  </font>
+{% endblock %}
+{% block content_second %}
+  <table style="font-size:14px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;border-collapse:collapse;width:100%;background:#fff;" align="center" border="0" cellpadding="0" cellspacing="0" width="100%">                    
+    {% for adv in advs if adv %}    
+      <tr>
+        <td style="border-bottom:1px dashed #ddd;padding-bottom:10px;padding-top:10px;">
+        {% if adv.AdvImagess.Data[0] is defined %}
+          <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias, ref: token }) }}"
+              title="{{ adv.name|slice(0, 1)|upper~adv.name|slice(1) }}">
+          <img width="120" style="padding:0 5px 0 0;" src="{{ top_panel.settings.url }}/images/a/images/{{ adv.AdvImagess.Data[0].thumb }}"
+             alt="{{ adv.name|slice(0, 1)|upper~adv.name|slice(1) }}"
+             title="{{ adv.name|slice(0, 1)|upper~adv.name|slice(1) }}">
+          </a>
+        {% endif %}
+        </td>
+        <td style="text-align:left;vertical-align:top;border-bottom:1px dashed #ddd;padding-bottom:10px;padding-top:10px;">
+          <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias, ref: token }) }}" title="{{ adv.name|slice(0, 1)|upper~adv.name|slice(1) }}">
+            <strong style="font-size:14px;">{{ adv.name|slice(0, 1)|upper~adv.name|slice(1) }} {{ adv.Regions.PageTitle }}</strong>
+          </a>
+          <p>{{ adv.description|slice(0, 1)|upper~adv.description|slice(1) | truncate(200, true, ' ...') }}
+          </p>
+          <strong style="white-space:nowrap;font-size:16px;color:#000000;">
+            {% if adv.dogovor %}
+              Договорная
+            {% else %}
+              {% if adv.price %}
+                {{ adv.price|number_format(0, '.', ' ') }} ₽</i>
+              {% else %}
+                Бесплатно
+              {% endif %}
+            {% endif %}
+          </strong>
+        </td>        
+      </tr>
+    {% endfor %}
+  </table>
+  <p><br><a style="color:#222;text-decoration:none;background:#bbeaff;border:1px solid #96d0ff;padding:5px 15px;border-radius:6px;" href="{{ url('unsubscribe_page', {email:email, token:token}) }}" target="_blank">Отписаться от таких писем</a></p>
+{% endblock %}

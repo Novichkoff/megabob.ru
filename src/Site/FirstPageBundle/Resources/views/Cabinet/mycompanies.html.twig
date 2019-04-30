@@ -1,0 +1,110 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title 'Мои компании' %}
+
+    {% block content %}
+        <div class="clearfix">
+            
+            <div class="col-md-9 padding-5">
+
+                {% include 'SiteFirstPageBundle:Cabinet:user_menu.html.twig' %}
+
+                <h1>Мои компании</h1>
+
+                {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                    class="sr-only">Закрыть</span></button>
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+                {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                    class="sr-only">Закрыть</span></button>
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+
+                {# Таблица компаний #}
+                <div class="clearfix">
+                    {# Компании #}
+                    <table class="table table-hover">
+                        {% set total = 0 %}
+                        {% for company in companies %}
+                            <tr>
+                                <td class="col-xs-1 col-sm-2 padding-0 text-center">
+                                <a href="{{ path('site_shop_advspage', { 'alias' : company.alias, region: 'russia' }) }}"
+                                   title="Перейти к объявлениям компании">
+                                  {% if company.icon is defined %}
+                                    {% if company.icon %}
+                                      <img class="img-shop img-responsive"
+                                         src="{{ asset('images/shops/images/') }}{{ company.icon }}"
+                                         alt="{{ company.name }}" title="{{ company.name }}">
+                                    {% endif %}
+                                  {% endif %}
+                                </a>
+                              </td>
+                              <td class="col-xs-11 col-sm-10">
+                                <a href="{{ path('shop_edit_page', { 'id' : company.id, region: 'russia' }) }}" class="pull-right" title="Редактировать Компанию"><i class="fa fa-pencil"></i> Редактировать</a>
+                                <a href="{{ path('site_shop_advspage', { 'alias' : company.alias, region: 'russia' }) }}"
+                                   title="Перейти к объявлениям компании">										
+                                  <h4 class="shop_name">{{ company.name }}</h4>
+                                </a>
+                                {% if not company.enabled %}<strong class="red">На модерации</strong><br>{% endif %}
+                                <span>Объявлений в компании: <b>{{ company.Advss.count }}</b></span>									
+                              </td>
+                            </tr>
+                            {% set total = total+company.Advss.count %}
+                        {% endfor %}
+                    </table>
+                </div>
+                
+                {% if app.user.Advss|length != total %}
+                  <div class="alert alert-danger alert-dismissible" role="alert">
+                      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                  class="sr-only">Закрыть</span></button>
+                      <h4>Добавьте объявления в компании</h4>
+                      <b>Внимание!</b> Мы обнаружили, что не все Ваши объявления размещены в компаниях.<br> Чтобы разместить объявление в компанию, перейдите на страницу "Объявления" Личного кабинета и возле необходимого объявления нажмите "В компанию".
+                  </div>
+                {% endif %}
+                {# Баннер #}
+                {% if banner_bottom and user.roles[1] is not defined %}
+                  <div class="clearfix padding-0 text-center banner" onclick="set_click({{ banner_bottom.id }})">
+                    <div style="width: {% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                      {{ banner_bottom.code|raw }}
+                    </div>
+                  </div>
+                {% endif %}	
+                
+                <br>
+                <h4 class="padding-5">Хотите разместить свое бесплатное объявление?</h4>
+                <p class="padding-5">Чтобы подать бесплатное объявление необходимо заполнить простую форму
+                    размещения бесплатного объявления, выбрать регион, рубрику, придумать привлекательный заголовок и полный текст своего
+                    объявления, максимально заполнить характеристики и указать адекватную стоимость, свой e-mail
+                    и телефон. Добавьте фотографии — они помогут привлечь больше просмотров вашего объявления.
+                </p>
+                <p class="padding-5">
+                  <a class="btn btn-addnew" href="{{ path('add_adv_page') }}"
+                    title="Подать бесплатное объявление">Подать объявление</a>
+                 </p>
+            </div>
+
+            <!-- Правая сторона страницы -->
+            <div class="col-md-3 padding-5">
+                {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %} 
+{# Баннер в правой колонке #}
+{#
+        {% if banner_right and user.roles[1] is not defined %}
+          <div class="col-xs-12 padding-5 hidden-xs">					
+            <aside>
+              <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+                <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+              </div>
+            </aside>					
+          </div>
+        {% endif %}   
+       #}
+            </div>
+        </div>
+    {% endblock %}

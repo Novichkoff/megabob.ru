@@ -1,0 +1,23 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% form_theme form 'AdminAdminBundle:Form:fields.html.twig' %}
+{% trans_default_domain "FOSUserBundle" %}
+
+{% block content %}
+    <h1>Редактирование администратора</h1>
+    <div class="clearfix"><br></div>
+
+    <div class="clearfix">
+        {% if form %}
+            <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+                {{ form_widget(form) }}
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="{{ type|default('submit') }}" {{ block('button_attributes') }} class="btn btn-default">{{ 'profile.edit.submit'|trans }}</button>
+                </div>
+            </form><br><br>
+        {% endif %}
+    </div>
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_adminspage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}

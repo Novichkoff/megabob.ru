@@ -1,0 +1,52 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% block content %}
+<h1>Пакеты</h1>
+    <div class="clearfix"><br></div>
+
+    {% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+
+    <div class="clearfix">
+        <div class="col-md-3"><span class="label label-info">Всего пакетов : {{ pagination.getTotalItemCount }}</span></div>
+    </div><br>
+
+    <div class="clearfix">
+        <div class="highlight">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Название</th>
+                        <th class="action">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for packet in pagination if packet %}
+                    <tr>
+                        <td>{{ packet.id }}</td>
+                        <td><a href="{{ path('admin_admin_editpacketspage', {'id': packet.id}) }}" title="Редактировать">{{ packet.name }}</a></td>
+                        <td class="action">
+                            <a href="{{ path('admin_admin_editpacketspage', {'id': packet.id}) }}" title="Редактировать">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="4">Нет пакетов</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="col-md-offset-7">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_homepage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% block content %}
+    <h1>Google</h1>    
+    {% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+
+    <div class="clearfix">
+		<strong>user active on site</strong><br />
+		{% for site, val in activeUser %}
+			<div class="user">
+				<span class="cnt">{{ val.cnt }}</span> <img src="/images/ico_{{ val.slug }}.png" alt="" />
+			</div>
+		{% endfor %}
+		 
+		<strong>viewing now</strong><br />
+		{% for page in pages %}
+			<div class="page">
+				<span class="cnt">{{ page.cnt }}</span> <img src="/images/ico_{{ page.slug }}.png" alt="" />  <a href="{{ page.url }}">{{ page.title|slice(0, 42) }}</a>
+			</div>
+		{% endfor %}
+    </div>
+
+{% endblock %}

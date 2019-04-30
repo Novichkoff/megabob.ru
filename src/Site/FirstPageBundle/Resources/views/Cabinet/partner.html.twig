@@ -1,0 +1,6 @@
+<img class="pull-right" width="40" src="/images/bonus_partner.png" alt="Партнерская программа">
+<h2>Партнерская программа</h2>
+<p class="red">Скопируйте код на свой сайт и зарабатывайте бонусы! За каждые 1000 показов - Вы получите бонус в размере <b>100 р.</b></p>
+<div class="zero-clipboard"><span class="btn-clipboard" id="copy-button" data-clipboard-target="partner_code">Скопировать</span></div>
+<figure class="highlight"><pre><code id="partner_code" class="language-html" data-lang="html"><span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"{% if app.user.Shopss|length %}{{ url('site_shop_advspage', { 'alias': app.user.Shopss[0].alias }) }}{% else %}{{ url('site_user_advs_page',{ 'user_id': app.user.id }) }}{% endif %}"</span> <span class="na">target=</span><span class="s">"_blank"</span><span class="nt">&gt;</span><span class="nt">&lt;img</span> <span class="na">width=</span><span class="s">"88"</span> <span class="na">src=</span><span class="s">"{{ url('partner_page', { 'partner_id': app.user.id}) }}"</span> <span class="na">alt=</span><span class="s">"MegaBob"</span><span class="nt">/&gt;</span><span class="nt">&lt;/a&gt;</span></code></pre></figure>
+<p>Нажав на кнопку посетитель перейдет на страницу {% if app.user.Shopss|length %}вашей компании{% else %}с вашими объявлениями{% endif %}.</p><br>

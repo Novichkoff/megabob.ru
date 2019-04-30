@@ -1,0 +1,191 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% form_theme form 'AdminAdminBundle:Form:fields.html.twig' %}
+
+{% block content %}
+    <h1>Редактирование категории</h1>
+    <div class="clearfix"><br></div>
+
+    {% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('error1') %}
+        <div class="alert alert-danger">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+
+    <div class="alert alert-info">
+        <b>Внимание!</b> В тексте, заголовке и описании можно использовать формы городов или регионов.
+        Используйте <b>{in}</b> для подстановки "в Москве"; <b>{net}</b> для подстановки "Москвы"
+    </div>
+    {% if icon %}
+        <div class="clearfix">
+			<div class="col-sm-offset-3 col-sm-2">
+				<img src="/images/categories/{{ icon }}"><br><br>
+			</div>			
+		</div>
+    {% endif %}
+	
+    {% if generator %}
+        <div class="clearfix">
+			<div class="col-sm-3 text-right">
+				<label>Сгенерированное Название:</label>
+			</div>
+			<div class="col-sm-9">
+				<strong class="red">{{ generator }}</strong>
+			</div>
+		</div><br>
+    {% endif %}
+
+    {% if form %}
+        <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+            {{ form_widget(form) }}
+        </form>
+    {% endif %}
+
+    <div class="clearfix"><br></div>
+
+    <h3>Дополнительные поля категории:</h3>
+    <div class="row">
+        <div class="col-md-2 col-md-offset-10"><a href="{{ path('admin_admin_addcategoryfieldpage', { 'category_id': id }) }}" class="label label-primary"><span class="glyphicon glyphicon-plus"></span> Добавить поле</a></div>
+    </div><br>
+
+    <div class="highlight">
+
+        <table class="table table-striped table-hover" id="sortFixed">
+            <thead>
+                <tr>
+                    <th>Поле</th>
+                    <th>ID</th>
+                    <th>Тип поля</th>
+                    <th>Описание</th>
+                    <th>Обязательное</th>
+                    <th colspan="5">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for category_field in parentcategory_fields if category_field %}
+                <tr id="{{ category_field.id }}" data-sort="{{ category_field.sort }}">
+                    <td>{{ category_field.name }}</td>
+					<td>{{ category_field.id }}</td>
+                    <td>{% if category_field.type == 1 %}Текстовое поле{% elseif category_field.type == 2 %}Список{% elseif category_field.type == 3 %}Числовое поле{% elseif category_field.type == 4 %}Адрес{% elseif category_field.type == 5 %}Координаты{% elseif category_field.type == 6 %}Список, зависимый от города{% elseif category_field.type == 7 %}Список, зависимый от региона{% elseif category_field.type == 7 %}Числовой список{% else %}Флажок{% endif %}</td>
+                    <td><a href="{{ path('admin_admin_editcategoriespage',{'id': category_field.categoryId}) }}">Перейти к родительской категории</a></td>
+                    <td colspan="6"></td>
+                </tr>
+            {% endfor %}
+            {% for category_field in category_fields if category_field %}
+                <tr id="{{ category_field.id }}" data-sort="{{ category_field.sort }}">
+                    <td><a href="{{ path('admin_admin_editcategoryfieldpage', {'id': category_field.id}) }}" title="Редактировать">{{ category_field.name }}</a></td>
+                    <td>{{ category_field.id }}</td>
+					<td>{% if category_field.type == 1 %}Текстовое поле{% elseif category_field.type == 2 %}Список{% elseif category_field.type == 3 %}Числовое поле{% elseif category_field.type == 4 %}Адрес{% elseif category_field.type == 5 %}Координаты{% elseif category_field.type == 6 %}Список, зависимый от города{% elseif category_field.type == 7 %}Список, зависимый от региона{% elseif category_field.type == 8 %}Числовой список{% else %}Флажок{% endif %}</td>
+                    <td>{{ category_field.helper }}</td>
+                    <td>{% if category_field.required %}<span class="glyphicon glyphicon-ok"></span>{% endif %}</td>
+                    <td>
+                        {% if category_field.enabled %}
+                            <a href="{{ path('admin_admin_offcategoryfieldpage', {'id': category_field.id}) }}" title="Выключить"><span class="glyphicon glyphicon-off green"></span></a>
+                        {% else %}
+                            <a href="{{ path('admin_admin_oncategoryfieldpage', {'id': category_field.id}) }}" title="Включить"><span class="glyphicon glyphicon-off red"></span></a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if category_field.showInFilter %}
+                            <a href="{{ path('admin_admin_noshowcategoryfieldpage', {'id': category_field.id}) }}" title="Не показывать в фильтре"><span class="glyphicon glyphicon-filter green"></span></a>
+                        {% else %}
+                            <a href="{{ path('admin_admin_showcategoryfieldpage', {'id': category_field.id}) }}" title="Показывать в фильтре"><span class="glyphicon glyphicon-filter red"></span></a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if category_field.showInTable %}
+                            <a href="{{ path('admin_admin_noshowtablecategoryfieldpage', {'id': category_field.id}) }}" title="Не показывать в таблице"><span class="glyphicon glyphicon-sort-by-attributes green"></span></a>
+                        {% else %}
+                            <a href="{{ path('admin_admin_showtablecategoryfieldpage', {'id': category_field.id}) }}" title="Показывать в таблице"><span class="glyphicon glyphicon-sort-by-attributes red"></span></a>
+                        {% endif %}
+                    </td>
+                    <td><a href="{{ path('admin_admin_editcategoryfieldpage', {'id': category_field.id}) }}" title="Редактировать"><span class="glyphicon glyphicon-edit"></span></a></td>
+                    <td><a class="confirm-delete" href="#" data-toggle="modal" data-target="#myModal" data-id="{{ category_field.id }}" title="Удалить"><span class="glyphicon glyphicon-trash"></span></a></td>
+                </tr>
+            {% else %}
+                {% if parentcategory_fields == false %}
+                <tr><td colspan="9">Нет дополнительных полей категории</td></tr>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h3 class="modal-title" id="myModalLabel">Удаление</h3>
+                    </div>
+                    <div class="modal-body">
+                        Вы действительно хотите удалить поле?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                        <button type="button" class="btn btn-danger" id="btnYesCategoryField">Удалить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"><br></div>
+
+    </div>
+	<div class="clearfix">
+		<table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Регион</th>
+                    <th>Город</th>
+                </tr>
+            </thead>
+            <tbody>
+			{% for subscriber in subscribers if subscriber %}
+				<tr>
+          <td>{{ subscriber.email }}</td>
+          <td>{% if subscriber.Areas %}{{ subscriber.Areas.name }}{% endif %}</td>
+          <td>{% if subscriber.Regions %}{{ subscriber.Regions.name }}{% endif %}</td>
+        </tr>
+			{% endfor %}
+			</tbody>
+		</table>
+	</div>
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_categoriespage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript" src="//code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+    <script>
+        $('td, th', '#sortFixed').each(function () {
+			var cell = $(this);
+			cell.width(cell.width());
+		});
+
+		$('#sortFixed tbody').sortable({
+				items: '> tr',
+				stop: function (event, ui) {					
+					$('body').css('cursor','wait');
+					var sortedIDs = $( "#sortFixed tbody" ).sortable( "toArray" );										
+					$.ajax({
+						type : "POST",
+						url : "/administrator_panel/sort_fields",
+						data : {
+							array : sortedIDs
+						},
+						success : function (data) {
+							location.reload();
+						}
+					});
+					console.log(sortedIDs);
+				}
+			}).disableSelection();		
+    </script>
+{% endblock %}

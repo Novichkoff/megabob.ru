@@ -1,0 +1,413 @@
+admin_admin_homepage:
+    pattern:  /
+    defaults: { _controller: AdminAdminBundle:Default:index }
+
+admin_google_homepage:
+    pattern:  /google
+    defaults: { _controller: AdminAdminBundle:Default:google }
+
+admin_settings_page:
+    pattern:  /settings
+    defaults: { _controller: AdminAdminBundle:Default:settings }
+    
+usage_cpu_page:
+    pattern: /usage_cpu
+    defaults: { _controller: AdminAdminBundle:Default:usageCpu, _format: json }
+    
+usage_memory_page:
+    pattern: /usage_memory
+    defaults: { _controller: AdminAdminBundle:Default:usageMemory, _format: json }
+    
+admin_sender_page:
+    pattern:  /sender
+    defaults: { _controller: AdminAdminBundle:Sender:index }
+
+admin_sender_email:
+    pattern:  /sender/email
+    defaults: { _controller: AdminAdminBundle:Sender:email }
+
+admin_sender_send:
+    pattern:  /sender/send
+    defaults: { _controller: AdminAdminBundle:Sender:send }
+
+admin_admin_adminspage:
+    pattern:  /admins
+    defaults: { _controller: AdminAdminBundle:Admins:index }
+
+admin_admin_adminaddpage:
+    pattern:  /addadmin
+    defaults: { _controller: AdminAdminBundle:AdminDetails:add }
+
+admin_admin_admindetailpage:
+    pattern:  /admin_detail/{id}
+    defaults: { _controller: AdminAdminBundle:AdminDetails:index }
+    requirements:
+            id:  \d+
+
+admin_admin_admindelpage:
+    pattern:  /deladmin/{id}
+    defaults: { _controller: AdminAdminBundle:AdminDetails:delete }
+    requirements:
+            id:  \d+
+
+admin_admin_userspage:
+    pattern:  /users
+    defaults: { _controller: AdminAdminBundle:Users:index }
+
+admin_admin_users_findpage:
+    pattern:  /users_find
+    defaults: { _controller: AdminAdminBundle:Users:find }
+
+admin_admin_advs_findpage:
+    pattern:  /advs_find
+    defaults: { _controller: AdminAdminBundle:Advs:find }
+    
+admin_admin_userdetailpage:
+    pattern:  /user/{id}
+    defaults: { _controller: AdminAdminBundle:UserDetails:index }
+    requirements:
+            id:  \d+
+
+admin_admin_useraddpage:
+    pattern:  /adduser
+    defaults: { _controller: AdminAdminBundle:UserDetails:add }
+
+admin_admin_userdelpage:
+    pattern:  /deluser/{id}
+    defaults: { _controller: AdminAdminBundle:UserDetails:delete }
+    requirements:
+            id:  \d+
+
+admin_admin_menuspage:
+    pattern:  /menus
+    defaults: { _controller: AdminAdminBundle:Menus:index }
+
+admin_admin_addmenuspage:
+    pattern:  /addmenu
+    defaults: { _controller: AdminAdminBundle:Menus:create }
+
+admin_admin_editmenuspage:
+    pattern:  /editmenu/{id}
+    defaults: { _controller: AdminAdminBundle:Menus:edit }
+    requirements:
+                id:  \d+
+
+admin_admin_deletemenuspage:
+    pattern:  /delmenu/{id}
+    defaults: { _controller: AdminAdminBundle:Menus:delete }
+    requirements:
+                id:  \d+
+
+admin_admin_regionspage:
+    pattern:  /regions
+    defaults: { _controller: AdminAdminBundle:Regions:index }
+
+admin_admin_citiespage:
+    pattern:  /cities
+    defaults: { _controller: AdminAdminBundle:Regions:cities }
+
+admin_admin_findcitypage:
+    pattern:  /findcity
+    defaults: { _controller: AdminAdminBundle:Regions:findCity }
+
+admin_admin_areaspage:
+    pattern:  /areas
+    defaults: { _controller: AdminAdminBundle:Regions:areas }
+
+admin_admin_addregionspage:
+    pattern:  /addregion
+    defaults: { _controller: AdminAdminBundle:Regions:create }
+
+admin_admin_editregionspage:
+    pattern:  /editregion/{id}
+    defaults: { _controller: AdminAdminBundle:Regions:edit }
+    requirements:
+                id:  \d+
+
+admin_admin_deleteregionspage:
+    pattern:  /delregion/{id}
+    defaults: { _controller: AdminAdminBundle:Regions:delete }
+    requirements:
+                id:  \d+
+
+admin_admin_addareaspage:
+    pattern:  /addarea
+    defaults: { _controller: AdminAdminBundle:Regions:createArea }
+
+admin_admin_editareaspage:
+    pattern:  /editarea/{id}
+    defaults: { _controller: AdminAdminBundle:Regions:editArea }
+    requirements:
+                id:  \d+
+
+admin_admin_deleteareaspage:
+    pattern:  /delarea/{id}
+    defaults: { _controller: AdminAdminBundle:Regions:deleteArea }
+    requirements:
+                id:  \d+
+
+admin_admin_categoriespage:
+    pattern:  /categories
+    defaults: { _controller: AdminAdminBundle:Categories:index }
+
+admin_admin_categories_sort_page:
+    pattern:  /sort
+    defaults: { _controller: AdminAdminBundle:Categories:sort }
+    
+admin_admin_categories_fields_sort_page:
+    pattern:  /sort_fields
+    defaults: { _controller: AdminAdminBundle:Categories:sortFields }
+    
+admin_admin_categories_sort_values_page:
+    pattern:  /sort_values
+    defaults: { _controller: AdminAdminBundle:Categories:sortValues }
+
+admin_admin_addcategoriespage:
+    pattern:  /addcategory
+    defaults: { _controller: AdminAdminBundle:Categories:create }
+
+admin_admin_editcategoriespage:
+    pattern:  /editcategory/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:edit }
+    requirements:
+                id:  \d+
+
+admin_admin_deletecategoriespage:
+    pattern:  /delcategory/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:delete }
+    requirements:
+                id:  \d+
+
+admin_admin_addcategoryfieldpage:
+    pattern:  /addcategoryfield/{category_id}
+    defaults: { _controller: AdminAdminBundle:Categories:createfield }
+    requirements:
+                    category_id:  \d+
+
+admin_admin_oncategoryfieldpage:
+    pattern:  /oncategoryfield/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:onfield }
+    requirements:
+                id:  \d+
+
+admin_admin_offcategoryfieldpage:
+    pattern:  /offcategoryfield/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:offfield }
+    requirements:
+                id:  \d+
+
+admin_admin_showcategoryfieldpage:
+    pattern:  /showcategoryfield/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:showfield }
+    requirements:
+                id:  \d+
+
+admin_admin_noshowcategoryfieldpage:
+    pattern:  /noshowcategoryfield/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:noshowfield }
+    requirements:
+                id:  \d+
+                
+admin_admin_showtablecategoryfieldpage:
+    pattern:  /showtablecategoryfield/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:showtablefield }
+    requirements:
+                id:  \d+
+
+admin_admin_noshowtablecategoryfieldpage:
+    pattern:  /noshowtablecategoryfield/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:noshowtablefield }
+    requirements:
+                id:  \d+
+
+admin_admin_editcategoryfieldpage:
+    pattern:  /editcategoryfield/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:editfield }
+    requirements:
+                id:  \d+
+
+admin_admin_deletecategoryfieldpage:
+    pattern:  /delcategoryfield/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:deletefield }
+    requirements:
+                id:  \d+
+
+admin_admin_addfieldvaluepage:
+    pattern:  /addfieldvalue/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:createfieldvalue }
+    requirements:
+                    id:  \d+
+                    
+admin_admin_addfieldvaluespage:
+    pattern:  /addfieldvalues/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:createfieldvalues }
+    requirements:
+                    id:  \d+
+
+admin_admin_editfieldvaluepage:
+    pattern:  /editfieldvalue/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:editfieldvalue }
+    requirements:
+                    id:  \d+
+
+admin_admin_deletefieldvaluepage:
+    pattern:  /deletefieldvalue/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:deletefieldvalue }
+    requirements:
+                id:  \d+
+
+admin_admin_onfieldvaluepage:
+    pattern:  /onfieldvalue/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:onfieldvalue }
+    requirements:
+                id:  \d+
+
+admin_admin_offfieldvaluepage:
+    pattern:  /offfieldvalue/{id}
+    defaults: { _controller: AdminAdminBundle:Categories:offfieldvalue }
+    requirements:
+                id:  \d+
+
+admin_admin_advpage:
+    pattern:  /adv
+    defaults: { _controller: AdminAdminBundle:Advs:index }
+
+admin_admin_advspage:
+    pattern:  /advs
+    defaults: { _controller: AdminAdminBundle:Advs:advs }
+
+admin_admin_advdetailspage:
+    pattern:  /advdetails/{id}
+    defaults: { _controller: AdminAdminBundle:Advs:edit }
+    requirements:
+                        id:  \d+
+
+admin_admin_deleteadvpage:
+    pattern:  /deladv/{id}
+    defaults: { _controller: AdminAdminBundle:Advs:delete }
+    requirements:
+                id:  \d+
+
+admin_admin_moderedadvpage:
+    pattern:  /moderadv/{id}
+    defaults: { _controller: AdminAdminBundle:Advs:modered }
+    requirements:
+                id:  \d+
+     
+admin_admin_modered_from_site_page:
+    pattern:  /moderadvfs/{id}
+    defaults: { _controller: AdminAdminBundle:Advs:moderedFromSite }
+    requirements:
+                id:  \d+
+
+admin_admin_advs_moderpage:
+    pattern:  /moderadvs
+    defaults: { _controller: AdminAdminBundle:Advs:modereds }
+
+admin_admin_digestadvpage:
+    pattern:  /digestadv/{id}
+    defaults: { _controller: AdminAdminBundle:Advs:digest }
+    requirements:
+                id:  \d+
+                
+admin_admin_offadvpage:
+    pattern:  /offadv/{id}
+    defaults: { _controller: AdminAdminBundle:Advs:off }
+    requirements:
+                id:  \d+
+
+admin_admin_bannerspage:
+    pattern:  /banners
+    defaults: { _controller: AdminAdminBundle:Banners:index }
+
+admin_admin_addbannerspage:
+    pattern:  /addbanner
+    defaults: { _controller: AdminAdminBundle:Banners:create }
+
+admin_admin_editbannerspage:
+    pattern:  /editbanner/{id}
+    defaults: { _controller: AdminAdminBundle:Banners:edit }
+    requirements:
+                id:  \d+
+
+admin_admin_deletebannerspage:
+    pattern:  /delbanner/{id}
+    defaults: { _controller: AdminAdminBundle:Banners:delete }
+    requirements:
+                id:  \d+
+
+admin_admin_packetspage:
+    pattern:  /packets
+    defaults: { _controller: AdminAdminBundle:Packets:index }
+
+admin_admin_editpacketspage:
+    pattern:  /editpacket/{id}
+    defaults: { _controller: AdminAdminBundle:Packets:edit }
+    requirements:
+                id:  \d+
+
+admin_admin_pagespage:
+    pattern:  /pages
+    defaults: { _controller: AdminAdminBundle:Pages:index }
+
+admin_admin_addpagespage:
+    pattern:  /addpage
+    defaults: { _controller: AdminAdminBundle:Pages:create }
+
+admin_admin_editpagespage:
+    pattern:  /editpage/{id}
+    defaults: { _controller: AdminAdminBundle:Pages:edit }
+    requirements:
+                id:  \d+
+
+admin_admin_deletepagespage:
+    pattern:  /delpage/{id}
+    defaults: { _controller: AdminAdminBundle:Pages:delete }
+    requirements:
+                id:  \d+
+
+admin_admin_newspage:
+    pattern:  /news
+    defaults: { _controller: AdminAdminBundle:News:index }
+
+admin_admin_addnewspage:
+    pattern:  /addnews
+    defaults: { _controller: AdminAdminBundle:News:create }
+
+admin_admin_editnewspage:
+    pattern:  /editnews/{id}
+    defaults: { _controller: AdminAdminBundle:News:edit }
+    requirements:
+                id:  \d+
+
+admin_admin_deletenewspage:
+    pattern:  /delnews/{id}
+    defaults: { _controller: AdminAdminBundle:News:delete }
+    requirements:
+                id:  \d+
+
+admin_admin_shopshomepage:
+    pattern:  /shops
+    defaults: { _controller: AdminAdminBundle:Shops:index }
+
+admin_admin_addshopspage:
+    pattern:  /addshop
+    defaults: { _controller: AdminAdminBundle:Shops:create }
+
+admin_admin_editshopspage:
+    pattern:  /editshop/{id}
+    defaults: { _controller: AdminAdminBundle:Shops:edit }
+    requirements:
+                    id:  \d+
+
+admin_admin_deleteshopspage:
+    pattern:  /delshop/{id}
+    defaults: { _controller: AdminAdminBundle:Shops:delete }
+    requirements:
+                    id:  \d+
+
+admin_admin_delcomplainepage:
+    pattern:  /delcomplaine/{id}
+    defaults: { _controller: AdminAdminBundle:Advs:deleteComplaine }
+    requirements:
+                    id:  \d+

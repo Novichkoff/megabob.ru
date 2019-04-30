@@ -1,0 +1,22 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% form_theme form 'AdminAdminBundle:Form:fields.html.twig' %}
+
+{% block content %}
+    <h1>Добавление значения</h1>
+    <div class="clearfix"><br></div>
+
+    {% if form %}
+        <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+            {{ form_widget(form) }}
+        </form>
+    {% endif %}
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_editcategoryfieldpage', {'id':id}) }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/adminadmin/js/bootstrap-colorpicker.js') }}"></script>
+{% endblock %}

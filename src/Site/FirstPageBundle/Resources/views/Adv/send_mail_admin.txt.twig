@@ -1,0 +1,18 @@
+{% extends 'AdminAdminBundle::mail.html.twig' %}
+{% block content_first %}
+  <font color="#222222" face="Arial" size="3">
+    <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:22px;text-align:center;margin:0;"
+       align="center">Здравствуйте, <strong style="color:#333;">{{ username }}</strong>!<br>
+        {% if adv %}
+          Вы разместили на сайте {{ top_panel.settings.name }} свое объявление:<br>
+          <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+            title="Перейти к объявлению" target="_blank">{{ adv.name }}</a><br>&nbsp;<br>
+        {% endif %}
+        Администрация сайта {{ top_panel.settings.name }}<br> отправила Вам личное сообщение:<br>
+    </p>   
+  </font>
+{% endblock %}
+{% block content_second %}
+  <p style="font-size:18px;font-family:Verdana,sans-serif;color:#000000 !important;line-height:22px;text-align:center;margin:0;padding:10px;"
+      align="center">{{ messagetext }}</p> 
+{% endblock %}

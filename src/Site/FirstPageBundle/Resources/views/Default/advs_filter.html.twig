@@ -1,0 +1,12 @@
+{% form_theme filter 'SiteFirstPageBundle:Default:filter.html.twig' %}
+<form id="filter_form" class="form-horizontal" role="form" method="GET" {{ form_enctype(filter) }}>
+    <div class="filter_params clearfix col-lg-3 col-md-4 col-xs-6 col-sm-6 padding-5">
+        <div class="filter_input"> {{ form_widget(filter.p_from) }}
+            <div class="price_to">{{ form_label(filter.p_to) }}</div> {{ form_widget(filter.p_to) }}</div>
+        {{ form_label(filter.p_from) }}
+    </div>
+    {{ form_rest(filter) }}
+    <div class="filter_submit">
+        <button type="submit">Применить</button>
+    </div>
+</form>

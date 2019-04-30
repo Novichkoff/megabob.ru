@@ -1,0 +1,35 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% form_theme form 'AdminAdminBundle:Form:fields.html.twig' %}
+
+{% block content %}
+    <h1>Изменение значения</h1>
+    <div class="clearfix"><br></div>
+
+    {% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+
+    {% if icon %}
+        <div class="col-sm-offset-3 col-sm-9">
+            <img src="/images/categories/values/{{ icon }}">
+        </div>
+        <div class="clearfix"><br></div>
+    {% endif %}
+	
+	{% if form %}
+        <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+            {{ form_widget(form) }}
+        </form>
+    {% endif %}
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_editcategoryfieldpage', {'id':id}) }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/adminadmin/js/bootstrap-colorpicker.js') }}"></script>
+{% endblock %}

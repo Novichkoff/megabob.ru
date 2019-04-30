@@ -1,0 +1,247 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% block title 'Мой кошелек' %}
+{% block stylesheets %}
+  {{ parent() }}  
+  <link href="{{ asset('bundles/sitefirstpage/css/ZeroClipboard.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+    <div class="clearfix">
+
+        <div class="col-md-9 padding-5 clearfix">
+
+            {% include 'SiteFirstPageBundle:Cabinet:user_menu.html.twig' %}
+            <h1>Мой кошелек</h1>
+
+            {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+                    {{ flashMessage|raw }}
+                </div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+                    {{ flashMessage|raw }}
+                </div>
+            {% endfor %}
+
+            <div class="clearfix">
+            <div class="col-sm-6 padding-5">
+                <div class="clearfix padding-0 my_balance">
+                    Баланс:
+                    <strong>{% if user.account.balance is defined %}{{ user.account.balance|number_format(0, '.', ' ') }} р.{% else %}0{% endif %}</strong>                
+                    <a class="pull-right" target="_blank" href="{{ path('site_pages_page', {'alias' : 'platnye-uslugi'} ) }}" title="Как потратить">Как потратить?</a>
+                </div>                
+                {% if user.partnerVisits %}
+                  <div class="clearfix padding-0 my_balance">                    
+                      Партнерка:
+                      <strong>{{ (user.partnerVisits/100)|number_format(2, '.', ' ') }} р.</strong>
+                  </div>
+                {% endif %}                
+                <hr>
+
+                <h2>Пополнение кошелька</h2>
+                {# Яндекс #}
+                <div class="payment-icons"><img class="image image_name_yamoney-wallet image_size_30 payment-icons__icon payment-icons__icon_name_wallet" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="wallet" title="Яндекс.Деньги"><img class="image image_name_visa image_size_40 payment-icons__icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="VISA" title="Visa"><img class="image image_name_maestro image_size_40 payment-icons__icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="maestro" title="Maestro"><img class="image image_name_mastercard image_size_40 payment-icons__icon" src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" alt="mastercard" title="MasterCard"></div>
+                <br>
+                <form method="POST" action="https://money.yandex.ru/quickpay/confirm.xml">
+                    <input type="hidden" name="receiver" value="41001898155844">
+                    <input type="hidden" name="formcomment" value="Пополнение кошелька на {{ top_panel.settings.name }}">
+                    <input type="hidden" name="short-dest" value="{{ top_panel.settings.name }}">
+                    <input type="hidden" name="label" value="{{ user.email }}">
+                    <input type="hidden" name="quickpay-form" value="shop">
+                    <input type="hidden" name="targets" value="{{ user.email }}">
+
+                    <div class="clearfix">
+                        <label class="col-sm-3">Сумма:</label>
+
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" name="sum" value="" data-type="number"><br>
+                        </div>
+                    </div>
+                    <input type="hidden" name="need-fio" value="false">
+                    <input type="hidden" name="need-email" value="false">
+                    <input type="hidden" name="need-phone" value="false">
+                    <input type="hidden" name="need-address" value="false">
+
+                    <div class="clearfix">
+                        <div class="col-sm-9 col-sm-offset-3">
+                            <input type="radio" name="paymentType" value="PC" checked> Яндекс.Деньгами</input><br>
+                            <input type="radio" name="paymentType" value="AC"> Банковской картой</input>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <div class="col-sm-9 col-sm-offset-3">
+                            <br><input class="btn btn-success" type="submit" name="submit-button" value="Пополнить кошелек"><br><br>
+                        </div>
+                    </div>
+                </form>
+                {# QIWI #} 
+                 {#
+                 <hr>
+                <div class="payment-icons"><img width="100" class="image" src="/images/logo_qiwi_rgb.png" alt="wallet" title="Qiwi"></div>
+                <br>
+                <form method="POST" action="https://w.qiwi.com/order/external/create.action">
+                    <input type="hidden" name="from" value="477086">
+                    <input type="hidden" name="comm" value="{{ user.email }}">
+                    <input type="hidden" name="currency" value="RUB">                    
+                    <input type="hidden" name="successUrl" value="{{ top_panel.settings.url }}/fill_qiwi">
+                    <input type="hidden" name="txn_id" value="{{ date().timestamp }}">                    
+                    <div class="clearfix">
+                        <label class="col-sm-3">Телефон:</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" name="to" value="{{ user.phone }}"><br>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <label class="col-sm-3">Сумма:</label>
+                        <div class="col-sm-9">
+                            <input class="form-control" type="text" name="summ" value="" data-type="number"><br>
+                        </div>
+                    </div>                    
+                    <div class="clearfix">
+                        <div class="col-sm-9 col-sm-offset-3">
+                            <input type="radio" name="pay_source" value="qw" checked > с баланса Visa QIWI Wallet</input><br>
+                            {#<input type="radio" name="pay_source" value="mobile"> с баланса мобильного телефона</input><br>
+                            <input type="radio" name="pay_source" value="card"> банковской картой</input><br>#}{#
+                            <input type="radio" name="pay_source" value="wm"> с привязанного кошелька WebMoney</input><br>
+                            <input type="radio" name="pay_source" value="ssk"> наличными в терминале QIWI</input>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <div class="col-sm-9 col-sm-offset-3">
+                            <br><input class="btn btn-success" type="submit" value="Пополнить кошелек"><br>
+                        </div>
+                    </div>
+                </form>
+                <hr>
+                <p>После оплаты счета наличными через терминал системы платежей Qiwi пройдите проверку оплаты</p>
+                <form method="GET" action="/fill_qiwi">                                        
+                    <div class="clearfix">
+                        <label class="col-sm-3 form-group padding-5">№ счета:</label>
+                        <div class="col-sm-6 form-group padding-5">
+                            <input class="form-control" type="text" name="order">
+                        </div>
+                        <div class="col-sm-3 form-group padding-5">
+                            <input class="btn btn-primary" type="submit" value="Проверить">
+                        </div>
+                    </div>                    
+                </form><br>
+                #}
+            </div>
+            <div class="col-sm-6 padding-5">
+                {% if paid_advs|length %}
+                    <h2>Неоплаченные пакеты</h2>
+                    <table class="table table-condensed">
+                        <thead>
+                        <tr>                            
+                            <th>Объявление</th>
+                            <th>Сумма</th>
+                            <th>Операция</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for paid_adv in paid_advs if paid_adv %}
+                            <tr class="danger">                                
+                                <td>{{ paid_adv.Advs.Name }}</td>
+                                <td class="text-nowrap"><b>{{ paid_adv.Packets.price|number_format(0, '.', ' ') }} р.</b></td>
+                                <td class="text-center"><a class="btn btn-danger btn-xs"
+                                                           href="{{ path('paid_adv_page', { id : paid_adv.id, region: top_panel.url_region }) }}"
+                                                           title="Оплатить пакет">оплатить</a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+                <h2>История операций</h2>
+                {% if user.transactions|length %}                    
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Дата</th>
+                            <th>Операция</th>
+                            <th>Сумма</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for transaction in user.transactions if transaction %}
+                            <tr>
+                                <td><small>{{ transaction.transactionDate|date("H:i d.m.Y") }}</small></td>
+                                <td class="text-center">{{ transaction.type }}</td>
+                                <td class="text-right" style="white-space: nowrap"><b>{{ transaction.sum|number_format(0, '', ' ') }} р.</b></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                  <p>Пока нет операций</p>
+                {% endif %}
+				<br>               
+            </div>
+            </div>
+			<hr>
+			
+			{# Партнерская программа #}
+			{% include 'SiteFirstPageBundle:Cabinet:partner.html.twig' %} 
+			
+            {# Баннер #}
+            {% if banner_search and user.roles[1] is not defined %}
+              <div class="clearfix padding-0 text-center banner" onclick="set_click({{ banner_search.id }})">
+                <div style="width: {% if banner_search.width %}{{ banner_search.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                  {{ banner_search.code|raw }}
+                </div>
+              </div>
+            {% endif %}
+            
+            <br>
+                <h4 class="padding-5">Хотите разместить свое бесплатное объявление?</h4>
+                <p class="padding-5">Чтобы подать бесплатное объявление необходимо заполнить простую форму
+                    размещения бесплатного объявления, выбрать регион, рубрику, придумать привлекательный заголовок и полный текст своего
+                    объявления, максимально заполнить характеристики и указать адекватную стоимость, свой e-mail
+                    и телефон. Добавьте фотографии — они помогут привлечь больше просмотров вашего объявления.
+                </p>
+                <p class="padding-5">
+                  <a class="btn btn-addnew" href="{{ path('add_adv_page') }}"
+                    title="Подать бесплатное объявление">Подать объявление</a>
+                 </p>
+        </div>
+
+        <!-- Правая сторона страницы -->
+        <div class="col-md-3 padding-5">
+
+			<div class="col-sm-6 col-md-12 padding-5">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<strong><i class="fa fa-question-circle fa-fw"></i> Помощь</strong>
+					</div>
+					<div class="panel-body">
+						На текущий момент доступно пополнение кошелька с помощью банковской карты или Яндекс.Денег.
+					</div>
+				</div>        
+			</div>			    
+
+            {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}  
+        {# Баннер в правой колонке #}
+        {#
+        {% if banner_right and user.roles[1] is not defined %}
+          <div class="col-xs-12 padding-5 hidden-xs">					
+            <aside>
+              <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+                <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+              </div>
+            </aside>					
+          </div>
+        {% endif %}  
+            #} 
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/sitefirstpage/js/ZeroClipboard.min.js') }}"></script>
+    <script>$(document).ready(function(){var clip = new ZeroClipboard($("#copy-button"));});</script>
+{% endblock %}

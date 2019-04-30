@@ -1,0 +1,19 @@
+{% extends 'AdminAdminBundle::mail.html.twig' %}
+{% block content_first %}
+  <font color="#222222" face="Arial" size="3">
+    <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:22px;text-align:center;margin:0;" align="center">Здравствуйте, <strong>{{ username }}</strong>!<br>
+      Вы разместили на сайте MegaBob.ru свои объявления:<br><br>    
+      <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="Перейти к объявлению">{{ adv.name }}</a><br><br>
+      Вами был выбран пакет услуг <b>"{{ adv.AdvPacketss[0].Packets.name }}"</b><br>
+      <b style="color:red">Но Вы забыли оплатить его!</b><br>      
+    </p>
+  </font>
+{% endblock %}
+{% block content_second %}
+  <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:22px;text-align:center;margin:0;" align="center">
+    Объявления с выбранным платным неоплаченным пакетом услуг <b>не показываются на сайте</b> до их оплаты.<br>&nbsp;<br>
+    <b>Для оплаты</b> необходимо перейти в <a href="{{ url('user_cabinet_page') }}" target="_blank" style="color:#0077cc;text-decoration:none;" title="Перейти в Личный кабинет">Личный кабинет</a> в раздел Объявления или Кошелек и оплатить выбранное объявление.<br>
+    Также оплатить можно со <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" target="_blank" style="color:#0077cc;text-decoration:none;" title="Перейти к объявлению">страницы самого объявления</a>.<br>
+    Оплатить объявление можно в течении 2-х суток, после чего оно автоматически будет сброшено на бесплатное.
+  </p>    
+{% endblock %}

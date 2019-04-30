@@ -1,0 +1,20 @@
+{% if category %}
+  {% form_theme search_form 'SiteFirstPageBundle:Form:subscribe.html.twig' %}
+  {# Подписка #}
+  <div class="col-sm-6 col-md-12 padding-5 clearfix{% if subscribe_status=='close' %} no-show{% endif %}" id="subscribe_form">  
+    <form id="subscribe" method="POST" {{ form_enctype(subscribe_form) }}>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <button type="button" class="close" aria-label="Закрыть" onclick="close_subscribe()"><span>&times;</span></button>
+          <strong><i class="fa fa-envelope-o fa-fw"></i> Подписка</strong>
+        </div>
+        <div class="panel-body text-center">          
+		  <label class="">Хотите узнать когда здесь появится новое объявление?</label>
+		  <img width="75" height="75" src="/images/subscribe.svg" alt="Подписка" title="Подписка"><br><br>
+		  {{ form_rest(subscribe_form) }}
+          <div class="no_t"><a href="#subscribe_form" onclick="close_subscribe_all()">Больше не показывать</a></div>
+        </div>			
+      </div>
+    </form>
+  </div>
+{% endif %}

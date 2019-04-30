@@ -1,0 +1,61 @@
+{% form_theme search_form 'SiteFirstPageBundle:Default:search_form.html.twig' %}
+<div id="search_form_div">
+  <form class="clearfix" id="search_form" method="GET" {{ form_enctype(search_form) }} action="{{ path('site_search_page', { region: top_panel.url_region }) }}">
+  <input id="map_open" type="hidden" name="map_open" value="0">
+	<div class="padding-5">			
+		<div class="search-line col-sm-2 clearfix">
+			{{ form_widget(search_form.area) }}
+      <div class="search-region">
+        <a title="Выбрать регион" id="ttown" data-toggle="modal" data-target="#townModal"><i class="fa fa-fw fa-location-arrow"></i> 
+          {% if top_panel.current_region %}{{ top_panel.current_region }}</a> <button type="button" class="close" title="Сбросить" onclick="get_page('/')"><span aria-hidden="true">×</span></button>
+		  {% elseif top_panel.current_area %}{{ top_panel.current_area }}</a> <button type="button" class="close" title="Сбросить" onclick="get_page('/')"><span aria-hidden="true">×</span></button>
+		  {% else %}Все регионы</a>{% endif %}           
+      </div>      
+		</div>
+		<div class="search-line col-sm-2 clearfix hidden-xs">
+			{{ form_widget(search_form.region) }}		
+		</div>
+		<div class="search-line col-sm-3 clearfix">
+			{{ form_widget(search_form.cid) }}		
+		</div>
+		<div class="search-line col-sm-5 clearfix">
+			<div class="input-group">
+				{{ form_widget(search_form.sq) }}
+				<span class="input-group-btn"><button class="btn btn-search" type="submit"><i class="fa fa-search"></i> Найти</button></span>
+			</div>
+			<div class="pull-left padding-0">
+				<div class="search-images pull-left">
+					{{ form_widget(search_form.im) }}
+					<label for="im" title="Показывать объявления только с фото">только с фото</label>
+				</div>
+			</div>
+			{% if category is defined %}
+				{% if category.id is defined %}
+					{% if category.id %}
+						<div class="pull-right toggle_filters filter_on{% if filt == 'show' or category.id is not defined %} hide_filter{% endif %}">
+              <span class="link" onclick="show_filter();" title="показать фильтр"><i class="fa fa-sliders"></i> Расширенный фильтр</span>
+						</div>
+						<div class="pull-right toggle_filters filter_off{% if filt == 'hide' %} hide_filter{% endif %}">
+							<span class="link" onclick="hide_filter();" title="скрыть фильтр"><i class="fa fa-sliders"></i> Расширенный фильтр</span>
+						</div>
+					{% endif %}
+				{% endif %}
+			{% endif %}
+		</div>
+	</div>
+	{% if category is defined %}
+		{% if category.id is defined %}
+			{% if category.id %}
+				<div class="text-left{% if filt == 'hide' %} hide_filter{% endif %} clearfix" id="search_filter_params">
+					<div class="filter_params clearfix col-md-3 col-sm-4 col-xs-12 padding-5">
+						<div class="col-xs-4 padding-0 text-center">{{ form_label(search_form.sp_from) }}</div>
+						<div class="col-xs-4 padding-left-5 from-to">{{ form_widget(search_form.sp_from) }}</div>
+						<div class="col-xs-4 padding-left-5 from-to">{{ form_widget(search_form.sp_to) }}</div>
+					</div>
+					{{ form_rest(search_form) }}
+				</div>
+			{% endif %}
+		{% endif %}
+	{% endif %}
+  </form>
+</div>

@@ -1,0 +1,27 @@
+{% extends 'AdminAdminBundle::mail.html.twig' %}
+{% block content_first %}
+  <font color="#222222" face="Arial" size="3">
+    <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:22px;text-align:center;margin:0;"
+       align="center">Здравствуйте, <strong style="color:#333;">{{ username }}</strong>!<br>
+        Вы разместили на сайте {{ top_panel.settings.name }} свое объявление:<br>
+        <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+           title="Перейти к объявлению" target="_blank">{{ adv.name }}</a><br>&nbsp;<br>
+        Пользователь <strong style="color:#333;">{{ sendername }}</strong><br>
+        написал вам следующее сообщение:<br>
+    </p>   
+  </font>
+{% endblock %}
+{% block content_second %}
+  <p style="font-size:18px;font-family:Verdana,sans-serif;color:#000000 !important;line-height:22px;text-align:center;margin:0;padding:10px;"
+      align="center">{{ messagetext }}</p>
+ <div style="line-height:14px;height:28px;">&nbsp;<hr>&nbsp;<br></div>
+  <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:22px;text-align:center;margin:0;"
+    align="center"><br>
+    Вы можете ответить на это сообщение<br>
+    написав письмо на электронный адрес:<br>
+    <a href="mailto:{{ senderemail }}" style="color:#0077cc;text-decoration:none;" title="Написать письмо">{{ senderemail }}</a><br>&nbsp;<br>
+    {% if senderphone %} или позвонить по телефону:<br>
+      <a href="tel:{{ senderphone }}" style="color:#0077cc;text-decoration:none;" title="Позвонить по телефону">{{ senderphone }}</a>
+    {% endif %}
+  </p>  
+{% endblock %}

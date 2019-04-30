@@ -1,0 +1,108 @@
+{% form_theme form 'SiteFirstPageBundle:Form:add.html.twig' %}
+{% use 'SimpleThingsFormExtraBundle:Form:field_type_help.html.twig' %}
+
+
+		
+{% trans_default_domain 'FOSUserBundle' %}
+
+{% if form %}            
+  <div id="add_adv">
+      <form class="padding-0" id="add_adv_form" role="form" method="POST" {{ form_enctype(form) }}>
+          {{ form_errors(form) }}
+          {{ form_row(form.user_type) }}
+          <div id="company">
+              {% if form.company_name is defined %}{{ form_row(form.company_name) }}{% endif %}
+          </div>
+          {{ form_row(form.username) }}
+          {{ form_row(form.email) }}
+          <div id="user_pass">
+              {% if form.password is defined %}{{ form_row(form.password) }}{% endif %}
+          </div>
+          {{ form_row(form.email_status) }}
+          {% if form.shop_id is defined %}{{ form_row(form.shop_id) }}{% endif %}
+          {{ form_row(form.phone) }}
+          {{ form_row(form.skype) }}
+          {{ form_row(form.area_id) }}
+          <div id="town">
+              {% if form.region_id is defined %}{{ form_row(form.region_id) }}{% endif %}
+          </div>
+          {{ form_row(form.category_id) }}
+          <div id="params">
+              {% for field in category_fileds_array if (attribute(form, field) is defined) %}
+                  {{ form_row(attribute(form, field)) }}
+              {% endfor %}
+          </div>
+          <div id="name_adv">
+            {% if form.name is defined %}{{ form_row(form.name) }}{% endif %}
+          </div>
+          <div id="desc_adv">
+            {% if form.description is defined %}{{ form_row(form.description) }}{% endif %}
+          </div>
+            {% if form.site is defined %}{{ form_row(form.site) }}{% endif %}
+                      <div class="form-group form-site">
+                          {{ form_label(form.image) }}
+                          {% if images %}
+                              <div class="col-sm-7 adv_images padding-5 clearfix">                                    
+                                  {{ form_widget(form.image) }}<br>
+                                  {% for image in images %}
+                                      <div class="upload_img">
+                                          <img id="img_{{ image.id }}"
+                                               src="/images/a/images/{{ image.path }}?timestamp={{ "now"|date("His") }}">
+                                          <span class="image_delete link" onclick="imgDelete({{ image.id }})"
+                                                title="удалить изображение"><i class="fa fa-trash-o"></i></span>
+                                          <span class="image_rotate link" onclick="imgRotate({{ image.id }})"
+                                                title="повернуть изображение"><i class="fa fa-repeat"></i></span>
+                                      </div>
+                                  {% endfor %}									
+                              </div>
+                          {% endif %}
+                      </div>
+                      {{ form_row(form.imagedelete) }}
+                      <div id="price_div">
+            {% if form.price is defined %}{{ form_row(form.price) }}{% endif %}
+            {% if form.dogovor is defined %}{{ form_row(form.dogovor) }}{% endif %}
+            {% if form.torg is defined %}{{ form_row(form.torg) }}{% endif %}
+          </div>
+          {{ form_row(form.youtube) }}
+          {{ form_row(form.captcha) }}
+          {{ form_row(form.enabled) }}
+          {{ form_rest(form) }}
+          <hr>
+          <div class="padding-5">Используйте платные пакеты услуг,
+              чтобы ваше объявление располагалось на приоритетных местах. Подключите пакет сейчас или
+              сделайте это позже из Личного кабинета. К оплате принимаются банковские карты и Яндекс.Деньги
+          </div><br>
+          <div class="form-group form-site padding-0 clearfix packets">
+              <label class="col-sm-2 control-label text-right">Пакет услуг:</label>
+              <div class="col-sm-10 padding-0">                                
+                {% for packet in packets %}
+                  <div class="col-sm-4 padding-5">
+                    <div class="alert {% if packet.id == 3 %}alert-info{% elseif packet.id == 2 %}alert-success{% elseif packet.id == 1 %}alert-warning{% endif %} packet_info show"
+                     id="packet_info_{{ packet.id }}" role="alert">
+                      <div class="clearfix">
+                      {% if packet.id == 1 %}
+                        <img class="img-packet-adv" src="/bundles/sitefirstpage/images/premium.png" title="{{ packet.name }}" alt="{{ packet.name }}">
+                      {% elseif packet.id == 2 %}
+                        <img class="img-packet-adv" src="/bundles/sitefirstpage/images/lite.png" title="{{ packet.name }}" alt="{{ packet.name }}">
+                      {% endif %}
+                      <input id="packet_{{ packet.id }}" type="radio" name="packet" value="{{ packet.id }}"
+                        {% if packet.id == 3 %}checked{% endif %}><label for="packet_{{ packet.id }}" class="padding-5"><h4 class="padding-5"><strong>{{ packet.name }}</strong></h4></label>
+                        </div>												
+                    {{ packet.description|raw }}
+                    <div>Срок размещения: <strong>90 дней</strong></div>
+                    {% if packet.id == 3 %}
+                      <hr><h4>БЕСПЛАТНО</h4>
+                    {% else %}
+                      <hr><h4>{{ packet.price }} <i class="fa fa-rub"></i> на {{ packet.days }} дней</h4>{% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+          </div>
+
+          <div class="col-sm-offset-5 col-sm-7 padding-5 clearfix">
+              <button class="btn btn-add pull-right" type="submit" id="advs_save">Подать объявление</button>
+          </div>                        
+      </form>
+  </div>
+{% endif %}

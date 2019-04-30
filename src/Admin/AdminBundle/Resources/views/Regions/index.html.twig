@@ -1,0 +1,30 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% block content %}
+<h1>Регионы</h1>
+    <div class="clearfix"><br></div>
+	
+	{% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+
+    <div class="clearfix">
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 text-center">
+            <a href="{{ path('admin_admin_areaspage') }}">
+                <img width="50" src="{{ asset('/bundles/adminadmin/images/regions.png') }}">
+                <h3>Области</h3>
+            </a>
+        </div>
+        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2 text-center">
+            <a href="{{ path('admin_admin_citiespage') }}">
+                <img width="50" src="{{ asset('/bundles/adminadmin/images/towns.png') }}">
+                <h3>Города</h3>
+            </a>
+        </div>
+    </div>
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_homepage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}

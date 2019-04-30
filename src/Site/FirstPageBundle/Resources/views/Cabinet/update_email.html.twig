@@ -1,0 +1,18 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+	<div class="container"><br><br>		
+    <div class="alert alert-success alert-dismissible" role="alert">
+      <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+      <strong>Всё отлично, {{ name }}!</strong> Все ваши объявления обновлены.
+    </div>		
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        var timerMulti;
+        $( document ).ready( function() { timerMulti = window.setTimeout(location.reload();, 3000); });
+    </script>
+{% endblock %}

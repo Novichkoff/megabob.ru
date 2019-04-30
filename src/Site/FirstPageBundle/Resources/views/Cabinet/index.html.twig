@@ -1,0 +1,182 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% form_theme form 'SiteFirstPageBundle:Form:fields_fos.html.twig' %}
+{% block title 'Мой профиль' %}
+{% block stylesheets %}
+  {{ parent() }}  
+  <link href="{{ asset('bundles/sitefirstpage/css/ZeroClipboard.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="clearfix">
+
+        <div class="col-md-9 padding-5">
+
+            {% include 'SiteFirstPageBundle:Cabinet:user_menu.html.twig' %}
+            <h1>Профиль</h1>
+
+            {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+                    {{ flashMessage }}
+                </div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+                    {{ flashMessage }}
+                </div>
+            {% endfor %}
+
+            {% trans_default_domain 'FOSUserBundle' %}
+
+            {% if form %}
+                <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+
+                    {% if user.photo %}
+						<div class="form-group form-site">
+							<div class="col-xs-12">
+								<img width="50" class="pull-right user_photo" src="/images/users/photos/{{ user.photo }}" alt="Фото" title="Фото">
+							</div>
+						</div>
+					{% endif %}
+					
+					{{ form_widget(form) }}
+
+                    <div class="form-group form-site">
+                        <div class="col-xs-12">
+                            <button class="btn btn-success pull-right"
+                                    type="{{ type|default('submit') }}" {{ block('button_attributes') }} >{{ 'profile.edit.submit'|trans }}</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="clearfix"></div>
+            {% endif %}
+            
+			{% if app.user.facebookId or app.user.vkontakteId or app.user.twitterId or app.user.mailruId or app.user.odnoklassnikiId or app.user.googleId %}
+				<div class="clearfix">
+					<label class="col-sm-3 text-right">Привязанный соц.аккаунт:</label>
+					<div class="col-sm-9 clearfix padding-5">
+						{% if app.user.facebookId %}<img class="autorization_social" src="{{ asset('bundles/sitefirstpage/images/facebook.png') }}"
+																				title="ID: {{ app.user.facebookId }}">&nbsp;{% endif %}
+						{% if app.user.vkontakteId %}<img class="autorization_social" src="{{ asset('bundles/sitefirstpage/images/vkontakte.png') }}"
+																				title="ID: {{ app.user.vkontakteId }}">&nbsp;{% endif %}
+						{% if app.user.twitterId %}<img class="autorization_social" src="{{ asset('bundles/sitefirstpage/images/twitter.png') }}"
+																				title="ID: {{ app.user.twitterId }}">&nbsp;{% endif %}
+						{% if app.user.mailruId %}<img class="autorization_social" src="{{ asset('bundles/sitefirstpage/images/mailru.png') }}"
+																				title="ID: {{ app.user.mailruId }}">&nbsp;{% endif %}
+						{% if app.user.odnoklassnikiId %}<img class="autorization_social" src="{{ asset('bundles/sitefirstpage/images/odnoklassniki.png') }}"
+																				title="ID: {{ app.user.odnoklassnikiId }}">{% endif %}
+						{% if app.user.googleId %}<img class="autorization_social" src="{{ asset('bundles/sitefirstpage/images/google.png') }}"
+																				title="ID: {{ app.user.googleId }}">{% endif %}
+					</div>
+				</div>
+			{% endif %}			
+      
+			<br>
+			<div class="clearfix">				
+				{% block hwi_oauth_content %}
+					{% if error is defined and error %}
+						<div class="alert alert-danger">
+							<span>{{ error }}</span>
+						</div>
+					{% endif %}
+					<label class="col-sm-3 text-right">Привязать соц.аккаунт:</label>
+					<div class="col-sm-9 clearfix padding-5">
+						{% for owner in hwi_oauth_resource_owners() %}
+							<a href="{{ hwi_oauth_login_url(owner) }}"><img class="autorization_social" src="{{ asset('bundles/sitefirstpage/images/'~owner | trans({}, 'HWIOAuthBundle')~'.png') }}"></a>
+						{% endfor %}
+					</div>
+				{% endblock hwi_oauth_content %}				
+				<br><br><br>
+				{# Партнерская программа #}
+                {% include 'SiteFirstPageBundle:Cabinet:partner.html.twig' %}  
+			<br>
+      
+				{# Баннер #}
+                {% if banner_bottom and user.roles[1] is not defined %}
+                  <div class="clearfix padding-0 text-center banner" onclick="set_click({{ banner_bottom.id }})">
+                    <div style="width: {% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                      {{ banner_bottom.code|raw }}
+                    </div>
+                  </div>
+                {% endif %}	
+                
+                <br>
+                <h4 class="padding-5">Хотите разместить свое бесплатное объявление?</h4>
+                <p class="padding-5">Чтобы подать бесплатное объявление необходимо заполнить простую форму
+                    размещения бесплатного объявления, выбрать регион, рубрику, придумать привлекательный заголовок и полный текст своего
+                    объявления, максимально заполнить характеристики и указать адекватную стоимость, свой e-mail
+                    и телефон. Добавьте фотографии — они помогут привлечь больше просмотров вашего объявления.
+                </p>
+                <p class="padding-5">
+                  <a class="btn btn-addnew" href="{{ path('add_adv_page') }}"
+                    title="Подать бесплатное объявление">Подать объявление</a>
+                 </p>
+			 </div>
+        </div>
+
+        <!-- Правая сторона страницы -->
+        <div class="col-md-3 padding-5">
+          {# Размещение компании #}
+          {% if not user.Shopss|length %}
+            <div class="col-sm-6 col-md-12 padding-5">
+              <div class="panel panel-success">
+                <div class="panel-heading">
+                  <strong>Вы - представитель компании?</strong>
+                </div>
+                <div class="panel-body clearfix">
+                  <p>Разместите Вашу компанию на нашем сайте <strong>Бесплатно</strong>.</p>
+
+                  <p>Вы получите отдельную страницу с информацией о компании и всеми вашими объявлениями.
+                    Внутри каждого объявления также появится информация о вашей компании.</p>
+
+                  <div class="text-center"><a class="btn btn-success"
+                                href="{{ path('site_add_shop_page', { region: top_panel.url_region }) }}"
+                                title="Размещение компании на сайте">Добавить компанию</a></div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+
+            {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}     
+{# Баннер в правой колонке #}
+{#
+        {% if banner_right and user.roles[1] is not defined %}
+          <div class="col-xs-12 padding-5 hidden-xs">					
+            <aside>
+              <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+                <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+              </div>
+            </aside>					
+          </div>
+        {% endif %}   
+#}        
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/sitefirstpage/js/ZeroClipboard.min.js') }}"></script>
+    <script>$(document).ready(function(){var clip = new ZeroClipboard($("#copy-button"));});</script>
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        var google_conversion_id = 967632158;
+        var google_conversion_language = "en";
+        var google_conversion_format = "3";
+        var google_conversion_color = "ffffff";
+        var google_conversion_label = "XjplCKj7mFgQnsqzzQM";
+        var google_remarketing_only = false;
+        /* ]]> */
+    </script>
+    <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js"></script>    
+    <noscript>
+        <div style="display:inline;">
+            <img height="1" width="1" style="border-style:none;" alt=""
+                 src="//www.googleadservices.com/pagead/conversion/967632158/?label=XjplCKj7mFgQnsqzzQM&amp;guid=ON&amp;script=0"/>
+        </div>
+    </noscript>
+{% endblock %}

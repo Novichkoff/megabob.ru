@@ -1,0 +1,72 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% if form %}{% form_theme form 'SiteFirstPageBundle:Form:paid.html.twig' %}{% endif %}
+{% block content %}
+    <div class="container clearfix">
+
+        <div class="col-md-9 padding-5">
+
+            {% include 'SiteFirstPageBundle:Cabinet:user_menu.html.twig' %}
+            <h1>Оплата пакета</h1>
+
+            {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+                    {{ flashMessage|raw }}
+                </div>
+            {% endfor %}
+            {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert"><span
+                                aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+                    {{ flashMessage|raw }}
+                </div>
+            {% endfor %}
+
+            <div class="col-sm-12 padding-0">
+                <h4>Объявление № {{ paid_adv.advId }} "{{ paid_adv.Advs.name }}"</h4><br>
+
+                <h3>Подключение пакета "{{ paid_adv.Packets.name }}" стоимостью
+                    <strong class="red">{{ paid_adv.Packets.price|number_format(2, '.', ' ') }} ₽</strong></h3>
+                <hr>                
+                {% if form %}                    
+                    <div class="clearfix padding-0 my_balance">
+                        Баланс:
+                        <strong>{% if user.account.balance is defined %}{{ user.account.balance|number_format(0, '.', ' ') }} ₽{% else %}0{% endif %}</strong>
+                    </div>
+                    <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+                        {{ form_widget(form) }}
+                        &nbsp;&nbsp;<a class="btn btn-success" target="_blank"
+                        href="{{ path('user_balance_page', { region: top_panel.url_region}) }}"
+                        title="Пополнить кошелек">Пополнить кошелек</a>
+                        <a class="btn btn-default"
+																   href="{{ path('free_adv_page', { 'id' : paid_adv.id, region:top_panel.url_region }) }}"
+																   title="Отменить пакет">Отменить пакет</a>
+                    </form>
+                    <div class="panel-body">
+                      Внимание! Неоплаченные пакеты не отображаются в результатах поиска. По истечении суток, в случае неоплаты пакета он автоматически меняет пакет на Бесплатный.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Правая сторона страницы -->
+        <div class="col-md-3 padding-5">
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Помощь</h3>
+                </div>
+                <div class="panel-body">
+                    На текущий момент доступно пополнение кошелька наличными с помощью Яндекс.Деньег или с вашей банковской
+                    карточки.<br>
+                    Для пополнения укажите необходимую сумму, например 200, мы зачислим вам именно ее - комиссию мы
+                    берем на себя!                    
+                </div>
+            </div>
+
+            {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}            
+
+        </div>
+    </div>
+{% endblock %}

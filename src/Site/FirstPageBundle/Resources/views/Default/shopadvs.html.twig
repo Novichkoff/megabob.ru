@@ -1,0 +1,169 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title %}{{ shop.name }} - компании и магазины{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% endblock %}
+{% block metatitle %}{{ shop.name }} - компании и магазины{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% endblock %}
+{% block description shop.description|truncate(150, true, ' ...') %}
+{% block keywords 'компания '~shop.name~', компании и магазины' %}
+{% block metaimage '/images/shops/images/'~shop.icon %}
+{% block canonical %}{{ url('site_shop_advspage',{'alias' : shop.alias, region: 'russia'}) }}{% endblock%}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script type="text/javascript" src="//yastatic.net/share/share.js" charset="utf-8"></script>
+	<script>
+		$(function () {
+			$('[data-toggle="tooltip"]').tooltip({html: true})
+		})
+	</script>
+{% endblock %}
+
+{% block content %}
+	<div class="clearfix">
+		<div class="clearfix" id="main">			
+			{# Объявления #}
+			<div class="col-md-9 padding-5 advs-cat">       
+
+				<div class="clearfix">
+          <ol class="breadcrumb">
+          <li><a href="{{ path('site_first_page_homepage', { region: top_panel.url_region }) }}" title="Главная">Все объявления</a></li>
+          <li class="active""><a href="{{ path('site_shops_homepage', { region: top_panel.url_region }) }}" title="Компании">Компании и магазины</a></li>
+          </ol>      
+        </div>
+        
+        <div class="clearfix">			
+          {# Баннер под поиском #}
+          {% if banner_search and user.roles[1] is not defined %}
+            <div class="clearfix padding-5 text-center" onclick="set_click({{ banner_search.id }})">
+              <div style="width: {{ banner_search.width }}px; margin: 0 auto; text-align: center;">{{ banner_search.code|raw }}</div>
+            </div>                
+          {% endif %}								
+        </div>
+        
+        <h1 class="padding-10">{{ shop.name }}</h1>
+        <div class="clearfix" id="shop">
+
+					<div class="col-sm-4 padding-0">
+						{% if shop.icon is defined and shop.icon %}<img class="img-responsive"
+														  src="{{ asset('images/shops/images/') }}{{ shop.icon }}"
+														  alt="{{ shop.name }}"
+														  title="{{ shop.name }}">{% endif %}
+					</div>
+					<div class="col-sm-8">
+						<h2 class="shop_name">{{ shop.title }}</h2>
+
+						<div class="text-justify">{{ shop.description|nl2br }}</div>
+					</div>
+					<div class="col-sm-12">
+						<div class="clearfix shop_address">
+							{% if shop.address %}
+								<div class="col-sm-12 padding-5"><i
+									class="fa fa-map-marker"></i> {{ shop.Regions.Areas.name }}
+								, {{ shop.Regions.name }}, {{ shop.address }}</div>{% endif %}
+							{% if shop.phone %}
+								<div class="col-sm-4 padding-5"><i class="fa fa-phone"></i> {{ shop.phone }}
+								</div>{% endif %}
+							{% if shop.site %}
+								<div class="col-sm-8 padding-5"><i class="fa fa-dribbble"></i> <span
+										class="blue link" onclick="get_site('{{ shop.site }}');"
+										title="Перейти на сайт {{ shop.name }}">{{ shop.site }}</span>
+								</div>{% endif %}							
+						</div>
+            <div class="clearfix">
+								{# Блок "Поделиться" #}
+								<div class="yashare-auto-init" data-yashareL10n="ru"
+									 data-yashareQuickServices="vkontakte,facebook,twitter,odnoklassniki,moimir"
+									 data-yashareTheme="counter"></div>
+							</div>
+					</div>
+
+				</div>
+
+				{# Настройка вида #}
+				<div class="clearfix setview">
+					<div class="col-sm-3 hidden-xs btn-group padding-0" role="group" aria-label="view">
+						<button title="Плитка" type="button"
+								class="btn btn-default{% if view == 'grid' %} active{% endif %}"
+								onclick="set_param('view','grid');"><i class="fa fa-th"></i></button>
+						<button title="Список" type="button"
+								class="btn btn-default{% if view == 'line' %} active{% endif %}"
+								onclick="set_param('view','line');"><i class="fa fa-list"></i></button>
+						<button title="Таблица" type="button"
+								class="btn btn-default{% if view == 'list' %} active{% endif %}"
+								onclick="set_param('view','list');"><i class="fa fa-table"></i></button>
+					</div>
+					<div class="col-sm-3 hidden-xs btn-group padding-0" role="group" aria-label="onpage">
+						<button title="Выводить по 20" type="button"
+								class="btn btn-default{% if onpage == '24' %} active{% endif %}"
+								onclick="set_param('onpage',24);">20
+						</button>
+						<button title="Выводить по 50" type="button"
+								class="btn btn-default{% if onpage == '48' %} active{% endif %}"
+								onclick="set_param('onpage',48);">50
+						</button>
+						<button title="Выводить по 100" type="button"
+								class="btn btn-default{% if onpage == '96' %} active{% endif %}"
+								onclick="set_param('onpage',96);">100
+						</button>
+					</div>
+					<div class="col-sm-6 text-right padding-0">
+						{{ knp_pagination_render(advs) }}
+					</div>
+				</div>
+
+				{% embed "SiteFirstPageBundle:Default:"~view~".html.twig" %}{% endembed %}
+        {# Баннер #}
+        {% if banner_bottom and user.roles[1] is not defined %}
+          <div class="clearfix padding-5 text-center banner" onclick="set_click({{ banner_bottom.id }})">
+            <div style="width: {% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+              {{ banner_bottom.code|raw }}
+            </div>
+          </div>
+        {% endif %}
+        <h2>Размещение компании на {{ top_panel.settings.name }}</h2>
+        {% if user == 'anon.' %}<p>Подать заявку на размещение компании может <strong>только</strong>
+          зарегистрированный пользователь.</p>{% endif %}
+        <p>Здесь представлены компании и
+          магазины{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %} разместившие свои
+          объявления на нашем сайте. Вы можете добавить свою компанию на наш сайт совершенно
+          бесплатно.</p>
+
+        <p><strong>Компания на {{ top_panel.settings.name }}</strong> - эффективный сервис, который позволит выделить ваши
+          товары или услуги среди множества конкурентов, позволит заявить о себе, а так же найти и
+          расширить новые каналы сбыта и коммуникации с клиентами. Создав компанию, вы сможете
+          предоставить полный спектр ваших товаров или услуг, создать лояльную аудиторию, свою
+          клиентскую базу, которая постоянно будет расширяться, а клиенты смогут узнавать компанию и
+          ее товары или услуги среди конкурентов.</p>
+        {% if user != 'anon.' %}
+          <a class="btn btn-add"
+             href="{{ path('site_add_shop_page', {region: top_panel.url_region}) }}"
+             title="Размещение компании">Разместить компанию</a>
+        {% else %}
+          <a class="btn btn-add" href="{{ path('user_registration_register') }}" title="Регистрация">Регистрация</a>
+        {% endif %}
+
+			</div>
+
+			{# Правая сторона страницы #}
+			<div class="col-md-3 clearfix">
+
+				{# Вы смотрели #}
+        {% include 'SiteFirstPageBundle:Default:yadvs.html.twig' %}
+      
+        {# Личный кабинет #}
+        {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+
+        {# Баннер в правой колонке #}
+        {% if banner_right and user.roles[1] is not defined %}
+          <div class="col-xs-12 padding-5 hidden-xs">
+          <aside>
+            <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+              <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+            </div>
+          </aside></div>
+        {% endif %}
+
+			</div>
+
+		</div>		
+	</div>
+{% endblock %}

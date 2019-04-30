@@ -1,0 +1,140 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title %}Компании и магазины. Объявления компаний и магазинов{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% endblock %}
+{% block canonical %}{{ url('site_shops_homepage',{region: top_panel.url_region}) }}{% endblock%}
+{% block metatitle %}Компании и магазины. Объявления компаний и магазинов{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% endblock %}
+{% block description 'Объявления о продаже, покупке и предложении услуг от компаний и магазинов{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %} на '~top_panel.settings.name %}
+
+    {% block content %}
+        <div class="clearfix">      
+			
+			<div class="clearfix">                
+                {# Баннер под поиском #}
+                {% if banner_search and user.roles[1] is not defined %}
+                  <div class="clearfix padding-5 text-center" onclick="set_click({{ banner_search.id }})">
+                    <div style="width: {{ banner_search.width }}px; margin: 0 auto; text-align: center;">{{ banner_search.code|raw }}</div>
+                  </div>                
+                {% endif %}
+                <div class="col-md-9 clearfix padding-5" id="main">
+                    {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                                <div class="alert alert-success alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+                                </button>{{ flashMessage }}
+                                </div>
+                    {% endfor %}
+                    {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                                <div class="alert alert-danger alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+                                </button>{{ flashMessage }}</div>
+                    {% endfor %}
+                    {# Хлебные крошки #}		
+                    <div class="clearfix" xmlns:v="http://rdf.data-vocabulary.org/#">
+                      <ol class="breadcrumb" itemprop="breadcrumb">
+                        <li typeof="v:Breadcrumb">
+                            <a href="{{ path('site_first_page_homepage') }}"
+                               title="Главная"
+                               rel="v:url"
+                               property="v:title">Все объявления</a>
+                        </li>
+                        {% if top_panel.current_region or top_panel.current_area %}
+                        <li typeof="v:Breadcrumb">
+                          <a href="{{ path('site_first_page_homepage', { region: top_panel.url_region }) }}"
+                             title="{% if top_panel.current_region %}{{ top_panel.current_region }}{% elseif top_panel.current_area %}{{ top_panel.current_area }}{% endif %}"
+                             rel="v:url"
+                             property="v:title">{% if top_panel.current_region %}{{ top_panel.current_region }}{% elseif top_panel.current_area %}{{ top_panel.current_area }}{% endif %}</a>
+                        </li>
+                        {% endif %}
+                        <li typeof="v:Breadcrumb">Компании</li>
+                      </ol>
+                    </div>                    	
+                    {# Компании #}
+                    <h1>Компании и магазины{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}</h1>                    
+                    <div class="clearfix">
+                        <table class="table">                            
+                            {% for shop in shops if shop %}
+                                <tr>
+                                    <td class="col-xs-1 col-sm-2 padding-0 text-center">
+                                        <a href="{{ path('site_shop_advspage', { 'alias' : shop.alias, region: 'russia' }) }}"
+                                           title="Перейти к объявлениям компании">
+                                            {% if shop.icon is defined %}
+                                                {% if shop.icon %}
+                                                    <img class="img-shop img-responsive"
+                                                         src="{{ asset('images/shops/images/') }}{{ shop.icon }}"
+                                                         alt="{{ shop.name }}" title="{{ shop.name }}">
+                                                {% endif %}
+                                            {% endif %}
+                                        </a>
+                                    </td>
+                                    <td class="col-xs-11 col-sm-10">
+                                        <a href="{{ path('site_shop_advspage', { 'alias' : shop.alias, region: 'russia' }) }}"
+                                           title="Перейти к объявлениям компании">
+                                            <h4 class="shop_name">{{ shop.name }} <small>{{ shop.Regions.pagetitle }}</small></h4>
+                                        </a>
+                                        <div class="text-justify">{{ shop.description|truncate(200, true, ' ...') }}</div>
+                                        <span>Размещено объявлений: <b>{{ shop.Advss.count }}</b></span>
+                                    </td>
+                                </tr>                                
+                            {% endfor %}
+                        </table>
+                    </div>
+                    <div class="clearfix text-right padding-0">{{ knp_pagination_render(shops) }}</div>                    
+					<div class="clearfix">
+						<h2>Размещение компании на {{ top_panel.settings.name }}</h2>
+						{% if user == 'anon.' %}<p>Разместить компанию на сайте может <strong>только</strong>
+							зарегистрированный пользователь.</p>{% endif %}
+						<p>Здесь представлены компании и магазины разместившие свои объявления на нашем
+							сайте{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}. Вы можете добавить свою компанию
+							на наш сайт совершенно бесплатно.</p>
+
+						<p><strong>Компания на {{ top_panel.settings.name }}</strong> - эффективный сервис, который позволит выделить ваши товары или
+							услуги среди множества конкурентов, позволит заявить о себе, а так же найти и расширить новые каналы
+							сбыта и коммуникации с клиентами. Создав компанию, вы сможете предоставить полный спектр ваших
+							товаров или услуг{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}, создать лояльную
+							аудиторию, свою клиентскую базу, которая постоянно будет расширяться, а клиенты смогут узнавать
+							компанию и ее товары или услуги среди конкурентов.</p>
+						{% if user != 'anon.' %}
+							<a class="btn btn-add pull-right" href="{{ path('site_add_shop_page', {region: top_panel.url_region} ) }}"
+							   title="Размещение компании{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">Разместить компанию</a>
+						{% else %}
+							<a class="btn btn-add pull-right" href="{{ path('user_registration_register', { region: top_panel.url_region}) }}" title="Регистрация">Регистрация</a>
+						{% endif %}
+          </div>
+          <div class="clearfix">  
+            {# Баннер #}
+            {% if banner_bottom and user.roles[1] is not defined %}
+              <br><div class="clearfix padding-5 text-center banner" onclick="set_click({{ banner_bottom.id }})">
+                <div style="width: {% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                  {{ banner_bottom.code|raw }}
+                </div>
+              </div>
+            {% endif %}	
+					</div>
+                </div>
+
+                {# Правая сторона страницы #}
+                <div class="col-md-3 clearfix padding-5">
+                  
+                  {# Личный кабинет #}
+                  {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+                  
+                  {# Вы смотрели #}
+                  {% include 'SiteFirstPageBundle:Default:yadvs.html.twig' %}				
+                  
+                  {# Баннер в правой колонке #}
+                  {% if banner_right and user.roles[1] is not defined %}
+                  </div>
+                  <div class="col-md-3 padding-5 clearfix">
+                      <div class="padding-5 visible-md-block visible-lg-block clearfix">
+                        <aside>
+                            <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+                                <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+                            </div>
+                        </aside>
+                      </div>
+                  {% endif %}
+
+                </div>
+
+            </div>            
+        </div>
+    {% endblock %}

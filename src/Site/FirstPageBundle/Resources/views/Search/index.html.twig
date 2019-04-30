@@ -1,0 +1,247 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title %}Результаты поиска {% if category.name is defined %}{{ category.name }}{% if category.parentId %} - {{ category.AdCategoriesRelatedByParentId.name }}{% endif %}{% endif %}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% if advs.getCurrentPageNumber != 1 %} страница {{ advs.getCurrentPageNumber }}{% endif %}{% endblock %}
+{% block description %}{{ description }}{% endblock %}
+{% if category %}{% if category.parentId %}{% set parent_alias = category.AdCategoriesRelatedByParentId.alias %}{% else %}{% set parent_alias = category.alias %}{% endif %}{% endif %}
+{% block content %}
+    <div class="clearfix">        
+        
+        <div class="clearfix" id="main">          
+          <div class="col-md-9 advs-cat clearfix">
+            {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+                            </button>{{ flashMessage }}
+                            </div>
+                {% endfor %}
+                {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                            <div class="alert alert-danger alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+                            </button>{{ flashMessage }}</div>
+                {% endfor %}
+                {% set msg_cnt = 0 %}
+                {% if app.user is defined and app.user.UserMessagess is defined %}
+                  {% if app.user.UserMessagess|length %}                    
+                    {% for msg in app.user.UserMessagess %}
+                      {% if not msg.viewed %}{% set msg_cnt = msg_cnt+1 %}{% endif %}
+                    {% endfor %}
+                  {% endif %}
+                  {% if msg_cnt %}
+                    <div class="alert alert-danger" role="alert">
+                      <b>Внимание!</b> У Вас есть непрочитанные сообщения! <a class="btn btn-red" href="{{ path('user_messages_page', { region: top_panel.url_region }) }}">Перейти к сообщениям</a>
+                    </div>
+                  {% endif %}
+                {% endif %}
+            {# Баннер под поиском #}
+                {% if banner_search and user.roles[1] is not defined %}
+                    <div class="clearfix padding-0 text-center banner" onclick="set_click({{ banner_search.id }})">
+                        <div style="width: {% if banner_search.width %}{{ banner_search.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                            {{ banner_search.code|raw }}
+                        </div>
+                    </div>
+                {% endif %}
+            <div class="clearfix" xmlns:v="http://rdf.data-vocabulary.org/#">
+              <ol class="breadcrumb">                
+                <li typeof="v:Breadcrumb">
+                  <a href="{{ path('site_first_page_homepage') }}"
+                     title="Все объявления"
+                     rel="v:url"
+                     property="v:title">Все объявления</a>
+                </li>                
+                {% if top_panel.current_region or top_panel.current_area %}
+                <li typeof="v:Breadcrumb"><a
+                                    href="{{ path('site_first_page_homepage', { region: top_panel.url_region }) }}"
+                                    title="{% if top_panel.current_region %}{{ top_panel.current_region }}{% elseif top_panel.current_area %}{{ top_panel.current_area }}{% endif %}"
+                                    rel="v:url" property="v:title">{% if top_panel.current_region %}{{ top_panel.current_region }}{% elseif top_panel.current_area %}{{ top_panel.current_area }}{% endif %}</a></li>
+                {% endif %}
+                {% if category %}
+                  {% if category.parentId %}
+                    <li typeof="v:Breadcrumb"><a
+                                      href="{{ path('site_category_page', { category: parent_alias, region: top_panel.url_region }) }}"
+                                      title="{{ category.parent.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}"
+                                      rel="v:url" property="v:title">{{ category.parent.name }}</a></li>
+                    {% endif %}  
+                      <li typeof="v:Breadcrumb"><a
+                                  href="{{ path('site_category_page', { category: parent_alias, subcategory: category.alias, region: top_panel.url_region }) }}"
+                                  title="{{ category.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}"
+                                  rel="v:url" property="v:title">{{ category.name }}</a></li>
+                  
+                {% endif %}
+                <li class="active" typeof="v:Breadcrumb">Поиск</li>
+              </ol>
+            </div>            
+                {% if category.id is defined %}
+                  {# Категории #}
+                  <div class="categories clearfix">
+                    <div class="clearfix">
+                      <div class="clearfix">                         
+                        <img class="img-responsive pull-right"
+                             src="{{ asset('images/categories/') }}{% if category.icon %}{{ category.icon }}{% else %}{{ category.parent.icon }}{% endif %}"
+                             alt="{% if category.icon %}{{ category.name }}{% else %}{{ category.parent.name }}{% endif %}"
+                             title="{% if category.icon %}{{ category.name }}{% else %}{{ category.parent.name }}{% endif %}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">
+                        <h1 class="map-small">{{ category.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}</h1>                      
+                        {% if category.childs|length %}
+                          <div class="subcategories clearfix">
+                            {% for category_child in category.childs if category_child %}
+                              <a class="link" href="{{ path('site_category_page', { category: category.alias, subcategory: category_child.alias, region: top_panel.url_region }) }}"
+                                 title="{{ category_child.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">{{ category_child.name }}</a>
+                            {% endfor %}
+                          </div>
+                        {% endif %}                                                
+                      </div>			
+                    </div>
+                  </div>
+                {% endif %}
+
+                {# Объявления #}
+                {% if category.useMap is defined %}
+                    {% if category.useMap %}
+                        <a id="c_title" data-category="{{ category.id }}" class="advs_on_map_c hide"
+                           title="Объявления на карте">
+                            <div><i class="fa fa-map-marker blue"></i> Все объявления на карте</div>
+                        </a>
+                        <div id="aamap">
+                            <div class="map_help text-center">{% for okey,ocolor in colors if ocolor %}
+                                    <div style="border:3px solid {{ ocolor.color }};border-radius:20px; padding:2px 4px;margin:1px;cursor:pointer;" onclick="set_search_param({{ ocolor.id }},{{ ocolor.value }})">{{ okey }}</div>{% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+                {# Настройка вида #}
+                <div class="clearfix setview">
+                    <div class="col-sm-3 hidden-xs btn-group padding-0" role="group" aria-label="view">
+                        <button title="Плитка" type="button"
+                                class="btn btn-default{% if view == 'grid' %} active{% endif %}"
+                                onclick="set_param('view','grid');"><i class="fa fa-th"></i></button>
+                        <button title="Список" type="button"
+                                class="btn btn-default{% if view == 'line' %} active{% endif %}"
+                                onclick="set_param('view','line');"><i class="fa fa-list"></i></button>
+                        <button title="Таблица" type="button"
+                                class="btn btn-default{% if view == 'list' %} active{% endif %}"
+                                onclick="set_param('view','list');"><i class="fa fa-table"></i></button>
+                    </div>
+                    <div class="col-sm-3 hidden-xs btn-group padding-0" role="group" aria-label="onpage">
+                        <button title="Выводить по 20" type="button"
+                                class="btn btn-default{% if onpage == '24' %} active{% endif %}"
+                                onclick="set_param('onpage',24);">20
+                        </button>
+                        <button title="Выводить по 50" type="button"
+                                class="btn btn-default{% if onpage == '48' %} active{% endif %}"
+                                onclick="set_param('onpage',48);">50
+                        </button>
+                        <button title="Выводить по 100" type="button"
+                                class="btn btn-default{% if onpage == '96' %} active{% endif %}"
+                                onclick="set_param('onpage',96);">100
+                        </button>
+                    </div>
+                    <div class="col-sm-6 text-right padding-0 pagination_top">{{ knp_pagination_render(advs) }}</div>
+                </div>            
+
+              {% if advs|length == 0 and p_advs|length == 0 and l_advs|length == 0 %}
+                <br><div class="alert alert-warning" role="alert">Нет объявлений удовлетворяющих вашему запросу</div>
+                {% if r_advs|length %}
+                  <h4>Похожие объявления {{ top_panel.current_area.pagetitle }}:</h4>
+                  {% set advs = r_advs %}
+                  {% embed "SiteFirstPageBundle:Default:"~view~".html.twig" %}{% endembed %}
+                {% endif %}
+              {% else %}
+                {% embed "SiteFirstPageBundle:Default:"~view~".html.twig" %}{% endembed %}
+              {% endif %}
+              <div class="clearfix">
+                {# Переход по страницам #}
+                <div class="col-xs-12 col-md-4 text-left padding-5 setview search-time">
+                    {% if time is defined %}<small>Поиск занял: {{ time|number_format(2, '.', ',') }} сек.</small>{% endif %}
+                </div>
+                {{ knp_pagination_render(advs) }}
+              </div>
+              <br>
+              {# Баннер в конце объявлений #}
+              {% if banner_bottom and user.roles[1] is not defined %}                
+                <div class="clearfix padding-5" onclick="set_click({{ banner_bottom.id }})">
+                  <div style="width:{% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %};margin:0 auto;text-align:center;">{{ banner_bottom.code|raw }}</div>
+                </div>
+                <br>
+              {% endif %}
+              {% if text %}
+                <p class="padding-0 hidden-xs">{{ text|nl2br }}</p>
+              {% endif %}				
+              <div class="clearfix">
+                <h4>Хотите разместить свое бесплатное объявление?</h4>				
+                <p>Чтобы разместить объявление в рубрику <b>{% if category.name is defined %}{{ category.name }} {{ top_panel.in_town }}{% endif %}</b> необходимо заполнить простую форму подачи бесплатного объявления, выбрать регион{% if top_panel.current_region %} <b>{{ top_panel.current_region }}</b>{% endif %}, рубрику {% if category.name is defined %}<b>{{ category.name }}</b>{% endif %} написать привлекательный заголовок и полный текст своего объявления, максимально заполнить характеристики и указать адекватную стоимость, свой e-mail и телефон. Добавьте фотографии — они помогут быстрее продать Ваш товар или услугу.</p>					
+                <a class="btn btn-addnew" href="{{ path('add_adv_page', { region: 'russia' }) }}" title="Подать бесплатное объявление{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">Подать объявление</a>
+              </div>
+              
+            </div>
+
+            {# Правая сторона страницы #}
+            <div class="col-md-3 padding-0 clearfix hidden-xs">
+
+            {# VIP #}
+            {% if vip_advs|length and (advs|length+p_advs|length+l_advs|length) > 5 %}
+              <div class="col-sm-6 col-md-12 padding-5 clearfix">
+                <div class="panel panel-danger panel-vip">							
+                  <div class="panel-heading text-center">Объявления VIP</div>
+                  <div class="panel-body text-center">
+                    {% for vip_adv in vip_advs if vip_adv %}                    
+                      <div class="clearfix text-center">
+                        <a class="red" href="{{ path('site_adv_page', { category: vip_adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: vip_adv.AdCategories.alias, id: vip_adv.id, alias: vip_adv.alias, region: vip_adv.Regions.alias }) }}"><strong>{{ vip_adv.name }}</strong></a>
+                        {% if vip_adv.AdvImagess.Data[0] is defined %}
+                          <a href="{{ path('site_adv_page', { category: vip_adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: vip_adv.AdCategories.alias, id: vip_adv.id, alias: vip_adv.alias, region: vip_adv.Regions.alias }) }}">
+                            <img class="img-responsive" src="{{ asset('images/a/images/') }}{{ vip_adv.AdvImagess.Data[0].mediumThumb }}" alt="{{ vip_adv.name }}" title="{{ vip_adv.name }}">
+                          </a>
+                        {% endif %}									
+                        <div class="clearfix text-center">{{ vip_adv.Regions.name}}<br><strong class="grid_price red">{% if vip_adv.dogovor %}Договорная{% else %}{% if vip_adv.price %}{{ vip_adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</strong></div><hr>
+                      </div>
+                    {% endfor %}
+                    <a href="{{ path('site_pages_page', {'alias' : 'platnye-uslugi'} ) }}" title="Платные услуги">Как сюда попасть?</a>
+                  </div>							
+                </div>
+              </div>
+            {% endif %}				
+				
+        {# Подписка на новые объявления #}
+				{% include 'SiteFirstPageBundle:Default:subscribe.html.twig' %}
+
+                {# Личный кабинет #}
+				{% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+        
+        {# Вы смотрели #}
+				{% if (advs|length+p_advs|length+l_advs|length) > 5 %}{% include 'SiteFirstPageBundle:Default:yadvs.html.twig' %}{% endif %}        
+
+                {# Баннер в правой колонке #}
+                {% if banner_right and user.roles[1] is not defined and (advs|length+p_advs|length+l_advs|length) > 0 %}
+                  </div>
+                  <div class="col-md-3 padding-0 clearfix">
+                    <div class="padding-5 clearfix">
+                        <aside>
+                          <div class="adv_right" id="ads" onclick="set_click({{ banner_right.id }})">
+                              <div style="width:{% if banner_right.width %}{{ banner_right.width }}px{% else %}100%{% endif %};margin:0 auto;text-align:center;">
+                                  {{ banner_right.code|raw }}
+                              </div>
+                          </div>
+                        </aside>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>        
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}    
+    {% if category.useMap is defined %}
+      {% if category.useMap %}
+        <script src="//api-maps.yandex.ru/2.1/?lang=ru-RU&load=package.full" type="text/javascript"></script>
+        <script src="{{ asset('bundles/sitefirstpage/js/pie-chart-clusterer.min.js') }}"></script>
+        <script src="{{ asset('bundles/sitefirstpage/js/map.js') }}"></script>
+        {% if map_open %}
+          <script>
+            $(window).load(function(){
+              $('.advs_on_map_c').trigger('click');
+            });
+          </script>
+        {% endif %}        
+      {% endif %}
+    {% endif %}    
+{% endblock %}

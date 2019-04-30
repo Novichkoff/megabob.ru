@@ -1,0 +1,87 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% form_theme form 'SiteFirstPageBundle:Form:fields.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/sitefirstpage/js/inputmask.js') }}" type="text/javascript"></script>    
+    <script>$(':input').inputmask();</script>
+{% endblock %}
+{% block canonical %}{{ url('site_add_shop_page', { region: 'russia'}) }}{% endblock%}
+
+{% block title 'Размещение компаний и магазинов на доске объявлений' %}
+    {% block metatitle 'Размещение компаний и магазинов на доске объявлений' %}
+        {% block description 'Сервис, который позволит выделить ваши товары или услуги среди множества конкурентов, позволит заявить о себе, а так же найти и расширить новые каналы сбыта и коммуникации с клиентами' %}
+            {% block keywords 'размещение магазина, размещение компании' %}
+
+                {% block content %}
+                    <div class="clearfix">
+
+                        {% trans_default_domain 'FOSUserBundle' %}
+
+                        {% if form %}
+                            <div class="col-sm-9 padding-5">
+                                <h1>Размещение компаний и магазинов</h1>
+
+                                {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                                    <div class="alert alert-success alert-dismissible" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert"><span
+                                                    aria-hidden="true">&times;</span><span
+                                                    class="sr-only">Закрыть</span></button>
+                                        {{ flashMessage|raw }}
+                                    </div>
+                                {% endfor %}
+                                {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                                    <div class="alert alert-danger alert-dismissible" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert"><span
+                                                    aria-hidden="true">&times;</span><span
+                                                    class="sr-only">Закрыть</span></button>
+                                        {{ flashMessage|raw }}
+                                    </div>
+                                {% endfor %}
+
+                                <div class="clearfix">
+                                    <strong>Компания на {{ top_panel.settings.name }}</strong> - эффективный сервис, который позволит выделить
+                                    ваши товары или услуги среди множества конкурентов, позволит заявить о себе, а так
+                                    же найти и расширить новые каналы сбыта и коммуникации с клиентами. Создав компанию,
+                                    вы сможете предоставить полный спектр ваших товаров или услуг, создать лояльную
+                                    аудиторию, свою клиентскую базу, которая постоянно будет расширяться, а клиенты
+                                    смогут узнать вас и ваши товары или услуги среди конкурентов.
+                                </div>
+
+                                <div id="add_adv">
+                                    <form class="form-horizontal" id="add_shop_form" role="form" method="POST" {{ form_enctype(form) }}>
+                                        {{ form_javascript(form) }}
+                                        {{ form_widget(form) }}
+                                        <div class="col-sm-offset-5 col-sm-7 padding-5 clearfix">
+                                            <button class="btn btn-add pull-right" type="button" id="shop_save">
+                                                Разместить компанию
+                                            </button>
+                                        </div>
+                                        <br><br>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Правая сторона страницы -->
+                            <div class="col-sm-3 padding-5">
+
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">Компании - магазины</h4>
+                                    </div>
+                                    <div class="panel-body">
+                                        Размещение магазина или компании позволит вам получить уникальную страницу всех
+                                        объявлений своей организации, а также дополнительную информацию внутри каждого
+                                        объявления. Рядом с названием фирмы будет расположен ваш логотип, размещена
+                                        контактная информация.
+                                    </div>
+                                </div>
+
+                                {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+                {% endblock %}

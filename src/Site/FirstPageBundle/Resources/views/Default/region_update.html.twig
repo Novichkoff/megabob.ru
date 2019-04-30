@@ -1,0 +1,9 @@
+{% if regions %}
+    <option>Выберите город</option>
+    <option value="{{ area.alias }}">Весь регион</option>
+    {% for region in regions %}
+        <option value="{{ region.alias }}">{{ region.name }}</option>
+    {% endfor %}
+{% else %}
+    <option></option>
+{% endif %}

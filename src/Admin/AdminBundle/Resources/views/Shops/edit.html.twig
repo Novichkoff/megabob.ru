@@ -1,0 +1,35 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% form_theme form 'AdminAdminBundle:Form:fields.html.twig' %}
+
+{% block content %}
+    <h1>Редактирование магазина</h1>
+    <div class="clearfix"><br></div>
+
+    {% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('error1') %}
+        <div class="alert alert-danger">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+
+    {% if image %}
+        <div class="clearfix"><div class="col-sm-offset-3 col-sm-9">
+            <img src="/images/shops/images/{{ image }}" height="100">
+        </div></div><br>
+    {% endif %}
+
+    {% if form %}
+        <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+            {{ form_javascript(form) }}
+            {{ form_widget(form) }}
+        </form>
+    {% endif %}
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_shopshomepage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}

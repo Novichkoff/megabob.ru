@@ -1,0 +1,121 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% form_theme form 'AdminAdminBundle:Form:fields.html.twig' %}
+{% form_theme balance_form 'AdminAdminBundle:Form:fields.html.twig' %}
+{% trans_default_domain "FOSUserBundle" %}
+
+{% block content %}
+    <h1>Редактирование пользователей</h1>
+    <div class="clearfix"><br></div>
+
+    <div class="clearfix">
+        {% if form %}
+            <form class="form-horizontal" role="form" method="POST" {{ form_enctype(form) }}>
+                {{ form_widget(form) }}
+				<div class="form-group">
+					<label class="col-sm-3 control-label">Количество отправленных писем:</label>
+					<div class="col-sm-9">
+						<h4 class="red">{% if sending_mails %}{{ sending_mails }}{% else %}0{% endif %}</h4>                            
+					</div>
+				</div>
+                {% if account is defined %}                    
+					<div class="form-group">
+                        <label class="col-sm-3 control-label">Баланс пользователя:</label>
+                        <div class="col-sm-9">
+                            <h4 class="green">{% if account.Balance is defined %}{{ account.Balance }}{% endif %} р.</h4>
+                        </div>
+                    </div>                    
+                {% endif %}
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="{{ type|default('submit') }}" {{ block('button_attributes') }} class="btn btn-default">{{ 'profile.edit.submit'|trans }}</button>
+                    <a class="btn btn-primary" data-toggle="modal" data-target="#balanceModal"><i class="fa fa-rub"></i> Изменить баланс</a>
+                    <a class="btn btn-success" data-toggle="modal" data-target="#postAdminModal" title="Отправить письмо"><span class="glyphicon glyphicon-envelope"></span> Сообщение</a>                    
+                </div>
+            </form>
+        {% endif %}
+    </div>
+    <div class="modal fade" id="balanceModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title"><i class="fa fa-rub"></i> Баланс пользователя</h4>
+          </div>
+          {% if balance_form %}
+            <form class="form-horizontal" role="form" method="POST" {{ form_enctype(balance_form) }}>
+              <div class="modal-body">            
+                {{ form_widget(balance_form) }} 
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                <button type="submit" class="btn btn-primary">Сохранить</balance>
+              </div>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    {# Сообщения пользователям от Администрации #}
+    <div class="modal fade" id="postAdminModal" tabindex="-1" role="dialog" aria-labelledby="postAdminModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+            <h4 class="modal-title" id="exampleModalLabel">Отправить сообщение</h4>
+          </div>
+          <form role="form" action="{{ path('send_mail_admin_page') }}" method="POST">
+            <div class="modal-body">                    
+              <input type="hidden" hidden name="recipient_id" id="recipient_id" value="{{ account.fosUserId }}">
+              <input type="hidden" hidden name="adv_id" id="adv_id">
+              <input type="hidden" hidden name="admin" value="1">
+              <div class="form-group">
+                <label class="control-label">Текст сообщения:</label>
+                <textarea class="form-control" name="message_text" required></textarea>
+              </div>                    
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+              <button type="submit" class="btn btn-success">Отправить</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="clearfix">        
+		<div class="col-md-4 clearfix">
+            <h4>Объявления:</h4>
+            <ul class="list-group">
+                {% for adv in advs if adv %}
+                    <li class="list-group-item{% if adv.deleted %} list-group-item-danger{% elseif not adv.enabled %} list-group-item-warning{% elseif adv.moderApproved %} list-group-item-success{% endif %}">
+						<a href="{{ path('admin_admin_advdetailspage', {'id': adv.id}) }}" title="Перейти к объявлению">{{ adv.id }} - {{ adv.name }}</a>
+						<a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="На сайте" target="_blank" class="pull-right"><span class="glyphicon glyphicon-eye-open"></span></a>
+					</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="col-md-4 clearfix">
+            <h4>Компании:</h4>
+            <ul class="list-group">
+                {% for shop in shops if shop %}
+                    <li class="list-group-item"><a href="{{ path('admin_admin_editshopspage', {'id': shop.id}) }}" title="Перейти к компании">{{ shop.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+		
+		<div class="col-md-4 clearfix">
+            <h4>Сообщения:</h4>
+            <ul class="list-group">
+                {% for message in messages if message %}
+                    <li class="list-group-item">{{ message.date|date('d.m.Y') }} - {{ message.message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <hr>
+    <a class="btn btn-default" href="{{ path('admin_admin_userspage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}

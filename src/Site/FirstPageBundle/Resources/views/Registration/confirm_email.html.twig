@@ -1,0 +1,25 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+	<div class="container"><br><br>
+		{% if name %}
+			<div class="alert alert-success alert-dismissible" role="alert">
+				<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+				<strong>Всё отлично, {{ name }}!</strong> Ваш Email подтвержден.
+			</div>
+		{% else %}
+			<div class="alert alert-danger alert-dismissible" role="alert">
+				<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span></button>
+				<strong>Ошибка!</strong> Ваш Email не может быть подтвержден этим ключом.
+			</div>
+		{% endif %}
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        var timerMulti;
+        $( document ).ready( function() { timerMulti = window.setTimeout("document.location.href = '/cabinet';", 3000); });
+    </script>
+{% endblock %}

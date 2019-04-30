@@ -1,0 +1,72 @@
+<table style="border-collapse:collapse;width:502px;" align="center" border="0" cellpadding="0" cellspacing="0" width="752">
+  <tbody>
+    <tr>
+      <td>
+        <div style="width:500px;border-radius:5px;border:1px solid #FFC107;">
+          <table style="border-collapse:collapse;width:500px;border-radius:5px 5px 0 0;background:#FFEB3B;" align="center" border="0" cellpadding="0" cellspacing="0" width="750">
+            <tbody>
+              <tr>
+                <td style="vertical-align:top;" align="center" valign="top">                  
+                  <div style="line-height:35px;">&nbsp;<br></div>
+                  <div style="line-height:0;height:34px;"><h1 style="font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222;font-size:50px;font-weight:normal;text-shadow: 1px 1px 1px #FFFFFF;">MegaBob</h1></div>                  
+                  <div> <font color="#444444" face="Arial" size="3">
+                      <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center">Здравствуйте, <strong>{{ name }}</strong>!<br>
+                      В своё время Вы зарегистрировались на нашем сайте<br>
+                      и разместили у нас свои объявления.<br>
+                      В знак благодарности мы подготовили Вам<br>
+                      <b>ПОДАРОК - БОНУС на {{ bonus }} руб!</b><br>                      
+                      </p>
+                    </font></div>
+                  <div style="line-height:12px;height:24px;">&nbsp;<br>
+                    &nbsp;</div>
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+          <table style="border-collapse:collapse;width:500px;background:#fff;" align="center" border="0" cellpadding="0" cellspacing="0" width="750">
+            <tbody>
+              <tr>
+                <td style="vertical-align:top;padding:20px;" align="center" valign="top">                                   
+                  <div style="line-height:16px;height:16px;">&nbsp;</div>
+                  <div>
+                    <p style="font-size:18px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center">
+                    Заберите Ваш подарок <br>&nbsp;</p>
+                    <p>Это займет всего 1 секунду вашего драгоценного времени!</p><br>&nbsp;<br>
+                    <a href="https://www.megabob.ru/take_bonus?uid={{token}}" target="_blank" style="font-size:24px;color:#FFFFFF;text-decoration:none;background:#FFC107;padding:15px;border-radius:8px" title="Получить бонус">Получить бонус сейчас</a></p>                    
+                    {% if bonus %}<p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center"><br>Бонусом для продвижения Ваших объявлений<br> будет <b>{{ bonus }} руб.</b> на Ваш счет от MegaBob!</p>{% endif %}
+                    <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center"><br>Срок действия предложения неограничен.</p>                    
+                  </div>
+                  <div style="line-height:14px;height:28px;">&nbsp;<br>
+                    &nbsp;</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table style="border-collapse:collapse;width:500px;border-radius:0 0 5px 5px;background:#FFEB3B;" align="center" border="0" cellpadding="0" cellspacing="0" width="750">
+            <tbody>
+              <tr>
+                <td style="vertical-align:top;" align="center" valign="top">
+                  <div style="line-height:18px;height:36px;">&nbsp;<br>
+                    &nbsp;</div>
+                  <div> <font color="#444444" face="Arial" size="3">
+                      <p style="font-size:15px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center">
+                        <strong>Мы очень хотим видеть Ваши объявления на нашем сайте!</strong><br>
+                        Администрация MegaBob.<br>&nbsp;<br>
+                        <a href="https://www.megabob.ru" target="_blank" style="color:#333333;text-decoration:none;background:#FFFFFF;border:1px solid #FFC107;padding:5px 15px;border-radius:6px;" title="Перейти на MegaBob.ru">Перейти на MegaBob.ru</a></p>
+                    </font> </div>
+                  <div style="line-height:16px;height:12px;">&nbsp;</div>
+                  <div> <font color="#444444" face="Arial" size="3"><br>
+                      <p style="font-size:14px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center">
+                        Вы получили это письмо,<br> т.к. являетесь пользователем сайта MegaBob.ru<br>
+                        Email: {{ email }} указан как контактный.<br> Пожалуйста, не отвечайте на это письмо.<br>
+                        <br>&nbsp;<br></p>
+                    </font> </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

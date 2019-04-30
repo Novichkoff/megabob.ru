@@ -1,0 +1,141 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% block canonical %}{{ url('site_user_advs_page', { 'user_id' : t_user.id }) }}{% endblock%}
+{% block title %}Объявления пользователя {{ t_user.Realname | title }}{% endblock %}
+{% block metatitle %}Объявления пользователя {{ t_user.Realname | title }}{% endblock %}
+{% block description 'Здесь представлены все объявления пользователя {{ t_user.Realname | title }}' %}
+            
+            {% block content %}
+                <div class="clearfix">
+                    <div class="clearfix" id="main">                        
+                        {# Объявления #}
+                        <div class="col-md-9 padding-5 advs-cat">
+                            {# Баннер под поиском #}
+                            {% if banner_search and user.roles[1] is not defined %}
+                              <div class="clearfix padding-5 text-center banner" onclick="set_click({{ banner_search.id }})">
+                                <div style="width: {% if banner_search.width %}{{ banner_search.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                                  {{ banner_search.code|raw }}
+                                </div>
+                              </div>
+                            {% endif %}
+                            {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                                        <div class="alert alert-success alert-dismissible" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+                                        </button>{{ flashMessage }}
+                                        </div>
+                            {% endfor %}
+                            {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                                        <div class="alert alert-danger alert-dismissible" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+                                        </button>{{ flashMessage }}</div>
+                            {% endfor %}
+                            {% if app.user is defined and app.user.UserMessagess is defined %}
+                              {% set msg_cnt = 0 %}
+                              {% if app.user.UserMessagess|length %}                                
+                                {% for msg in app.user.UserMessagess %}
+                                  {% if not msg.viewed %}{% set msg_cnt = msg_cnt+1 %}{% endif %}
+                                {% endfor %}
+                              {% endif %}
+                              {% if msg_cnt %}
+                                <div class="alert alert-danger" role="alert">
+                                  <b>Внимание!</b> У Вас есть непрочитанные сообщения! <a class="btn btn-red" href="{{ path('user_messages_page', { region: top_panel.url_region }) }}">Перейти к сообщениям</a>
+                                </div>
+                              {% endif %}
+                            {% endif %}                
+                            {# Хлебные крошки #}
+                            <div class="clearfix" xmlns:v="http://rdf.data-vocabulary.org/#">
+                              <ol class="breadcrumb">
+                                <li><a href="{{ path('site_first_page_homepage') }}" title="Главная" rel="v:url" property="v:title">Все объявления</a></li>
+                                <li class="active">{{ t_user.Realname | title }}</li>
+                              </ol>
+                            </div>
+                            
+                            <h1 class="padding-5">Объявления пользователя {{ t_user.Realname | title }}</h1>
+
+                            {# Настройка вида #}
+                            <div class="clearfix setview">
+                                <div class="col-sm-3 hidden-xs btn-group padding-0" role="group" aria-label="view">
+                                    <button title="Плитка" type="button"
+                                            class="btn btn-default{% if view == 'grid' %} active{% endif %}"
+                                            onclick="set_param('view','grid');"><i class="fa fa-th"></i></button>
+                                    <button title="Список" type="button"
+                                            class="btn btn-default{% if view == 'line' %} active{% endif %}"
+                                            onclick="set_param('view','line');"><i class="fa fa-list"></i></button>
+                                    <button title="Таблица" type="button"
+                                            class="btn btn-default{% if view == 'list' %} active{% endif %}"
+                                            onclick="set_param('view','list');"><i class="fa fa-table"></i></button>
+                                </div>
+                                <div class="col-sm-3 hidden-xs btn-group padding-0" role="group" aria-label="onpage">
+                                    <button title="Выводить по 20" type="button"
+                                            class="btn btn-default{% if onpage == '24' %} active{% endif %}"
+                                            onclick="set_param('onpage',24);">20
+                                    </button>
+                                    <button title="Выводить по 50" type="button"
+                                            class="btn btn-default{% if onpage == '48' %} active{% endif %}"
+                                            onclick="set_param('onpage',48);">50
+                                    </button>
+                                    <button title="Выводить по 100" type="button"
+                                            class="btn btn-default{% if onpage == '96' %} active{% endif %}"
+                                            onclick="set_param('onpage',96);">100
+                                    </button>
+                                </div>
+                                <div class="col-sm-6 text-right padding-0">
+                                    {{ knp_pagination_render(advs) }}
+                                </div>
+                            </div>
+
+                            {% embed "SiteFirstPageBundle:Default:"~view~".html.twig" %}{% endembed %}
+							
+							{# Баннер #}
+                              {% if banner_bottom and user.roles[1] is not defined %}
+                                <div class="clearfix padding-5 text-center banner" onclick="set_click({{ banner_bottom.id }})">
+                                  <div style="width: {% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                                    {{ banner_bottom.code|raw }}
+                                  </div>
+                                </div>
+                              {% endif %}
+							
+							<div class="clearfix">
+							
+								<p>На этой странице представлены все объявления пользователя {{ t_user.Realname | title }}. На нашем сайте пользователь {{ t_user.Realname | title }} разместил {% if advs|length == 1%}одно бесплатное объявление{% else %}{{ advs|length }} бесплатных объявлений{% endif %}. Вы также можете разместить свое объявление совершенно бесплатно и без регистрации в Вашем городе.</p>
+                                
+                              
+								<h4 class="padding-5">Хотите разместить свое объявление?</h4>
+								<p class="padding-5">Чтобы подать объявление необходимо заполнить простую форму
+									размещения бесплатного объявления, выбрать регион, рубрику, придумать привлекательный заголовок и полный текст своего
+									объявления, максимально заполнить характеристики и указать адекватную стоимость, свой e-mail
+									и телефон. Добавьте фотографии — они помогут привлечь больше просмотров вашего объявления.
+								</p>
+								<p class="padding-5">
+								  <a class="btn btn-addnew" href="{{ path('add_adv_page', { region: top_panel.url_region }) }}"
+									title="Подать объявление">Подать объявление</a>
+								 </p>							  
+
+                            </div>
+
+                        </div>
+
+                        {# Правая сторона страницы #}
+                        <div class="col-md-3 clearfix">
+
+                            {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+                            {# Вы смотрели #}
+                            {% if advs|length > 5 %}{% include 'SiteFirstPageBundle:Default:yadvs.html.twig' %}{% endif %}				
+                            
+                            {# Баннер в правой колонке #}
+                            {% if banner_right and user.roles[1] is not defined and (advs|length) > 0 %}
+                            </div>
+                            <div class="col-md-3 padding-5 clearfix">
+                                <div class="padding-5 visible-md-block visible-lg-block clearfix">
+                                  <aside>
+                                      <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+                                          <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+                                      </div>
+                                  </aside>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>                    
+                </div>
+            {% endblock %}

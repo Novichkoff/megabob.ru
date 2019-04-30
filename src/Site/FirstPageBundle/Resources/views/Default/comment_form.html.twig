@@ -1,0 +1,59 @@
+{% block form_label %}
+    {% spaceless %}
+        {% if label is not sameas(false) %}
+            {% if not compound %}
+    {% set label_attr = label_attr|merge({'for': id}) %}
+{% endif %}
+            {% if label is empty %}
+    {% set label = name|humanize %}
+{% endif %}
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %} class="filter_label">{{ label|trans({}, 'FOSUserBundle') }}</label>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_label %}
+
+{% block text_widget %}
+    {% spaceless %}
+        <input type="text" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}>
+    {% endspaceless %}
+{% endblock text_widget %}
+
+{% block textarea_widget %}
+    {% spaceless %}
+        <textarea rows="2" cols="50"
+                  class="form-control" {{ block('widget_attributes') }}>{% if value is defined %}{{ value }}{% endif %}</textarea>
+    {% endspaceless %}
+{% endblock textarea_widget %}
+
+{% block form_row %}
+    {% spaceless %}
+        {{ form_errors(form) }}
+        {{ form_widget(form) }}
+    {% endspaceless %}
+{% endblock form_row %}
+
+{% block submit_widget %}
+    {% spaceless %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <div>
+            <button type="{{ type|default('submit') }}" {{ block('button_attributes') }}
+                    class="btn btn-default">{{ label|trans({}, translation_domain) }}</button>
+        </div>
+    {% endspaceless %}
+{% endblock submit_widget %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for error in errors %}
+                        <li>{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}

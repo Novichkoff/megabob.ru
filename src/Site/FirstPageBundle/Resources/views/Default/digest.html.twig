@@ -1,0 +1,49 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% block title %}Дайджест самых интересных объявлений{% endblock %}
+{% block description %}Здесь мы отобрали самые интересные бесплатные объявления на нашем сайте.{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/sitefirstpage/css/animate.css') }}" rel="stylesheet">
+{% endblock %}
+{% block content %}    
+      {# Хлебные крошки #}		
+		<div class="clearfix" xmlns:v="http://rdf.data-vocabulary.org/#">
+			<ol class="breadcrumb">
+				<li typeof="v:Breadcrumb">
+					<a href="{{ path('site_first_page_homepage', { region: top_panel.url_region }) }}"
+						 title="{% if top_panel.current_region %}{{ top_panel.current_region }}{% elseif top_panel.current_area %}{{ top_panel.current_area }}{% endif %}"
+						 rel="v:url"
+						 property="v:title">{% if top_panel.current_region %}{{ top_panel.current_region }}{% elseif top_panel.current_area %}{{ top_panel.current_area }}{% else %}<i class="fa fa-home"></i>{% endif %}</a>
+				</li>
+				<li>Дайджест</li>
+			</ol>
+		</div>
+	  <h1 class="padding-5">Дайджест самых интересных объявлений</h1>
+	  <div class="popular-advs-main">
+		{# объявления #}           
+        <div class="clearfix padding-5">		  
+          <div class="clearfix digest_advs">
+            {% for last_adv in digest_advs if last_adv %}
+    
+        <div class="clearfix">
+            <a href="{{ path('site_adv_page', { 'id' : last_adv.id , region: top_panel.url_region}) }}"
+					title="{{ last_adv.name|slice(0, 1)|upper~last_adv.name|slice(1) }}">
+			<img class="img-responsive" src="{{ asset('images/a/images/') }}{{ last_adv.AdvImagess.Data[0].mediumThumb }}"
+                 alt="{{ last_adv.name|slice(0, 1)|upper~last_adv.name|slice(1) }}"
+                 title="{{ last_adv.name|slice(0, 1)|upper~last_adv.name|slice(1) }}">
+			</a>
+            <div class="digest_text text-justify">
+                <div><a href="{{ path('site_adv_page', { 'id' : last_adv.id , region: top_panel.url_region}) }}"
+					title="{{ last_adv.name|slice(0, 1)|upper~last_adv.name|slice(1) }}"><h4>{{ last_adv.name|slice(0, 1)|upper~last_adv.name|slice(1) }} {{ last_adv.Regions.PageTitle }}</h4></a>
+					{{ last_adv.description|slice(0, 1)|upper~last_adv.description|slice(1) | truncate(400, true, ' ...') }}
+				</div>                
+            </div>
+        </div>
+    
+{% endfor %}
+          </div>        
+        </div>
+      </div>    
+       
+  </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{# Личный кабинет #}
+{% if user != 'anon.' %}
+    <div class="col-sm-6 col-md-12 padding-5 clearfix">
+		<div class="panel panel-default">
+			<div class="panel-heading">				
+				<strong>{{ user.Realname }}</strong>
+			</div>
+			<div class="panel-body cabb">
+				<img width="20" height="20" src="/images/profile.svg" alt="Профиль" title="Профиль"> <a href="{{ path('user_cabinet_page', { region: top_panel.url_region}) }}" title="Настройки моего профиля">Профиль</a><br>
+				<img width="20" height="20" src="/images/wallet.svg" alt="Кошелек" title="Кошелек"> <a href="{{ path('user_balance_page', { region: top_panel.url_region}) }}" title="Баланс">Кошелек{% if app.user.userAccounts[0].balance is defined and app.user.userAccounts[0].balance %}<span class="pull-right label label-success" title="Баланс">{{ app.user.userAccounts[0].balance|number_format(0, '.', ' ') }} р.</span>{% endif %}</a><br>
+				<img width="20" height="20" src="/images/bookmark.svg" alt="Избранное" title="Избранное"> <a id="fav_advs" href="{{ path('user_favorites_page', { region: top_panel.url_region}) }}" title="В избранное">Избранное{% if user.UserFavorites|length %} <span class="pull-right label label-primary" id="fav_count" title="Количество избранных объявлений">{{ user.UserFavorites|length}}</span>{% endif %}</a><br>
+				<img width="20" height="20" src="/images/ob.svg" alt="Объявления" title="Объявления"> <a href="{{ path('user_advs_page', { region: top_panel.url_region}) }}" title="Мои объявления">Объявления{% if user.Advss|length %} <span class="pull-right label label-primary" title="Количество объявлений">{{ user.Advss|length}}</span>{% endif %}</a><br>
+				{% if user.Shopss|length %}
+          <img width="20" height="20" src="/images/business.svg" alt="Компании" title="Компании"> <a href="{{ path('user_companies_page', { region: top_panel.url_region }) }}" title="Мои компании">Компании{% if user.Shopss|length %} <span class="pull-right label label-success">{{ user.Shopss|length}}</span>{% endif %}</a><br>
+        {% endif %}
+        {% set msg_cnt = 0 %}
+        {% if user.UserMessagess|length %}          
+          {% for msg in user.UserMessagess %}
+            {% if not msg.viewed %}{% set msg_cnt = msg_cnt+1 %}{% endif %}
+          {% endfor %}
+        {% endif %}
+        <img width="20" height="20" src="/images/messages.svg" alt="Сообщения" title="Сообщения"> <a href="{{ path('user_messages_page', { region: top_panel.url_region }) }}">Сообщения{% if msg_cnt %} <span class="pull-right label label-danger" title="Количество сообщений">{{ msg_cnt }}</span>{% endif %}</a>
+			</div>
+			<div class="panel-footer clearfix">
+				<a href="{{ path('fos_user_security_logout', { region: top_panel.url_region}) }}" class="btn btn-default btn-xs pull-right"><i class="fa fa-power-off fa-fw"></i> Выход</a>
+			</div>
+		</div>
+	</div>
+{% endif %}

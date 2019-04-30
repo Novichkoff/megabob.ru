@@ -1,0 +1,103 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% block title %}Карта сайта объявлений{% if region != 'russia' %} {{ region_select.pagetitle }}{% endif %}{% if area != 'all' %} {{ area_select.pagetitle }}{% endif %}{% endblock %}
+{% block description %}Полная карта сайта бесплатных объявлений{% if region != 'russia' %} {{ region_select.pagetitle }}{% endif %}{% if area != 'all' %} {{ area_select.pagetitle }}{% else %} вашего города{% endif %}{% endblock %}
+{% block content %}
+    <div class="clearfix">
+        <div class="clearfix" xmlns:v="http://rdf.data-vocabulary.org/#">
+            <ol class="breadcrumb">
+                <li typeof="v:Breadcrumb"><a href="{{ path('site_first_page_homepage', { region: 'russia' }) }}" title="Главная" rel="v:url" property="v:title"><i class="fa fa-home"></i></a></li>
+				<li typeof="v:Breadcrumb">
+					{% if area == 'all' %}
+						Карта сайта
+					{% else %}
+						<a
+                            href="{{ path('sitemap_page') }}"
+                            title="Карта сайта" rel="v:url" property="v:title">Карта сайта</a>
+					{% endif %}
+				</li>
+                {% if area != 'all' %}
+                    {% if region_select %}
+						<li class="active" typeof="v:Breadcrumb"><a href="{{ path('sitemap_page', { area : area_select.alias }) }}"
+                           title="{{ area_select.name }}" rel="v:url" property="v:title">{{ area_select.name }}</a></li>
+					   <li class="active">{{ region_select.name }}</li>
+					{% else %}
+						<li class="active">{{ area_select.name }}</li>
+					{% endif %}
+                {% endif %}
+            </ol>
+        </div>
+        {% if area == 'all' %}
+            <h1 class="padding-5">Карта сайта</h1>            
+			{# Поиск Яндекса #}
+			<div class="clearfix text-center">
+				<div class="ya-site-form ya-site-form_inited_no" onclick="return {'action':'http://claso.ru/yandex_search','arrow':false,'bg':'transparent','fontsize':16,'fg':'#000000','language':'ru','logo':'rb','publicname':'Яндекс Поиск по сайту','suggest':false,'target':'_self','tld':'ru','type':2,'usebigdictionary':true,'searchid':2225272,'webopt':false,'websearch':false,'input_fg':'#666666','input_bg':'#ffffff','input_fontStyle':'normal','input_fontWeight':'normal','input_placeholder':'Яндекс Поиск по сайту','input_placeholderColor':'#999999','input_borderColor':'#4f9fcf'}">
+					<form action="http://yandex.ru/sitesearch" method="get" target="_self">
+						<input type="hidden" name="searchid" value="2225272"/>
+						<input type="hidden" name="l10n" value="ru"/>
+						<input type="hidden" name="reqenc" value="utf-8"/>
+						<input type="search" name="text" value=""/>
+						<input type="submit" value="Найти"/>
+					</form>
+				</div>
+			</div>
+			<h2 class="padding-5">Регионы</h2>
+			<ul id="tree_list">
+                {% for area in areas if area %}
+                    <li><a href="{{ path('sitemap_page', { area : area.alias, region: top_panel.url_region }) }}"
+                           title="{{ area.name }}">{{ area.name }}</a></li>
+                {% endfor %}
+            </ul>
+			<hr>
+			<h2 class="padding-5">Разделы</h2>
+			<ul id="tree_list" class="tl">                
+				{% for category in categories if category %}
+					<li>
+					<h3><a href="{{ path('site_category_page', { alias: category.alias }) }}" title="{{ category.name }}">{{ category.name }}</a></h3>
+					<ul>{% for ccategory in category.AdChildss if ccategory %}
+							<li>
+							<a href="{{ path('site_category_page', { alias: ccategory.alias }) }}" title="{{ ccategory.name }}">{{ ccategory.name }}</a>
+							</li>{% endfor %}</ul>
+					</li>
+				{% endfor %}                
+            </ul>
+        {% elseif region == 'russia' %}
+            <h1 class="padding-5">Карта сайта объявлений {{ area_select.pagetitle }}</h1>
+            <h2 class="padding-5">Регионы</h2>
+			<ul id="tree_list">
+                {% for town in towns if town %}
+                    <li><a href="{{ path('sitemap_page', { area : area, region: town.alias }) }}"
+                           title="{{ town.name }}">{{ town.name }}</a></li>
+                {% endfor %}
+            </ul>
+			<hr>
+			<h2 class="padding-5">Разделы</h2>
+			<ul id="tree_list" class="tl">                
+				{% for category in categories if category %}
+					<li>
+					<h3><a href="{{ path('site_category_page', { alias: category.alias, region: area_select.alias }) }}" title="{{ category.name }} {{ area_select.pagetitle }}">{{ category.name }}</a></h3>
+					<ul>{% for ccategory in category.AdChildss if ccategory %}
+							<li>
+							<a href="{{ path('site_category_page', { alias: ccategory.alias, region: area_select.alias }) }}" title="{{ ccategory.name }} {{ area_select.pagetitle }}">{{ ccategory.name }}</a>
+							</li>{% endfor %}</ul>
+					</li>
+				{% endfor %}                
+            </ul>
+        {% else %}
+            <h1 class="padding-5">Карта сайта объявлений {{ region_select.pagetitle }}</h1>
+            <h2 class="padding-5">Разделы</h2>
+			<ul id="tree_list" class="tl">                
+				{% for category in categories if category %}
+					<li>
+					<h3><a href="{{ path('site_category_page', { alias: category.alias, region: region_select.alias }) }}" title="{{ category.name }} {{ region_select.pagetitle }}">{{ category.name }}</a></h3>
+					<ul>{% for ccategory in category.AdChildss if ccategory %}
+							<li>
+							<a href="{{ path('site_category_page', { alias: ccategory.alias, region: region_select.alias }) }}" title="{{ ccategory.name }} {{ region_select.pagetitle }}">{{ ccategory.name }}</a>
+							</li>{% endfor %}</ul>
+					</li>
+				{% endfor %}                
+            </ul>
+        {% endif %}
+        <hr>
+        <p class="padding-5">Полная карта всех разделов сайта по регионам и городам</p>
+    </div>
+{% endblock %}

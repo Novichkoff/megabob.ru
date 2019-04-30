@@ -1,0 +1,346 @@
+site_well_page:
+    pattern:  /.well-known/acme-challenge/aEIRE_ecm-YTsX_DDclrRNK5mx0qdWj5surAbcjjI5E
+    defaults: { _controller: SiteFirstPageBundle:Default:well }
+    
+site_robots_page:
+    pattern:  /robots.txt
+    defaults: { _controller: SiteFirstPageBundle:Default:robots }
+    
+site_ads_page:
+    pattern:  /ads.txt
+    defaults: { _controller: SiteFirstPageBundle:Default:ads }
+    
+site_test_page:
+    pattern:  /test_page
+    defaults: { _controller: SiteFirstPageBundle:Test:index }
+
+site_bot_page:
+    pattern:  /bot
+    defaults: { _controller: SiteFirstPageBundle:Bot:index, region: russia }
+    
+site_bot_send_page:
+    pattern:  /bot/send
+    defaults: { _controller: SiteFirstPageBundle:Bot:send, region: russia }
+    
+site_random_adv_page:
+    pattern:  /russia/random
+    defaults: { _controller: SiteFirstPageBundle:OneAdv:randomAdv, region: russia }    
+    
+site_set_session:
+    pattern:  /set/session
+    defaults: { _controller: SiteFirstPageBundle:Default:setSession }
+    
+email_confirm_page:
+    pattern:  /confirm_email
+    defaults: { _controller: SiteFirstPageBundle:UserRegistration:emailActivation }
+    
+restore_advs_page:
+    pattern:  /restore
+    defaults: { _controller: AdminAdminBundle:Sender:restore }  
+
+take_bonus_advs_page:
+    pattern:  /take_bonus
+    defaults: { _controller: AdminAdminBundle:Sender:takeBonus }     
+
+unsubscribe_page:
+    pattern:  /unsubscribe
+    defaults: { _controller: SiteFirstPageBundle:UserRegistration:unsubscribe }
+
+unsubscriber_page:
+    pattern:  /unsubscribe_page
+    defaults: { _controller: SiteFirstPageBundle:UserRegistration:unsubscriber }
+
+email_confirm_send_page:
+    pattern:  /confirm_email_send/{id}
+    defaults: { _controller: SiteFirstPageBundle:UserRegistration:emailActivationSend }
+    requirements:
+                id:  \d+
+
+all_advs_page:
+    pattern: /all_advs
+    defaults: { _controller: SiteFirstPageBundle:Default:allAdvs, _format: json }
+
+all_areas_map_page:
+    pattern: /all_areas_map
+    defaults: { _controller: SiteFirstPageBundle:Default:allAreasMap, _format: json }
+
+all_advs_on_map_page:
+    pattern: /all_advs_on_map
+    defaults: { _controller: SiteFirstPageBundle:Default:allAdvsOnMap, _format: json }
+
+site_digest_page:
+    pattern:  /digest
+    defaults: { _controller: SiteFirstPageBundle:Default:digest, region: russia }
+
+yandex_search_page:
+    pattern:  /yandex_search
+    defaults: { _controller: SiteFirstPageBundle:Default:yandexSearch, region: russia }
+
+site_clear_history_page:
+    pattern:  /clear_history
+    defaults: { _controller: SiteFirstPageBundle:Default:clearHistory, region: russia }
+
+rss_page:
+    pattern: /rss
+    defaults: { _controller: SiteFirstPageBundle:Feeds:rss, _format: xml }
+    
+rss_vk_page:
+    pattern: /rss_vk
+    defaults: { _controller: SiteFirstPageBundle:Feeds:rssVk, _format: xml }
+
+partner_page:
+    pattern: /partner
+    defaults: { _controller: SiteFirstPageBundle:Default:partner }    
+    
+yandex_auto_page:
+    pattern: /yandex_auto
+    defaults: { _controller: SiteFirstPageBundle:Feeds:yandexAuto, _format: xml }
+
+yandex_realty_page:
+    pattern: /yandex_realty
+    defaults: { _controller: SiteFirstPageBundle:Feeds:yandexRealty, _format: xml }
+
+yandex_vacancy_page:
+    pattern: /yandex_vacancy
+    defaults: { _controller: SiteFirstPageBundle:Feeds:yandexVacancy, _format: xml }
+    
+site_add_shop_page:
+    pattern: /{region}/add-shop
+    defaults: { _controller: SiteFirstPageBundle:Adv:addShop, region: russia }
+
+add_adv_page:
+    pattern: /{region}/add/{alias}
+    defaults: { _controller: SiteFirstPageBundle:Adv:add, region: russia, alias: NULL }
+
+add_Update_adv_page:
+    pattern: /add_update
+    defaults: { _controller: SiteFirstPageBundle:Adv:addUpdate, region: russia }
+
+user_registration_register:
+    pattern: /registration
+    defaults: { _controller: SiteFirstPageBundle:UserRegistration:index, region: russia }
+
+user_cabinet_page:
+    pattern: /cabinet
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:index, region: russia }
+
+user_advs_page:
+    pattern: /myadvs
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:myadvs, region: russia }
+
+user_favorites_page:
+    pattern: /myfavorites
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:myfavorites, region: russia }
+
+favorites_page:
+    pattern: /favorites
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:favorites, region: russia }
+
+user_companies_page:
+    pattern: /mycompanies
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:mycompanies, region: russia }
+
+shop_edit_page:
+    pattern: /edit_shop/{id}
+    defaults: { _controller: SiteFirstPageBundle:Adv:editShop, region: russia }
+    requirements:
+                id:  \d+
+
+user_messages_page:
+    pattern: /mymessages
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:mymessages, region: russia }
+
+full_message_page:
+    pattern: /full_message
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:fullMessage, region: russia }
+
+user_balance_page:
+    pattern: /mybalance
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:myBalance, region: russia }
+    
+paid_adv_page:
+    pattern: /paid_adv/{id}
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:paidAdv, region: russia }
+    requirements:
+                id:  \d+
+                
+free_adv_page:
+    pattern: /free_adv/{id}
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:freeAdv, region: russia }
+    requirements:
+                id:  \d+
+   
+user_fill_account_page:
+    pattern: /fill_account
+    defaults: { _controller: SiteFirstPageBundle:Adv:fillAccount }
+    
+user_fill_qiwi_page:
+    pattern: /fill_qiwi
+    defaults: { _controller: SiteFirstPageBundle:Adv:fillQiwi }
+
+edit_adv_page:
+    pattern: /edit_adv/{id}
+    defaults: { _controller: SiteFirstPageBundle:Adv:edit, region: russia }
+    requirements:
+                id:  \d+
+on_adv_page:
+    pattern: /on_adv/{id}
+    defaults: { _controller: SiteFirstPageBundle:Adv:on, region: russia }
+    requirements:
+                id:  \d+
+
+update_adv_page:
+    pattern: /update_adv/{id}
+    defaults: { _controller: SiteFirstPageBundle:Adv:update, region: russia }
+    requirements:
+                id:  \d+
+
+update_all_advs_page:
+    pattern: /update_all_advs
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:updateAllAdvs }
+    
+update_all_advs_from_mail_page:
+    pattern: /update_mail
+    defaults: { _controller: SiteFirstPageBundle:UserCabinet:updateAllAdvsFromMail }
+
+off_adv_page:
+    pattern: /off_adv/{id}
+    defaults: { _controller: SiteFirstPageBundle:Adv:off, region: russia }
+    requirements:
+                id:  \d+
+
+delete_adv_page:
+    pattern: /delete_adv/{id}
+    defaults: { _controller: SiteFirstPageBundle:Adv:delete, region: russia }
+    requirements:
+                id:  \d+
+
+delete_forever_adv_page:
+    pattern: /delete_forever_adv/{id}
+    defaults: { _controller: SiteFirstPageBundle:Adv:deleteForever, region: russia }
+    requirements:
+                id:  \d+
+
+adv_to_top_page:
+    pattern: /adv_to_top
+    defaults: { _controller: SiteFirstPageBundle:Adv:advToTop, region: russia }
+
+adv_highlight_page:
+    pattern: /adv_highlight
+    defaults: { _controller: SiteFirstPageBundle:Adv:advHighlight, region: russia }
+    
+adv_company_page:
+    pattern: /adv_company
+    defaults: { _controller: SiteFirstPageBundle:Adv:advCompany, region: russia }
+
+search_form_update_form:
+    pattern: /search_form_update
+    defaults: { _controller: SiteFirstPageBundle:Default:search_form_update, region: russia }
+
+site_search_page:
+    pattern:  /{region}/search
+    defaults: { _controller: SiteFirstPageBundle:Search:index, region: russia }
+
+site_pages_page:
+    pattern:  /pages/{alias}
+    defaults: { _controller: SiteFirstPageBundle:Pages:index, region: russia }
+
+site_news_page:
+    pattern:  /news
+    defaults: { _controller: SiteFirstPageBundle:News:news, region: russia }
+
+site_news_item_page:
+    pattern:  /news/{alias}
+    defaults: { _controller: SiteFirstPageBundle:News:index, region: russia }
+
+region_update_form:
+    pattern: /region_update
+    defaults: { _controller: SiteFirstPageBundle:Default:region_update, region: russia }
+
+site_add_to_favorite_page:
+    pattern:  /add_to_favorite/{id}
+    defaults: { _controller: SiteFirstPageBundle:Default:add_to_favorite }
+    requirements:
+                    id:  \d+
+
+site_delete_favorite_page:
+    pattern:  /del_favorite/{id}
+    defaults: { _controller: SiteFirstPageBundle:Default:del_favorite }
+    requirements:
+                    id:  \d+
+
+site_add_to_favorite_n_page:
+    pattern:  /add_to_favorite_n/{id}
+    defaults: { _controller: SiteFirstPageBundle:Default:add_to_favorite_n }
+    requirements:
+                    id:  \d+
+
+site_delete_favorite_n_page:
+    pattern:  /del_favorite_n/{id}
+    defaults: { _controller: SiteFirstPageBundle:Default:del_favorite_n }
+    requirements:
+                    id:  \d+
+
+site_complain_page:
+    pattern:  /complain
+    defaults: { _controller: SiteFirstPageBundle:Default:complain, region: russia }
+
+get_params:
+    pattern: /get_params
+    defaults: { _controller: SiteFirstPageBundle:Default:getGetParams, region: russia }
+
+get_phone:
+    pattern: /get_phone
+    defaults: { _controller: SiteFirstPageBundle:Default:getPhone, region: russia }
+
+get_skype:
+    pattern: /get_skype
+    defaults: { _controller: SiteFirstPageBundle:Default:getSkype, region: russia }
+
+get_site_adv:
+    pattern: /get_site_adv
+    defaults: { _controller: SiteFirstPageBundle:Default:getSiteAdv, region: russia }
+
+set_click:
+    pattern: /set_click
+    defaults: { _controller: SiteFirstPageBundle:Default:setClick, region: russia }
+
+send_mail_page:
+    pattern: /send_mail
+    defaults: { _controller: SiteFirstPageBundle:Default:sendMail, region: russia }
+
+send_mail_admin_page:
+    pattern: /send_mail_admin
+    defaults: { _controller: SiteFirstPageBundle:Default:sendMailAdmin, region: russia }
+
+site_first_page_homepage:
+    pattern:  /{region}
+    defaults: { _controller: SiteFirstPageBundle:Default:index, region: russia }
+
+site_regions_page:
+    pattern:  /{region}/regions
+    defaults: { _controller: SiteFirstPageBundle:Default:allRegions, region: russia }
+
+site_shops_homepage:
+    pattern:  /{region}/companies
+    defaults: { _controller: SiteFirstPageBundle:Default:shops, region: russia }
+
+site_shop_advspage:
+    pattern:  /{region}/companies/{alias}
+    defaults: { _controller: SiteFirstPageBundle:Default:shop_advs, region: russia }
+
+site_user_advs_page:
+    pattern: /users/{user_id}
+    defaults: { _controller: SiteFirstPageBundle:Default:user, region: russia }
+    requirements:
+                user_id:  \d+
+                
+site_adv_page:
+    pattern:  /{region}/{category}/{subcategory}/{id}/{alias}
+    defaults: { _controller: SiteFirstPageBundle:OneAdv:adv, region: russia }
+    requirements:
+                id:  \d+
+   
+site_category_page:
+    pattern:  /{region}/{category}/{subcategory}/{parametr_1}/{parametr_2}/{parametr_3}
+    defaults: { _controller: SiteFirstPageBundle:Category:category, region: russia, subcategory: NULL, parametr_1: NULL, parametr_2: NULL, parametr_3: NULL }

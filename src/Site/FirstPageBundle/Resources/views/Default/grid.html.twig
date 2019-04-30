@@ -1,0 +1,268 @@
+{# Таблица объявлений #}
+<div class="clearfix">
+
+    {# Шапка таблицы #}
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>{% if advs.isSorted('price') %}{% if dir=='asc' %}<i class="fa fa-sort-numeric-asc"></i></i>{% else %}<i
+                        class="fa fa-sort-numeric-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Цена', 'price') }}
+            </th>
+            <th>{% if advs.isSorted('name') %}{% if dir=='asc' %}<i class="fa fa-sort-alpha-asc"></i>{% else %}<i
+                        class="fa fa-sort-alpha-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Название', 'name') }}
+            </th>
+            {% for field in fields %}
+                <th>{% if advs.isSorted('s_'~field.id) %}{% if dir=='asc' %}<i
+                        class="fa fa-sort-{% if field.type=='3' %}numeric{% else %}alpha{% endif %}-asc"></i>{% else %}
+                        <i
+                        class="fa fa-sort-{% if field.type=='3' %}numeric{% else %}alpha{% endif %}-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, field.filterName, 's_'~field.id) }}
+                </th>
+            {% endfor %}
+            <th>{% if advs.isSorted('photo') %}{% if dir=='asc' %}<i class="fa fa-sort-amount-asc"></i>{% else %}<i
+                        class="fa fa-sort-amount-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Фото', 'photo') }}
+            </th>
+            <th>{% if advs.isSorted('city') %}{% if dir=='asc' %}<i class="fa fa-sort-alpha-asc"></i>{% else %}<i
+                        class="fa fa-sort-alpha-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Город', 'city') }}
+            </th>
+            <th>{% if advs.isSorted('publish_date') %}{% if dir=='asc' %}<i class="fa fa-sort-amount-asc"></i>{% else %}<i
+                        class="fa fa-sort-amount-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Дата', 'publish_date') }}
+            </th>
+        </tr>
+        </thead>
+    </table>
+
+    {# Объявления #}
+    <div class="advs-table">
+        {% set advert = 0 %}
+        {% set column = 0 %}
+        <div class="clearfix">
+        {% if p_advs is defined %}
+          {% for adv in p_advs %}            
+            {% if column == 3 %}
+              {% set column = 1 %}</div><br><div class="clearfix new_row">
+            {% else %}
+              {% set column = column+1 %}
+            {% endif %}
+            <div class="col-xs-12 col-sm-6 col-md-4 padding-0 premium_td">
+              <div class="grid_td clearfix">
+                <div class="grid_img">
+                  <img class="img-packet-grid" src="{{ asset('bundles/sitefirstpage/images/vip.png') }}" alt="{{ adv.AdvPacketss[0].Packets.name }}" title="Использован пакет {{ adv.AdvPacketss[0].Packets.name }}">
+                  {% if adv.UpDate|date() != adv.CreateDate|date() %}<img class="use-up-grid" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+                  <a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+                     title="{{ adv.name }}">
+                    {% if adv.AdvImagess.Data[0] is defined %}
+                      <img src="{{ asset('images/a/images/') }}{{ adv.AdvImagess.Data[0].mediumThumb }}"
+                         class="img-responsive" alt="{{ adv.name }}" title="{{ adv.name }}">
+                      {% if adv.AdvImagess.Data|length > 1 %}
+                        <span class="photo-count">
+                          <span title="{{ adv.AdvImagess.Data|length }} фото">{{ adv.AdvImagess.Data|length }}</span>
+                        </span>
+                      {% endif %}
+                    {% elseif adv.Shops is defined and adv.Shops.icon is defined and adv.Shops.icon and adv.userType == 2 %}
+                      <img class="img-responsive"
+                         src="{{ asset('images/shops/images/') }}{{ adv.Shops.icon }}" alt="{{ adv.name }}"
+                         title="{{ adv.name }}">
+                    {% else %}
+                      <img class="img-responsive"
+                         src="{{ asset('bundles/sitefirstpage/images/no-photo-m.jpg') }}" alt="Нет фото"
+                         title="Нет фото">
+                    {% endif %}
+                  </a>
+                </div>
+                <div class="clearfix text-left padding-5">
+                  <small>{{ adv.AdCategories.name }}</small>
+				<small class="pull-right"
+                    title="Дата подачи объявления">{% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}Сегодня, {% endif %}{% if adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}Вчера, {% endif %}{{ adv.publishDate|date("d.m.y") }}</small>
+                {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                  {% if adv.UserFavorites.Data[0] is defined and adv.UserFavorites.Data[0].fosUserId == user.id %}
+                    <a class="red text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="delete_from_favorite({{ adv.id }})"
+                       title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+                  {% else %}
+                    <a class="text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="add_to_favorite({{ adv.id }})"
+                       title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+                  {% endif %}
+                {% else %}
+                  {% if top_panel.favorites is defined and adv.id in top_panel.favorites %}
+                    <a class="red text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="delete_from_favorite_n({{ adv.id }})"
+                       title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+                  {% else %}
+                    <a class="text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="add_to_favorite_n({{ adv.id }})"
+                       title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+                  {% endif %}
+                {% endif %}				
+                <br><small>{{ adv.Regions.Name }}</small><span
+                    class="grid-price pull-right">
+                    {% if adv.AdvPrices|reverse[0] is defined %}						
+                      {% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+                        <i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                      {% endif %}
+                    {% endif %}
+                  {% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</span>
+                <br>
+                
+				<a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+                   title="{{ adv.name }}"><b>{{ adv.name }}</b></a>
+                </div>
+              </div>
+            </div>
+            {% set advert = advert+1 %}
+          {% endfor %}
+        {% endif %}
+			
+        {% if l_advs is defined %}
+          {% for adv in l_advs %}            
+            {% if column == 3 %} 
+              {% set column = 1 %}</div><br><div class="clearfix new_row">
+            {% else %}
+              {% set column = column+1 %}
+            {% endif %}
+            <div class="col-xs-12 col-sm-6 col-md-4 padding-0 lite_td">
+              <div class="grid_td clearfix">
+                <div class="grid_img">
+                  <img class="img-packet-grid" src="{{ asset('bundles/sitefirstpage/images/turbo.png') }}" alt="{{ adv.AdvPacketss[0].Packets.name }}" title="Использован пакет {{ adv.AdvPacketss[0].Packets.name }}">
+                  {% if adv.UpDate|date() != adv.CreateDate|date() %}<img class="use-up-grid" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+                  <a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+                     title="{{ adv.name }}">
+                    {% if adv.AdvImagess.Data[0] is defined %}
+                      <img src="{{ asset('images/a/images/') }}{{ adv.AdvImagess.Data[0].mediumThumb }}"
+                         class="img-responsive" alt="{{ adv.name }}" title="{{ adv.name }}">
+                      {% if adv.AdvImagess.Data|length > 1 %}
+                        <span class="photo-count">
+                          <span title="{{ adv.AdvImagess.Data|length }} фото">{{ adv.AdvImagess.Data|length }}</span>
+                        </span>
+                      {% endif %}
+                    {% elseif adv.Shops is defined and adv.Shops.icon is defined and adv.Shops.icon and adv.userType == 2 %}
+                      <img class="img-responsive"
+                         src="{{ asset('images/shops/images/') }}{{ adv.Shops.icon }}" alt="{{ adv.name }}"
+                         title="{{ adv.name }}">
+                    {% else %}
+                      <img class="img-responsive"
+                         src="{{ asset('bundles/sitefirstpage/images/no-photo-m.jpg') }}" alt="Нет фото"
+                         title="Нет фото">
+                    {% endif %}
+                  </a>
+                </div>
+                <div class="clearfix text-left padding-5">
+                  <small>{{ adv.AdCategories.name }}</small>
+				<small class="pull-right"
+                    title="Дата подачи объявления">{% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}Сегодня, {% endif %}{% if adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}Вчера, {% endif %}{{ adv.publishDate|date("d.m.y") }}</small>
+                {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                  {% if adv.UserFavorites.Data[0] is defined and adv.UserFavorites.Data[0].fosUserId == user.id %}
+                    <a class="red text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="delete_from_favorite({{ adv.id }})"
+                       title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+                  {% else %}
+                    <a class="text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="add_to_favorite({{ adv.id }})"
+                       title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+                  {% endif %}
+                {% else %}
+                  {% if top_panel.favorites is defined and adv.id in top_panel.favorites %}
+                    <a class="red text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="delete_from_favorite_n({{ adv.id }})"
+                       title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+                  {% else %}
+                    <a class="text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="add_to_favorite_n({{ adv.id }})"
+                       title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+                  {% endif %}
+                {% endif %}				
+                <br><small>{{ adv.Regions.Name }}</small><span
+                    class="grid-price pull-right">
+                    {% if adv.AdvPrices|reverse[0] is defined %}						
+                      {% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+                        <i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                      {% endif %}
+                    {% endif %}
+                  {% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</span>
+                <br>                
+				<a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+                   title="{{ adv.name }}"><b>{{ adv.name }}</b></a>
+                </div>
+              </div>
+            </div>
+            {% set advert = advert+1 %}
+          {% endfor %}
+        {% endif %}
+        
+        {% for adv in advs %}          
+          {% if column == 3 %}
+            {% set column = 1 %}</div><br><div class="clearfix new_row">
+          {% else %}
+            {% set column = column+1 %}
+          {% endif %}
+          <div class="col-xs-12 col-sm-6 col-md-4 padding-0{% if adv.HlDate > date() %} hl_td{% endif %}">
+            <div class="grid_td clearfix">
+              <div class="grid_img">							
+                {% if adv.UpDate|date() != adv.CreateDate|date() %}<img class="use-up-grid" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+                <a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+                   title="{{ adv.name }}">
+                  {% if adv.AdvImagess.Data[0] is defined %}
+                    <img src="{{ asset('images/a/images/') }}{{ adv.AdvImagess.Data[0].mediumThumb }}"
+                       class="img-responsive" alt="{{ adv.name }}" title="{{ adv.name }}">
+                    {% if adv.AdvImagess.Data|length > 1 %}
+                      <span class="photo-count">
+                        <span title="{{ adv.AdvImagess.Data|length }} фото">{{ adv.AdvImagess.Data|length }}</span>
+                      </span>
+                    {% endif %}
+                  {% elseif adv.Shops is defined and adv.Shops.icon is defined and adv.Shops.icon and adv.userType == 2 %}
+                    <img class="img-responsive"
+                       src="{{ asset('images/shops/images/') }}{{ adv.Shops.icon }}" alt="{{ adv.name }}"
+                       title="{{ adv.name }}">
+                  {% else %}
+                    <img class="img-responsive"
+                       src="{{ asset('bundles/sitefirstpage/images/no-photo-m.jpg') }}" alt="Нет фото"
+                       title="Нет фото">
+                  {% endif %}
+                </a>
+              </div>
+              <div class="clearfix text-left padding-5">
+                <small>{{ adv.AdCategories.name }}</small>
+				<small class="pull-right"
+                    title="Дата подачи объявления">{% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}Сегодня, {% endif %}{% if adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}Вчера, {% endif %}{{ adv.publishDate|date("d.m.y") }}</small>
+                {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                  {% if adv.UserFavorites.Data[0] is defined and adv.UserFavorites.Data[0].fosUserId == user.id %}
+                    <a class="red text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="delete_from_favorite({{ adv.id }})"
+                       title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+                  {% else %}
+                    <a class="text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="add_to_favorite({{ adv.id }})"
+                       title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+                  {% endif %}
+                {% else %}
+                  {% if top_panel.favorites is defined and adv.id in top_panel.favorites %}
+                    <a class="red text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="delete_from_favorite_n({{ adv.id }})"
+                       title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+                  {% else %}
+                    <a class="text-nowrap" id="fav_{{ adv.id }}"
+                       onclick="add_to_favorite_n({{ adv.id }})"
+                       title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+                  {% endif %}
+                {% endif %}				
+                <br>
+				<small>{{ adv.Regions.Name }}</small>
+				<span
+                    class="grid-price pull-right">
+                    {% if adv.AdvPrices|reverse[0] is defined %}						
+                      {% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+                        <i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                      {% endif %}
+                    {% endif %}
+                  {% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</span>
+                <br>                
+				<a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+                   title="{{ adv.name }}"><b>{{ adv.name }}</b></a>
+              </div>
+            </div>
+          </div>
+          
+          {% endfor %}
+        </div>
+    </div>
+</div>

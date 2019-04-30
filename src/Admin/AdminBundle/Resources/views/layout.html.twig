@@ -1,0 +1,100 @@
+{% extends '::base.html.twig' %}
+{% block head %}
+
+    {% block stylesheets %}
+        {{ parent() }}
+        <link href="{{ asset('bundles/adminadmin/css/admin.css') }}" rel="stylesheet">
+        <link href="{{ asset('bundles/adminadmin/css/datepicker.css') }}" rel="stylesheet">
+        <link href="{{ asset('bundles/adminadmin/css/bootstrap-tagsinput.css') }}" rel="stylesheet">
+    {% endblock %}
+
+{% endblock %}
+
+{% block meta %}  
+  <title>Административная панель MegaBob</title>    
+{% endblock %}
+
+{% block body %}
+	<div id="wrapper">
+    {% block content_header %}
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Навигация</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url('admin_admin_homepage') }}">MB</a>
+				<ul class="nav navbar-top-links navbar-right">					
+					<li {% if app.request.attributes.get('_route') == 'admin_admin_advpage' %}class="active"{% endif %}><a href="{{ url('admin_admin_advspage') }}"><i class="fa fa-tags"></i> {% if for_moders.complaines %}<sup class="badge pull-right bg-red" title="{{ for_moders.complaines }} жалобы">{{ for_moders.complaines }}</sup>{% endif %} {% if for_moders.advs %}<sup class="badge pull-right bg-orange" title="Неодобрено {{ for_moders.advs }} объявления">{{ for_moders.advs }}</sup>{% endif %}</a></li>
+					<li><a href="{{ url('site_first_page_homepage') }}" target="_blank" title="На сайт"><i class="fa fa-desktop"></i></a></li>
+          <li><a href="{{ url('admin_sender_page') }}" title="Рассылка"><i class="fa fa-envelope"></i></a></li>
+				</ul>
+            </div>
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse collapse" aria-expanded="false">
+                    <ul class="nav" id="side-menu">
+                        <li{% if app.request.attributes.get('_route') == 'admin_admin_homepage' %} class="active"{% endif %}><a href="{{ url('admin_admin_homepage') }}"><i class="fa fa-fw fa-home"></i> Главная</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_settings_page' %} class="active"{% endif %}><a href="{{ url('admin_settings_page') }}"><i class="fa fa-fw fa-cogs"></i> Настройки</a></li>
+            <li{% if app.request.attributes.get('_route') == 'admin_admin_adminspage' %} class="active"{% endif %}><a href="{{ url('admin_admin_adminspage') }}"><i class="fa fa-fw fa-user"></i> Администраторы</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_userspage' %} class="active"{% endif %}><a href="{{ url('admin_admin_userspage') }}"><i class="fa fa-fw fa-users"></i> Пользователи</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_menuspage' %} class="active"{% endif %}><a href="{{ url('admin_admin_menuspage') }}"><i class="fa fa-fw fa-list"></i> Меню</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_pagespage' %} class="active"{% endif %}><a href="{{ url('admin_admin_pagespage') }}"><i class="fa fa-fw fa-files-o"></i> Страницы</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_newspage' %} class="active"{% endif %}><a href="{{ url('admin_admin_newspage') }}"><i class="fa fa-fw fa-newspaper-o"></i> Новости</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_regionspage' %} class="active"{% endif %}><a href="{{ url('admin_admin_regionspage') }}"><i class="fa fa-fw fa-dribbble"></i> Регионы</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_packetspage' %} class="active"{% endif %}><a href="{{ url('admin_admin_packetspage') }}"><i class="fa fa-fw fa-usd"></i> Пакеты</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_advpage' %} class="active"{% endif %}>
+							<a href="{{ url('admin_admin_advpage') }}"><i class="fa fa-fw fa-tags"></i> Объявления</a>
+							<ul class="nav nav-second-level">
+                                <li><a href="{{ url('admin_admin_categoriespage') }}">Категории</a></li>
+                                <li><a href="{{ path('admin_admin_advspage') }}">Объявления {% if for_moders.complaines %}<span class="badge pull-right" title="{{ for_moders.complaines }} жалобы">{{ for_moders.complaines }}</span>{% endif %} {% if for_moders.advs %}<span class="badge pull-right" title="Неодобрено {{ for_moders.advs }} объявления">{{ for_moders.advs }}</span>{% endif %}</a></li>                                
+                            </ul>
+						</li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_bannerspage' %} class="active"{% endif %}><a href="{{ url('admin_admin_bannerspage') }}"><i class="fa fa-fw fa-bullhorn"></i> Баннеры</a></li>
+						<li{% if app.request.attributes.get('_route') == 'admin_admin_shopshomepage' %} class="active"{% endif %}><a href="{{ url('admin_admin_shopshomepage') }}"><i class="fa fa-fw fa-building-o"></i> Компании {% if for_moders.shops %}<span class="badge pull-right bg-red" title="Новых компаний: {{ for_moders.shops }}">{{ for_moders.shops }}</span>{% endif %}</a></li>
+						<li><a href="{{ url('fos_user_security_logout') }}" title="Выход"><i class="fa fa-fw fa-sign-out"></i> Выход</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% endblock %}
+
+    <div class="main clearfix" id="page-wrapper">
+		<div class="block">
+			{% for flashMessage in app.session.flashbag.get('notice1') %}
+				<div class="alert alert-success alert-dismissable">
+					<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					{{ flashMessage }}
+				</div>
+			{% endfor %}
+			{% block content %}{% endblock %}
+		</div>
+	</div>
+       
+
+    {% if code is defined %}
+        <h2>Code behind this page</h2>
+        <div class="block">
+            <div class="symfony-content">{{ code|raw }}</div>
+        </div>
+    {% endif %}
+	</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('tinymce/tinymce.min.js') }}"></script>
+    <script src="{{ asset('bundles/adminadmin/js/modal.js') }}"></script>
+    <script src="{{ asset('bundles/adminadmin/js/popover.js') }}"></script>
+    <script src="{{ asset('bundles/adminadmin/js/bootstrap-datepicker.js') }}"></script>
+    <script>	
+      $(function(){
+        $('.datepicker').datepicker({
+          format: 'yyyy-mm-dd'
+        });
+      });
+    </script>    
+    <script src="{{ asset('bundles/adminadmin/js/bootstrap-tagsinput.js') }}"></script>
+{% endblock %}

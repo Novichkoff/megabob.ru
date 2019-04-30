@@ -1,0 +1,72 @@
+<table style="border-collapse:collapse;width:502px;" align="center" border="0" cellpadding="0" cellspacing="0" width="752">
+  <tbody>
+    <tr>
+      <td>
+        <div style="width:500px;border-radius:5px;border:1px solid #FFC107;">
+          <table style="border-collapse:collapse;width:500px;border-radius:5px 5px 0 0;background:#FFFACA;" align="center" border="0" cellpadding="0" cellspacing="0" width="750">
+            <tbody>
+              <tr>
+                <td style="vertical-align:top;" align="center" valign="top">
+                  <div style="line-height:18px;">&nbsp;<br>
+                              
+                            </div>
+                  <div style="line-height:0;height:34px;"><h1 style="font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222;font-size:50px;font-weight:normal;text-shadow: 1px 1px 1px #FFFFFF;">Claso.ru</h1></div>                  
+                  <div> <font color="#444444" face="Arial" size="3">
+                      <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center">Здравствуйте, <strong>{{ name }}</strong>!<br>
+                      Ранее Вы размещали свои объявления на сайте Claso.ru<br>
+                      Мы заметили что Ваши объявления<br> больше не показываются на сайте<br>
+                      и подготовили для Вас <b>уникальное предложение</b>.<br>
+                      </p>
+                    </font></div>
+                  <div style="line-height:12px;height:24px;">&nbsp;<br>
+                    &nbsp;</div>
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+          <table style="border-collapse:collapse;width:500px;background:#fff;" align="center" border="0" cellpadding="0" cellspacing="0" width="750">
+            <tbody>
+              <tr>
+                <td style="vertical-align:top;padding:20px;" align="center" valign="top">                                   
+                  <div style="line-height:16px;height:16px;">&nbsp;</div>
+                  <div>
+                    <p style="font-size:18px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center">
+                    Восстановите показ Ваших объявлений<br>{% if bonus %} и получите <b>ПОДАРОК = <span style="color:#F44336">{{ bonus}} руб.</span></b> от Claso{% endif %}!<br>&nbsp;<br>
+                    Это займет всего 1 секунду.<br>&nbsp;<br>
+                    <a href="https://claso.ru/restore?uid={{token}}" target="_blank" style="font-size:20px;color:#FFFFFF;text-decoration:none;background:#F44336;padding:8px 15px;border-radius:8px" title="Получить БОНУС">Получить <b>ПОДАРОК</b> сейчас</a><br>                    
+                    &nbsp;<br>Сделайте Ваше объявление привлекательнее!</p>
+                  </div>
+                  <div style="line-height:14px;height:28px;">&nbsp;<br>
+                    &nbsp;</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table style="border-collapse:collapse;width:500px;border-radius:0 0 5px 5px;background:#FFFACA;" align="center" border="0" cellpadding="0" cellspacing="0" width="750">
+            <tbody>
+              <tr>
+                <td style="vertical-align:top;" align="center" valign="top">
+                  <div style="line-height:18px;height:36px;">&nbsp;<br>
+                    &nbsp;</div>
+                  <div> <font color="#444444" face="Arial" size="3">
+                      <p style="font-size:15px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center">
+                        <strong>Мы очень хотим видеть ваше объявление на нашем сайте!</strong><br>
+                        Администрация Claso.<br>&nbsp;<br>
+                        <a href="https://claso.ru" target="_blank" style="color:#0275d8;text-decoration:none;background:#FFFFFF;border:1px solid #0275d8;padding:5px 15px;border-radius:6px;" title="Перейти на Claso">Перейти на Claso</a></p>
+                    </font> </div>
+                  <div style="line-height:16px;height:12px;">&nbsp;</div>
+                  <div> <font color="#444444" face="Arial" size="3"><br>
+                      <p style="font-size:14px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#444444 !important;line-height:22px;text-align:center;margin:0;" align="center">
+                        Вы получили это письмо,<br> т.к. являетесь пользователем сайта Claso.<br>
+                        Email: {{ email }} указан как контактный.<br> Пожалуйста, не отвечайте на это письмо.<br>
+                        <br>&nbsp;<br></p>
+                    </font> </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+</table>

@@ -1,0 +1,15 @@
+Admin\AdminBundle\Model\Regions:
+    properties:
+        name:
+            - NotBlank: ~
+Admin\AdminBundle\Model\Advs:
+    properties:
+        name:
+            - NotBlank: ~
+        description:
+            - NotBlank: ~
+        price:
+            - NotBlank: ~
+        email:
+            - Email:
+                checkMX: true

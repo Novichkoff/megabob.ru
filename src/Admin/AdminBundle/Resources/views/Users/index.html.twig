@@ -1,0 +1,125 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+{% endblock %}
+
+{% block content %}
+<h1>Пользователи</h1>
+    <div class="clearfix"><br></div>
+
+    {% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage }}
+        </div>
+    {% endfor %}
+
+    <div class="clearfix">
+        <div class="col-md-3"><span class="label label-info">Всего пользователей : {{ pagination.getTotalItemCount }}</label></div>
+        <div class="col-md-3 col-md-offset-6 text-right"><a href="adduser" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Добавить пользователя</a></div>
+    </div><br>
+
+    <form class="form-inline" role="form" action="{{ path('admin_admin_users_findpage') }}" method="get">
+        <div class="input-group clearfix">
+            <input id="find_user" type="text" class="form-control" name="username" placeholder="Поиск пользователя">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">Найти</button>
+            </span>
+        </div>
+    </form><br>
+
+    <div class="clearfix">
+
+        <div class="highlight">
+
+            <table class="table table-striped table-hover">
+                <thead>
+					<tr>
+						<th>#</th>
+						<th>Имя</th>
+						<th>Email</th>
+						<th>Подтвержден</th>
+						<th>Объявлений</th>
+						<th>Активен</th>
+						<th>Заблокирован</th>					
+						<th class="action">Действия</th>
+					</tr>
+                </thead>
+                <tbody>
+                {% for user in pagination if user %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td><a href="{{ path('admin_admin_userdetailpage',{'id': user.id}) }}" title="Редактировать">{{ user.realname }}</a></td>
+                        <td>{{ user.email }}</td>
+						<td>{% if user.emailConfirm %}<span class="glyphicon glyphicon-ok green"></span>{% endif %}</td>                        
+						<td>{{ user.Advss|length }}</td>
+						<td>{% if user.enabled %}<span class="glyphicon glyphicon-ok green"></span>
+                        {% else %}<span class="glyphicon glyphicon-ok red"></span>{% endif %}</td>
+						<td>{% if user.locked %}<span class="glyphicon glyphicon-ok red"></span>{% endif %}</td>
+                        <td class="action">
+                            <a href="{{ path('admin_admin_userdetailpage',{'id':user.id}) }}" title="Редактировать">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            <a class="confirm-delete" href="#" data-toggle="modal" data-target="#myModal" data-id="{{ user.id }}" title="Удалить">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="5">Нет пользователей</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h3 class="modal-title" id="myModalLabel">Удаление</h3>
+                        </div>
+                        <div class="modal-body">
+                            Вы действительно хотите удалить пользователя?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-danger" id="btnYes">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-offset-7">
+                {{ knp_pagination_render(pagination) }}
+            </div>
+
+        </div>
+
+        <div class="col-md-3 col-md-offset-9 text-right">
+            <a href="adduser" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Добавить пользователя</a>
+        </div>
+
+    </div>
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_homepage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script>
+        $(function() {
+            var availableNames = [
+                {% for user in all_users if user %}
+                "{{ user }}",
+                {% endfor %}
+            ];
+            $('#find_user').autocomplete({
+                source: availableNames
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'AdminAdminBundle::layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+{% endblock %}
+
+{% block content %}
+<h1>Объявления</h1>
+<div class="clearfix"><br></div>
+    {% for flashMessage in app.session.flashbag.get('notice1') %}
+        <div class="alert alert-success">
+            {{ flashMessage|raw }}
+        </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('alert1') %}
+        <div class="alert alert-danger">
+            {{ flashMessage|raw }}
+        </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('noticesite') %}
+        <div class="alert alert-success">
+            {{ flashMessage|raw }}
+        </div>
+    {% endfor %}
+    {% for flashMessage in app.session.flashbag.get('alertsite') %}
+        <div class="alert alert-danger">
+            {{ flashMessage|raw }}
+        </div>
+    {% endfor %}
+
+<div class="clearfix">
+    <div class="col-md-3 padding-0"><span class="label label-info">Всего объявлений : {{ pagination.getTotalItemCount }}</span></div>
+</div><div class="clearfix"><br></div>
+
+    <form class="form-inline" role="form" action="{{ path('admin_admin_advs_findpage') }}" method="get">
+        <div class="input-group clearfix">
+            <input id="find_adv" type="text" class="form-control" name="adv" placeholder="Поиск объявления">
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">Найти</button>
+            </span>
+        </div>
+    </form><br>
+
+<div class="clearfix">    
+
+	<form action="{{ path('admin_admin_advs_moderpage') }}" method="post">
+	
+		<div class="highlight">
+		
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th><a class="link" onclick="$('.moder_checkbox').attr('checked',true);" title="выделить все"><span class="glyphicon glyphicon-check"></span></a></th>
+						<th class="hidden-xs">№</th>
+						<th>Объявление</th>
+						<th class="hidden-xs"><span class="glyphicon glyphicon-eye-open"></span></th>
+						<th class="hidden-xs">Дата</th>
+						<th class="hidden-xs">Категория</th>
+						<th class="hidden-xs">Город</th>
+						<th class="hidden-xs">Цена</th>
+						<th class="hidden-xs"><i class="fa fa-google"></i></th>
+						<th class="hidden-xs"><i class="fa fa-yahoo"></i></th>
+						<th><i class="fa fa-power-off"></i></th>
+						<th><span class="glyphicon glyphicon-ok"></span></th>
+						<th><i class="fa fa-trash-o"></i></th>
+						<th class="hidden-xs"><i class="fa fa-camera-retro"></i></th>
+						<th><i class="fa fa-cogs"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for adv in pagination if adv %}
+					<tr{% if adv.deleted == 1 %} class="danger"{% endif %}{% if adv.enabled == 0 %} class="info"{% endif %}{% if adv.moderApproved == 0 %} class="warning"{% endif %}>
+						<td><input class="moder_checkbox" type="checkbox" name="advs_m[{{ adv.id }}]" title="{{ adv.description }}"></td>
+						<td class="hidden-xs"><a href="{{ path('admin_admin_advdetailspage', {'id': adv.id}) }}" title="{{ adv.description }}">{{ adv.id }}</a></td>
+						<td><a href="{{ path('admin_admin_advdetailspage', {'id': adv.id}) }}" title="{{ adv.description }}">{{ adv.name }}</a> {% if adv.AdvComplaines[0] is defined %}<i class="fa fa-comment red" title="Жалоба"></i>{% endif %}</td>
+						<td class="hidden-xs"><a href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="На сайте" target="_blank"><span class="glyphicon glyphicon-eye-open"></span></a></td>
+						<td class="hidden-xs">{% if adv.createDate|date("d.m.y") == "now"|date("d.m.y") %}<span class="green">Сегодня</span>{% else %}{{ adv.createDate|date("d.m.y") }}{% endif %}</td>
+						<td class="hidden-xs">{{ adv.AdCategories.name }}</td>
+						<td class="hidden-xs">{{ adv.Regions.name }}</td>
+						<td class="hidden-xs text-right">
+							{% if adv.AdvPrices[0] is defined %}						
+								{% if adv.Price > adv.AdvPrices[0].priceOld %}
+									<i class="fa fa-arrow-up fa-fw green"></i>
+								{% else %}
+									<i class="fa fa-arrow-down fa-fw red"></i>
+								{% endif %}
+							{% endif %}
+							{% if adv.dogovor %}
+								Договорная
+							{% else %}
+								{% if adv.price %}
+									{{ adv.price|number_format(0, '.', '') }} р.
+								{% else %}
+									Бесплатно
+								{% endif %}
+							{% endif %}						
+						</td>
+						<td class="hidden-xs">
+							{% if adv.googleDate %}<i class="fa fa-google green" title="{{ adv.googleDate|date('d.m.Y')}}"></i>{% endif %}
+						</td>
+						<td class="hidden-xs">
+							{% if adv.yandexDate %}<i class="fa fa-yahoo red" title="{{ adv.yandexDate|date('d.m.Y')}}"></i>{% endif %}
+						</td>
+						<td>
+							<span class="glyphicon glyphicon-ok-sign{% if adv.enabled %} green{% endif %}" aria-hidden="true"></span>
+						</td>
+						<td>
+							{% if adv.moderApproved %}<span class="glyphicon glyphicon-ok-sign green" title="{{ adv.description }}" aria-hidden="true"></span>
+							{% else %}
+							<a href="{{ path('admin_admin_moderedadvpage', { 'id' : adv.id }) }}"><span class="glyphicon glyphicon-ok-sign" title="{{ adv.description }}" aria-hidden="true"></span></a>
+							{% endif %}
+						</td>
+						<td>
+							{% if adv.deleted %}<span class="glyphicon glyphicon-ok-sign green" aria-hidden="true"></span>{% endif %}
+						</td>
+						<td class="hidden-xs">
+							{% if adv.AdvImagess[0] is defined %}<i class="fa fa-camera-retro"></i>{% endif %}
+						</td>
+						<td>                        
+							<a class="confirm-delete link" data-toggle="modal" data-target="#myModal" data-id="{{ adv.id }}" title="Удалить">
+								<span class="glyphicon glyphicon-trash"></span>
+							</a>
+						</td>
+					</tr>
+				{% else %}
+					<tr><td colspan="9">Нет объявлений</td></tr>
+				{% endfor %}
+				</tbody>
+			</table>		
+			
+		</div>
+		
+		<button type="submit" class="btn btn-primary pull-left">Одобрить выделенные</button>
+		
+	</form>
+
+	<!-- Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h3 class="modal-title" id="myModalLabel">Удаление</h3>
+				</div>
+				<div class="modal-body">
+					Вы действительно хотите удалить объявление?
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+					<button type="button" class="btn btn-danger" id="btnYesAdv">Удалить</button>
+				</div>
+			</div>
+		</div>
+	</div>
+    
+	<div class="pull-right">
+		{{ knp_pagination_render(pagination) }}
+	</div>
+
+    <div class="clearfix"><br></div>
+    <a class="btn btn-default" href="{{ path('admin_admin_advpage') }}" title="Назад"><span class="glyphicon glyphicon-arrow-left"></span> Назад</a>
+    <div class="clearfix"><br></div>
+
+{% endblock %}

@@ -1,0 +1,379 @@
+{# Таблица объявлений #}
+<div class="clearfix">
+    <table class="table table-hover advs-table">
+
+        {# Шапка таблицы #}
+        <thead>
+        <tr>
+            <th>{% if advs.isSorted('name') %}{% if dir=='asc' %}<i class="fa fa-sort-alpha-asc"></i>{% else %}<i
+                        class="fa fa-sort-alpha-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Название', 'name') }}
+            </th>
+            {% for field in fields %}
+                <th class="hidden-xs">{% if advs.isSorted('s_'~field.id) %}{% if dir=='asc' %}<i
+                        class="fa fa-sort-{% if field.type=='3' %}numeric{% else %}alpha{% endif %}-asc"></i>{% else %}
+                        <i
+                        class="fa fa-sort-{% if field.type=='3' %}numeric{% else %}alpha{% endif %}-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, field.filterName, 's_'~field.id) }}
+                </th>
+            {% endfor %}
+            <th>{% if advs.isSorted('photo') %}{% if dir=='asc' %}<i class="fa fa-sort-amount-asc"></i>{% else %}<i
+                        class="fa fa-sort-amount-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Фото', 'photo') }}
+            </th>
+            <th>{% if advs.isSorted('city') %}{% if dir=='asc' %}<i class="fa fa-sort-alpha-asc"></i>{% else %}<i
+                        class="fa fa-sort-alpha-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Город', 'city') }}
+            </th>
+            <th>{% if advs.isSorted('price') %}{% if dir=='asc' %}<i class="fa fa-sort-numeric-asc"></i></i>{% else %}<i
+                        class="fa fa-sort-numeric-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Цена', 'price') }}
+            </th>
+            <th>{% if advs.isSorted('publish_date') %}{% if dir=='asc' %}<i class="fa fa-sort-amount-asc"></i>{% else %}<i
+                        class="fa fa-sort-amount-desc"></i>{% endif %}{% endif %} {{ knp_pagination_sortable(advs, 'Дата', 'publish_date') }}
+            </th>
+        </tr>
+        </thead>
+
+        {# Объявления #}
+        <tbody>
+        {% set advert = 0 %}
+        {% if p_advs is defined %}
+			{% for adv in p_advs %}
+				{% set params = {} %}
+				{% set params_icon = {} %}
+				{% if fields|length >0 %}
+					{% for aparam in adv.AdvParamss %}
+						{% set key = 'key_'~aparam.fieldId %}
+						{% if aparam.valueId %}
+							{% set value = aparam.AdCategoriesFieldsValues.name %}							
+						{% else %}
+							{% if aparam.AdCategoriesFields.type == 9 %}
+								{% if aparam.textValue == 1 %}
+									{% set value = 'есть' %}
+								{% endif %}
+							{% else %}
+								{% set value = aparam.textValue %}								
+							{% endif %}
+						{% endif %}
+						{% set icon = aparam.AdCategoriesFieldsValues.icon %}
+						{% if value is defined %}{% set params = params|merge({(key):(value)}) %}{% endif %}
+						{% set params_icon = params_icon|merge({(key):(icon)}) %}
+					{% endfor %}
+				{% endif %}
+				<tr class="premium_td">
+					<td class="text-left">
+						{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+							{% if adv.UserFavorites.Data[0] is defined and adv.UserFavorites.Data[0].fosUserId == user.id %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="delete_from_favorite({{ adv.id }})"
+								   title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+							{% else %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="add_to_favorite({{ adv.id }})"
+								   title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+							{% endif %}
+						{% else %}
+							{% if top_panel.favorites is defined and adv.id in top_panel.favorites %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="delete_from_favorite_n({{ adv.id }})"
+								   title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+							{% else %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="add_to_favorite_n({{ adv.id }})"
+								   title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+							{% endif %}						
+						{% endif %}
+            <a class="grid-name premium" href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+						   title="{{ adv.name }}">{{ adv.name }}</a>						
+						{% if adv.UpDate|date() != adv.CreateDate|date() %}<img class="use-up-list" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+						{% if adv.HlDate > date() %}<img class="use-up-list" src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделение" title="Использовано Выделение">{% endif %}
+						<img class="img-packet-list" src="{{ asset('bundles/sitefirstpage/images/vip.png') }}" alt="{{ adv.AdvPacketss[0].Packets.name }}" title="Использован пакет {{ adv.AdvPacketss[0].Packets.name }}">
+					</td>
+					{% for field in fields %}
+						<td class="hidden-xs">
+							{% set key = 'key_'~field.id %}
+							{% if params[key] is defined %}
+								{% if params[key] %}
+									{% if params[key] == 'Бежевый' %}
+										<div class="box box_bezh" title="Бежевый"></div>
+									{% elseif params[key] == 'Белый' %}
+										<div class="box box_white" title="Белый"></div>
+									{% elseif params[key] == 'Голубой' %}
+										<div class="box box_yellow" title="Голубой"></div>
+									{% elseif params[key] == 'Желтый' %}
+										<div class="box box_yellow" title="Желтый"></div>
+									{% elseif params[key] == 'Зеленый' %}
+										<div class="box box_green" title="Зеленый"></div>
+									{% elseif params[key] == 'Золотой' %}
+										<div class="box box_gold" title="Золотой"></div>
+									{% elseif params[key] == 'Коричневый' %}
+										<div class="box box_brown" title="Коричневый"></div>
+									{% elseif params[key] == 'Красный' %}
+										<div class="box box_red" title="Красный"></div>
+									{% elseif params[key] == 'Оранжевый' %}
+										<div class="box box_orange" title="Оранжевый"></div>
+									{% elseif params[key] == 'Пурпурный' %}
+										<div class="box box_purple" title="Пурпурный"></div>
+									{% elseif params[key] == 'Розовый' %}
+										<div class="box box_pink" title="Розовый"></div>
+									{% elseif params[key] == 'Серебряный' %}
+										<div class="box box_silver" title="Серебряный"></div>
+									{% elseif params[key] == 'Серый' %}
+										<div class="box box_grey" title="Серый"></div>
+									{% elseif params[key] == 'Синий' %}
+										<div class="box box_blue" title="Синий"></div>
+									{% elseif params[key] == 'Фиолетовый' %}
+										<div class="box box_violet" title="Фиолетовый"></div>
+									{% elseif params[key] == 'Черный' %}
+										<div class="box box_black" title="Черный"></div>
+									{% elseif params_icon[key] %}<img src="/images/categories/values/{{ params_icon[key] }}" alt="{{ params[key] }}" title="{{ params[key] }}">
+									{% else %}{{ params[key] }}{% endif %}
+								{% endif %}
+							{% endif %}
+						</td>
+					{% endfor %}
+					<td class="text-center">
+						{% if adv.AdvImagess.Data[0] is defined %}
+							<i class="fa fa-camera" title="{{ adv.AdvImagess|length }} фото"></i>
+						{% endif %}
+					</td>
+					<td><small>{{ adv.Regions.Name }}</small></td>
+					<td class="text-right" style="white-space: nowrap">
+						{% if adv.AdvPrices|reverse[0] is defined %}						
+							{% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+								<i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+							{% endif %}
+						{% endif %}
+						<strong class="red" style="white-space: nowrap">{% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</strong>
+					</td>
+					<td class="text-right"><small>{% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}Сегодня{% elseif adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}Вчера{% else %}{{ adv.publishDate|date("d.m.y") }}{% endif %}</small></td>
+				</tr>
+			{% endfor %}
+		{% endif %}
+		
+		{% if l_advs is defined %}
+		
+			{% for adv in l_advs %}
+				{% set params = {} %}
+				{% set params_icon = {} %}
+				{% if fields|length >0 %}
+					{% for aparam in adv.AdvParamss %}
+						{% set key = 'key_'~aparam.fieldId %}
+						{% if aparam.valueId %}
+							{% set value = aparam.AdCategoriesFieldsValues.name %}
+						{% else %}
+							{% if aparam.AdCategoriesFields.type == 9 %}
+								{% if aparam.textValue == 1 %}
+									{% set value = 'есть' %}
+								{% endif %}
+							{% else %}
+								{% set value = aparam.textValue %}
+							{% endif %}
+						{% endif %}
+						{% set icon = aparam.AdCategoriesFieldsValues.icon %}
+						{% if value is defined %}{% set params = params|merge({(key):(value)}) %}{% endif %}
+						{% set params_icon = params_icon|merge({(key):(icon)}) %}
+					{% endfor %}
+				{% endif %}
+				<tr class="lite_td">
+					<td class="text-left">						
+						{% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+							{% if adv.UserFavorites.Data[0] is defined and adv.UserFavorites.Data[0].fosUserId == user.id %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="delete_from_favorite({{ adv.id }})"
+								   title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+							{% else %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="add_to_favorite({{ adv.id }})"
+								   title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+							{% endif %}
+						{% else %}
+							{% if top_panel.favorites is defined and adv.id in top_panel.favorites %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="delete_from_favorite_n({{ adv.id }})"
+								   title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+							{% else %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="add_to_favorite_n({{ adv.id }})"
+								   title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+							{% endif %}						
+						{% endif %}
+            <a class="grid-name lite" href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+						   title="{{ adv.name }}">{{ adv.name }}</a>						
+						{% if adv.UpDate|date() != adv.CreateDate|date() %}<img class="use-up-list" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+						{% if adv.HlDate > date() %}<img class="use-up-list" src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделение" title="Использовано Выделение">{% endif %}
+						<img class="img-packet-list" src="{{ asset('bundles/sitefirstpage/images/turbo.png') }}" alt="{{ adv.AdvPacketss[0].Packets.name }}" title="Использован пакет {{ adv.AdvPacketss[0].Packets.name }}">
+					</td>
+					{% for field in fields %}
+						<td class="hidden-xs">
+							{% set key = 'key_'~field.id %}
+							{% if params[key] is defined %}
+								{% if params[key] %}
+									{% if params[key] == 'Бежевый' %}
+										<div class="box box_bezh" title="Бежевый"></div>
+									{% elseif params[key] == 'Белый' %}
+										<div class="box box_white" title="Белый"></div>
+									{% elseif params[key] == 'Голубой' %}
+										<div class="box box_yellow" title="Голубой"></div>
+									{% elseif params[key] == 'Желтый' %}
+										<div class="box box_yellow" title="Желтый"></div>
+									{% elseif params[key] == 'Зеленый' %}
+										<div class="box box_green" title="Зеленый"></div>
+									{% elseif params[key] == 'Золотой' %}
+										<div class="box box_gold" title="Золотой"></div>
+									{% elseif params[key] == 'Коричневый' %}
+										<div class="box box_brown" title="Коричневый"></div>
+									{% elseif params[key] == 'Красный' %}
+										<div class="box box_red" title="Красный"></div>
+									{% elseif params[key] == 'Оранжевый' %}
+										<div class="box box_orange" title="Оранжевый"></div>
+									{% elseif params[key] == 'Пурпурный' %}
+										<div class="box box_purple" title="Пурпурный"></div>
+									{% elseif params[key] == 'Розовый' %}
+										<div class="box box_pink" title="Розовый"></div>
+									{% elseif params[key] == 'Серебряный' %}
+										<div class="box box_silver" title="Серебряный"></div>
+									{% elseif params[key] == 'Серый' %}
+										<div class="box box_grey" title="Серый"></div>
+									{% elseif params[key] == 'Синий' %}
+										<div class="box box_blue" title="Синий"></div>
+									{% elseif params[key] == 'Фиолетовый' %}
+										<div class="box box_violet" title="Фиолетовый"></div>
+									{% elseif params[key] == 'Черный' %}
+										<div class="box box_black" title="Черный"></div>
+									{% elseif params_icon[key] %}<img src="/images/categories/values/{{ params_icon[key] }}" alt="{{ params[key] }}" title="{{ params[key] }}">
+									{% else %}{{ params[key] }}{% endif %}
+								{% endif %}
+							{% endif %}
+						</td>
+					{% endfor %}
+					<td class="text-center">
+						{% if adv.AdvImagess.Data[0] is defined %}
+							<i class="fa fa-camera" title="{{ adv.AdvImagess|length }} фото"></i>
+						{% endif %}
+					</td>
+					<td><small>{{ adv.Regions.Name }}</small></td>
+					<td class="text-right" style="white-space: nowrap">
+						{% if adv.AdvPrices|reverse[0] is defined %}						
+							{% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+								<i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+							{% endif %}
+						{% endif %}
+						<strong class="red" style="white-space: nowrap">{% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</strong>
+					</td>
+					<td class="text-right"><small>{% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}Сегодня{% elseif adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}Вчера{% else %}{{ adv.publishDate|date("d.m.y") }}{% endif %}</small></td>
+				</tr>
+			{% endfor %}
+		{% endif %}
+		
+		{% for adv in advs %}
+            {% set params = {} %}
+			{% set params_icon = {} %}
+            {% if fields|length >0 %}
+				{% for aparam in adv.AdvParamss %}
+                    {% set key = 'key_'~aparam.fieldId %}
+                    {% if aparam.valueId %}
+						{% set value = aparam.AdCategoriesFieldsValues.name %}
+					{% else %}
+						{% if aparam.AdCategoriesFields.type == 9 %}
+							{% if aparam.textValue == 1 %}
+								{% set value = 'есть' %}
+							{% endif %}
+						{% else %}
+							{% set value = aparam.textValue %}
+						{% endif %}
+					{% endif %}
+          {% if aparam.AdCategoriesFieldsValues.icon is defined %}{% set icon = aparam.AdCategoriesFieldsValues.icon %}{% else %}{% set icon = NULL %}{% endif %}
+					{% if value is defined %}{% set params = params|merge({(key):(value)}) %}{% endif %}
+					{% set params_icon = params_icon|merge({(key):(icon)}) %}
+          {% endfor %}
+          {% endif %}
+            <tr class="{% if adv.HlDate > date() %}hl_td{% endif %}">
+                <td class="text-left">                    
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+							{% if adv.UserFavorites.Data[0] is defined and adv.UserFavorites.Data[0].fosUserId == user.id %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="delete_from_favorite({{ adv.id }})"
+								   title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+							{% else %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="add_to_favorite({{ adv.id }})"
+								   title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+							{% endif %}
+						{% else %}
+							{% if top_panel.favorites is defined and adv.id in top_panel.favorites %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="delete_from_favorite_n({{ adv.id }})"
+								   title="Удалить из избранного"><i class="fa fa-fw fa-bookmark favorite"></i></a>
+							{% else %}
+								<a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+								   onclick="add_to_favorite_n({{ adv.id }})"
+								   title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o favorite"></i></a>
+							{% endif %}						
+						{% endif %}
+          <a class="grid-name{% if adv.HlDate > date() %} premium{% endif %}" href="{{ path('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"
+                       title="{{ adv.name }}">{{ adv.name }}</a>
+                    
+					{% if adv.UpDate|date() != adv.CreateDate|date() %}<img class="use-up-list" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+					{% if adv.HlDate > date() %}<img class="use-up-list" src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделение" title="Использовано Выделение">{% endif %}
+                </td>
+                {% for field in fields %}
+                    <td class="hidden-xs">
+                        {% set key = 'key_'~field.id %}
+                        {% if params[key] is defined %}
+							{% if params[key] %}
+								{% if params[key] == 'Бежевый' %}
+									<div class="box box_bezh" title="Бежевый"></div>
+								{% elseif params[key] == 'Белый' %}
+									<div class="box box_white" title="Белый"></div>
+								{% elseif params[key] == 'Голубой' %}
+									<div class="box box_yellow" title="Голубой"></div>
+								{% elseif params[key] == 'Желтый' %}
+									<div class="box box_yellow" title="Желтый"></div>
+								{% elseif params[key] == 'Зеленый' %}
+									<div class="box box_green" title="Зеленый"></div>
+								{% elseif params[key] == 'Золотой' %}
+									<div class="box box_gold" title="Золотой"></div>
+								{% elseif params[key] == 'Коричневый' %}
+									<div class="box box_brown" title="Коричневый"></div>
+								{% elseif params[key] == 'Красный' %}
+									<div class="box box_red" title="Красный"></div>
+								{% elseif params[key] == 'Оранжевый' %}
+									<div class="box box_orange" title="Оранжевый"></div>
+								{% elseif params[key] == 'Пурпурный' %}
+									<div class="box box_purple" title="Пурпурный"></div>
+								{% elseif params[key] == 'Розовый' %}
+									<div class="box box_pink" title="Розовый"></div>
+								{% elseif params[key] == 'Серебряный' %}
+									<div class="box box_silver" title="Серебряный"></div>
+								{% elseif params[key] == 'Серый' %}
+									<div class="box box_grey" title="Серый"></div>
+								{% elseif params[key] == 'Синий' %}
+									<div class="box box_blue" title="Синий"></div>
+								{% elseif params[key] == 'Фиолетовый' %}
+									<div class="box box_violet" title="Фиолетовый"></div>
+								{% elseif params[key] == 'Черный' %}
+									<div class="box box_black" title="Черный"></div>
+								{% elseif params_icon[key] %}<img src="/images/categories/values/{{ params_icon[key] }}" alt="{{ params[key] }}" title="{{ params[key] }}">
+								{% else %}{{ params[key] }}{% endif %}
+							{% endif %}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+                <td class="text-center">
+                    {% if adv.AdvImagess.Data[0] is defined %}
+                        <i class="fa fa-camera" title="{{ adv.AdvImagess|length }} фото"></i>
+                    {% endif %}
+                </td>
+                <td><small>{{ adv.Regions.Name }}</small></td>
+                <td class="text-right" style="white-space: nowrap">
+					{% if adv.AdvPrices|reverse[0] is defined %}						
+						{% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+							<i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+						{% endif %}
+					{% endif %}
+					<strong class="red" style="white-space: nowrap">{% if adv.dogovor %}Договорная{% else %}{% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</strong>
+				</td>
+                <td class="text-right"><small>{% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}Сегодня{% elseif adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}Вчера{% else %}{{ adv.publishDate|date("d.m.y") }}{% endif %}</small></td>
+			</tr>
+        {% endfor %}
+            
+        </tbody>
+    </table>
+</div>

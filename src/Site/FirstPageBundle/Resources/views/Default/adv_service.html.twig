@@ -1,0 +1,65 @@
+{% if user.id is defined %}
+<br>
+<div class="clearfix">  
+  <div class="col-xs-6 padding-5 text-left"><a class="btn btn-default form-control" data-toggle="modal" data-target=".complane"
+       title="Пожаловаться"><i class="fa fa-fw fa-bell-o red"></i> Пожаловаться</a></div>                        
+  <div class="col-xs-6 padding-5 text-left"><a class="btn btn-default form-control" data-toggle="modal" data-target=".note"
+       title="Заметка"><i class="fa fa-fw fa-comment-o"></i> Заметка</a></div>       
+</div>
+<div class="modal fade complane" tabindex="-1" role="dialog" aria-labelledby="Complane" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <form method="post" action="{{ path('site_complain_page') }}">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+          </button>
+          <h4 class="modal-title" id="ComplaneLabel"><i class="fa fa-fw fa-bell-o"></i> Пожаловаться</h4>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" hidden name="adv" value="{{ adv.id }}">
+          <select name="reason" class="form-control">
+            <option>Укажите причину</option>
+            <option value="Услуга не существует">Услуга не существует</option>
+            <option value="Спам или реклама">Спам или реклама</option>
+            <option value="Неверная цена">Неверная цена</option>
+            <option value="Не дозвониться">Не дозвониться</option>
+            <option value="Мошенничество">Мошенничество</option>
+          </select>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-danger">Пожаловаться</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>                      
+<div class="modal fade note" tabindex="-1" role="dialog" aria-labelledby="Note" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      {% form_theme search_form 'SiteFirstPageBundle:Default:comment_form.html.twig' %}
+      <form id="note_form" role="form" method="POST" {{ form_enctype(comment_form) }}>
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+          </button>
+          <h4 class="modal-title" id="ComplaneLabel"><i class="fa fa-comment-o fa-fw"></i> Добавить заметку</h4>
+        </div>
+        <div class="modal-body">
+          Эта заметка будет видна только вам!
+          <div class="clearfix">
+            <div class="form-group">
+              {{ form_rest(comment_form) }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-warning">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}

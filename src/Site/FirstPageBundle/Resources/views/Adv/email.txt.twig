@@ -1,0 +1,22 @@
+{% extends 'AdminAdminBundle::mail.html.twig' %}
+{% block content_first %}
+  <font color="#222222" face="Arial" size="3">
+    <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:22px;text-align:center;margin:0;"
+       align="center">Здравствуйте, <strong>{{ realname }}</strong>!<br>
+        Добро пожаловать<br> на сайт бесплатных объявлений {{ top_panel.settings.name }}<br><br>
+        Для входа в ваш Личный кабинет на сайте<br>
+        используйте следующие регистрационные данные:
+    </p>    
+  </font>
+{% endblock %}
+{% block content_second %}
+  <p style="font-size:18px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:22px;text-align:center;margin:0;" align="center">
+      Логин: <strong>{{ email }}</strong><br>
+      Пароль: <strong>{{ password }}</strong>
+    </p> 
+  <p style="font-size:14px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222222 !important;line-height:32px;text-align:center;margin:0;" align="center">
+    Для подтверждения вашего Email нажмите кнопку<br>
+    <a style="color:#FFFFFF;text-decoration:none;background:#03A4CA;padding:5px 15px;margin:5px;border-radius:6px;" 
+    href="{{ url('email_confirm_page', {token: email_token}) }}" target="_blank">Подтвердить Email</a>
+  </p>  
+{% endblock %}

@@ -1,0 +1,736 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title adv.name~' '~adv.Regions.PageTitle~' - Объявление №'~adv.id %}
+{% block metatitle adv.name~' '~adv.Regions.PageTitle %}
+{% block description (adv.description~'. Объявление '~adv.name~' '~adv.Regions.PageTitle)|truncate(150, true) %}
+{% block canonical %}{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}{% endblock %}
+{% block keywords adv.category~','~adv.Regions.Name~',объявление' %}
+{% block metaimage %}{% if adv.advImagess[0] is defined %}{{ top_panel.settings.url }}{{ asset('images/a/images/') }}{{ adv.advImagess[0].path }}{% else %}{{ top_panel.settings.url }}{{ asset('/icon.png') }}{% endif %}{% endblock %}
+{% block DublinCore %}
+<!-- Dublin Core -->
+<meta name="DC.title" content="{{ adv.name }} {{ adv.Regions.PageTitle }}" />
+<meta name="DC.contributor" content="Объявления, подать объявление" />
+<meta name="DC.creator" content="{{ top_panel.settings.title }} {{ top_panel.settings.name }}" />
+<meta name="DC.date" content="{{ adv.createDate|date("Y-m-d") }}" />
+<meta name="DC.description" content="{{ adv.description }}" />
+<meta name="DC.format" content="text/html" />
+
+<meta name="DC.identifier" content="{{ top_panel.settings.url }}/" />
+<meta name="DC.language" content="ru-Ru" />
+<meta name="DC.publisher" content="Объявления, подать объявление" />
+<meta name="DC.rights" content="Copyright (c) 2017-{{ "now"|date('Y') }} by {{ top_panel.settings.name }}" />
+<meta name="DC.subject" content="{{ top_panel.settings.name }}, объявления, бесплатные объявления, подать объявление, {{ adv.AdCategories.AdCategoriesRelatedByParentId.name }}, {{ adv.AdCategories.name }}, {{ adv.Regions.Name }}" />
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/sitefirstpage/css/owl.carousel.css') }}" rel="stylesheet">
+    <meta property="og:url" content="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"/>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta property="twitter:image"
+          content="{% if adv.advImagess[0] is defined %}{{ top_panel.settings.url }}{{ asset('images/a/images/') }}{{ adv.advImagess[0].path }}{% else %}{{ top_panel.settings.url }}{{ asset('/icon.png') }}{% endif %}"/>
+    <meta property="twitter:title" content="{{ adv.name~' '~adv.Regions.PageTitle }} | {{ top_panel.settings.name }}"/>
+    <meta property="twitter:site" content="@MegaBob_ru"/>
+    <meta property="twitter:creator" content="@MegaBob_ru"/>
+    <meta property="twitter:url" content="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}"/>
+{% endblock %}
+
+{% block stylesheets_ext %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/sitefirstpage/css/print.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/sitefirstpage/css/lightgallery.min.css') }}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+    <div class="clearfix">
+        <div class="clearfix">
+        </div>
+        <div class="clearfix advv" id="main">                
+            <div class="col-md-9 clearfix">
+				{% for flashMessage in app.session.flashbag.get('noticesite') %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                    class="sr-only">Закрыть</span></button>
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+                {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                    class="sr-only">Закрыть</span></button>
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+                {% if app.user is defined and app.user.UserMessagess is defined %}
+                    {% if app.user.UserMessagess|length %}
+                        {% set msg_cnt = 0 %}
+                        {% for msg in app.user.UserMessagess %}
+                            {% if not msg.viewed %}{% set msg_cnt = msg_cnt+1 %}{% endif %}
+                        {% endfor %}
+                        {% if msg_cnt %}
+                            <div class="alert alert-danger" role="alert">
+                                <b>Внимание!</b> У Вас есть непрочитанные сообщения! <a class="btn btn-warning"
+                                                                                        href="{{ path('user_messages_page', { region: top_panel.url_region }) }}">Перейти
+                                    к сообщениям</a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+
+                {# Уведомления #}
+                {% if adv.deleted == true %}
+                    <div class="alert alert-danger">
+                        <strong>Внимание!</strong> Это объявление было удалено. Информация не является актуальной.
+                    </div>
+                {% elseif adv.enabled == false %}
+                    <div class="alert alert-danger">
+                        <strong>Внимание!</strong> Это объявление было отключено. Информация не является актуальной.
+                    </div>
+                {% elseif adv.moderApproved == false %}
+                    <div class="alert alert-warning">
+                        <strong>Внимание!</strong> Это объявление еще не одобрено модератором. Администрация сайта не
+                        гарантирует
+                        достоверность приведенной ниже информации.
+                    </div>
+                {% endif %}
+				{# Баннер под поиском #}
+                {% if banner_search and user.roles[1] is not defined %}
+                    <div class="clearfix padding-0 text-center banner" onclick="set_click({{ banner_search.id }})">
+                        <div style="width: {% if banner_search.width %}{{ banner_search.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                            {{ banner_search.code|raw }}
+                        </div>
+                    </div>
+                {% endif %}	
+				
+                {# Хлебные крошки #}                
+                <div class="clearfix padding-5">
+                    <ol class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+                        <li>
+                            <a href="{{ path('site_first_page_homepage') }}"
+                               title="Главная"
+                               rel="v:url"
+                               property="v:title">Все объявления</a>
+                        </li>
+                        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                          <a itemscope itemtype="http://schema.org/Thing" itemprop="item" 
+                            href="{{ path('site_first_page_homepage', { region: adv.Regions.alias }) }}"
+                            title="Все объявления {{ adv.Regions.pagetitle }}"><span itemprop="name">{{ adv.Regions.name }}</span></a>
+                          <meta itemprop="position" content="1" />
+                        </li>
+                        {% if category.parent and category.parent.alias != category.alias %}
+                            <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                              <a itemscope itemtype="http://schema.org/Thing" itemprop="item"
+                                href="{{ path('site_category_page', { category: category.parent.alias, subcategory: null, region: adv.Regions.alias }) }}"
+                                title="{{ category.parent.name }}{% if adv.Regions.pagetitle %} {{ adv.Regions.pagetitle }}{% endif %}">
+                                <span itemprop="name">{{ category.parent.name }}</span>
+                              </a>
+                              <meta itemprop="position" content="2" />
+                            </li>
+                        {% endif %}
+                        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                          <a itemscope itemtype="http://schema.org/Thing" itemprop="item"
+                            href="{{ path('site_category_page', { category: category.parent.alias, subcategory: category.alias, region: adv.Regions.alias }) }}"
+                            title="{{ category.name }}{% if adv.Regions.pagetitle %} {{ adv.Regions.pagetitle }}{% endif %}">
+                            <span itemprop="name">{{ category.name }}</span>
+                          </a>
+                          <meta itemprop="position" content="3" />
+                        </li>
+                    </ol>
+                </div>                
+                <div itemscope itemtype="http://schema.org/Product" class="ad">
+                    {% if user.id is defined %}
+                        {% if adv.UserFavorites.Data[0] is defined and adv.UserFavorites.Data[0].fosUserId == user.id %}
+                            <a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+                               onclick="delete_from_favorite({{ adv.id }})" title="Удалить из Избранного"><i
+                                        class="fa fa-fw fa-bookmark red"></i></a>
+                        {% else %}
+                            <a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+                               onclick="add_to_favorite({{ adv.id }})" title="Добавить в избранное"><i
+                                        class="fa fa-fw fa-bookmark-o"></i></a>
+                        {% endif %}
+                    {% else %}
+                        {% if top_panel.favorites is defined and adv.id in top_panel.favorites %}
+                            <a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+                               onclick="delete_from_favorite_n({{ adv.id }})" title="Удалить из Избранного"><i
+                                        class="fa fa-fw fa-bookmark red"></i></a>
+                        {% else %}
+                            <a class="text-nowrap pull-right" id="fav_{{ adv.id }}"
+                               onclick="add_to_favorite_n({{ adv.id }})" title="Добавить в избранное"><i
+                                        class="fa fa-fw fa-bookmark-o"></i></a>
+                        {% endif %}
+                    {% endif %}
+                    <h1 itemprop="name" class="a_title padding-5 map-small">{{ adv.name }}
+                        <small style="white-space:nowrap">{{ adv.Regions.pagetitle }}</small>
+                    </h1>
+                    <div class="clearfix">
+                        <div class="col-sm-4 padding-5">
+                            <i class="fa fa-calendar fa-fw" title="Размещено"></i>
+                            Размещено: {% if adv.createDate|date("d.m.y") == "now"|date("d.m.y") %}сегодня{% elseif adv.createDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}вчера{% else %}{{ adv.createDate|date("d.m.y") }}{% endif %}
+                            в {{ adv.createDate|date('H:i') }}
+                        </div>
+                        {% if adv.publishDate|date("d.m.y") != adv.createDate|date("d.m.y") %}
+                        <div class="col-sm-4 padding-5">
+                            <i class="fa fa-refresh fa-fw"
+                                    title="Обновлено"></i> Обновлено: {% if adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}сегодня{% elseif adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}вчера{% else %}{{ adv.publishDate|date("d.m.y") }}{% endif %} в {{ adv.publishDate|date('H:i') }}
+                        </div>
+                        {% endif %}
+                        <div class="col-sm-4 padding-5">
+                            <i class="fa fa-fw fa-eye" title="Просмотров"></i> Просмотров: <span title="всего">{{ adv.cnt }}</span> <span title="сегодня">({{ adv.cntToday }})</span>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <link rel="image_src"
+                              href="{{ top_panel.settings.url }}.ru{% if adv.advImagess[0] is defined %}{{ asset('images/a/images/') }}{{ adv.advImagess[0].path }}{% else %}{{ asset('images/logo.png') }}{% endif %}"/>
+                        {% if adv.advImagess|length or adv.youtube %}
+                            <div class="col-sm-7 padding-0">
+                                {# Изображения #}
+                                {% if adv.advImagess|length > 1 or adv.youtube %}
+                                    <div id="images">
+                                        {% for image in adv.advImagess %}
+                                            <a class="imagelightbox"
+                                               href="{{ top_panel.settings.url }}/images/a/images/{{ image.path }}"
+                                               title="{{ adv.name~' '~adv.Regions.PageTitle }}">
+                                                <img class="img-rounded" itemprop="image"
+                                                     src="{{ top_panel.settings.url }}/images/a/images/{{ image.path }}"
+                                                     alt="{{ adv.name }}"
+                                                     title="{{ adv.name~' '~adv.Regions.PageTitle }}">
+                                            </a>
+                                        {% endfor %}
+                                        {% if adv.youtube %}
+                                            <a class="owl-video imagelightbox" href="{{ adv.youtube }}"></a>
+                                            {% if not adv.advImagess|length %}
+                                                <img class="img-rounded" width="360" height="270" src="{{ asset('bundles/sitefirstpage/images/no-photo.jpg') }}"
+                                                     alt="Нет фото" title="Нет фото">
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div class="one-image clearfix" id="image_one">
+                                        <a class="imagelightbox"
+                                           href="{{ top_panel.settings.url }}/images/a/images/{{ adv.advImagess[0].path }}"
+                                           title="{{ adv.name~' '~adv.Regions.PageTitle }}">
+                                            <img class="img-rounded" itemprop="image"
+                                                 src="{{ top_panel.settings.url }}/images/a/images/{{ adv.advImagess[0].path }}"
+                                                 alt="{{ adv.name }}"
+                                                 title="{{ adv.name~' '~adv.Regions.PageTitle }}">
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="col-sm-7 padding-0 hidden-xs">
+                                <div class="one-image clearfix" id="image_one">
+                                    <img class="img-rounded" width="360" height="270" src="{{ asset('bundles/sitefirstpage/images/no-photo.jpg') }}"
+                                         alt="Нет фото" title="Нет фото">
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="col-sm-5 padding-5">
+                            <h3 itemprop="offers" itemscope itemtype="http://schema.org/Offer"
+                                class="adv-price">
+                                <meta itemprop="price" content="{{ adv.price }}"/>
+                                <meta itemprop="priceCurrency" content="RUB"/>
+                                {% if adv.AdvPrices|reverse[0] is defined %}
+                                    {% if adv.Price < adv.AdvPrices|reverse[0].priceOld %}
+                                        <span class="price_old"
+                                              title="Цена была снижена {{ adv.AdvPrices|reverse[0].date|date('d.m.Y') }}">{{ adv.AdvPrices|reverse[0].priceOld|number_format(0, '.', ' ') }}
+                                            р.</span><br>
+                                    {% endif %}                                    
+                                {% endif %}
+                                <span class="red">
+                                  {% if adv.dogovor %}Договорная{% else %}
+                                      {% if adv.price %}{{ adv.price|number_format(0, '.', ' ') }} р.
+                                      {% else %}Бесплатно{% endif %}
+                                  {% endif %}
+                                </span>
+                                {% if adv.torg %}<br><span class="torg">торг</span>{% endif %}
+                                {% if adv.category.id == 29 and adv.price and adv.params[66] and adv.params[88] == 'Продам' %}
+                                    <br><small class="text-nowrap">{{ (adv.price/adv.params[66])|number_format(0, '.', ' ') }}
+                                    р./м²</small>{% endif %}
+                            </h3>
+                            {% if adv.deleted != true %}
+                                {% include 'SiteFirstPageBundle:Default:contacts_adv.html.twig' %}
+                                {% include 'SiteFirstPageBundle:Default:adv_service.html.twig' %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="padding-0 clearfix adp">
+                      <h2 class="padding-5">Описание</h2>
+                      <div itemprop="description" class="adv-description padding-5">
+                          {{ adv.description|nl2br }}
+                      </div>
+                    </div>
+                    {% set emap = false %}                    
+                    {% if adv.params %}
+                        <div class="padding-5 clearfix all_fields">
+                            <h2>Характеристики</h2>
+                            {% for field in fields %}
+                                {% if adv.params[field.id] is defined %}
+                                    {% if adv.params[field.id] %}
+                                        <div class="col-sm-6 padding-0 fields clearfix">
+                                            <div class="col-xs-6 padding-5 field clearfix">{{ field.name }}:</div>
+                                            <div class="col-xs-6 padding-5 value clearfix">
+                                                {% if field.type == 4 and adv.params[field.id] is defined and adv.coord %}{% set emap = true %}
+                                                    <a class="link" href="#map"
+                                                       title="показать на карте">{{ adv.params[field.id] }}</a>
+                                                {% elseif field.type == 5 and adv.params[field.id] is defined and adv.coord %}{% set emap = true %}
+                                                    <a class="link" href="#map" title="показать на карте">показать на
+                                                        карте</a>
+                                                {% elseif adv.params[field.id] is defined %}
+                                                    {% if field.type == 9 and adv.params[field.id] == 1 %}<i
+                                                            class="fa fa-check green"></i>{% else %}
+                                                        {{ adv.params[field.id]|replace({'%\%': "/"}) }}
+                                                        {% if adv.params[field.id] == 'Бежевый' %}
+                                                            <div class="bbox box_bezh" title="Бежевый"></div>
+                                                        {% elseif adv.params[field.id] == 'Белый' %}
+                                                            <div class="bbox box_white" title="Белый"></div>
+                                                        {% elseif adv.params[field.id] == 'Голубой' %}
+                                                            <div class="bbox box_sky" title="Голубой"></div>
+                                                        {% elseif adv.params[field.id] == 'Желтый' %}
+                                                            <div class="bbox box_yellow" title="Желтый"></div>
+                                                        {% elseif adv.params[field.id] == 'Зеленый' %}
+                                                            <div class="bbox box_green" title="Зеленый"></div>
+                                                        {% elseif adv.params[field.id] == 'Золотой' %}
+                                                            <div class="bbox box_gold" title="Золотой"></div>
+                                                        {% elseif adv.params[field.id] == 'Коричневый' %}
+                                                            <div class="bbox box_brown" title="Коричневый"></div>
+                                                        {% elseif adv.params[field.id] == 'Красный' %}
+                                                            <div class="bbox box_red" title="Красный"></div>
+                                                        {% elseif adv.params[field.id] == 'Оранжевый' %}
+                                                            <div class="bbox box_orange" title="Оранжевый"></div>
+                                                        {% elseif adv.params[field.id] == 'Пурпурный' %}
+                                                            <div class="bbox box_purple" title="Пурпурный"></div>
+                                                        {% elseif adv.params[field.id] == 'Розовый' %}
+                                                            <div class="bbox box_pink" title="Розовый"></div>
+                                                        {% elseif adv.params[field.id] == 'Серебряный' %}
+                                                            <div class="bbox box_silver" title="Серебряный"></div>
+                                                        {% elseif adv.params[field.id] == 'Серый' %}
+                                                            <div class="bbox box_grey" title="Серый"></div>
+                                                        {% elseif adv.params[field.id] == 'Синий' %}
+                                                            <div class="bbox box_blue" title="Синий"></div>
+                                                        {% elseif adv.params[field.id] == 'Фиолетовый' %}
+                                                            <div class="bbox box_violet" title="Фиолетовый"></div>
+                                                        {% elseif adv.params[field.id] == 'Черный' %}
+                                                            <div class="bbox box_black" title="Черный"></div>
+                                                        {% endif %}
+                                                        {% if field.postfix %}{{ field.postfix }}{% endif %}
+                                                    {% endif %}{% endif %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div><br>
+                    {% endif %}
+                    {% if emap %}
+                        <div class="padding-5 clearfix adv-description-full">
+                            <div id="map" data-coordinate="{{ adv.coord }}" class="col-xs-12 padding-5 clearfix"></div>
+                        </div>
+                    {% endif %}							
+                
+					<div class="padding-5 clearfix adv-description-full">                    
+						<p class="a_info">Объявление № <b>{{ adv.id }}</b> "{{ adv.name }} {{ adv.Regions.pagetitle }}" было размещено на сайте {{ top_panel.settings.name }} 
+							в рубрику "{% if category.parent and category.parent.alias != category.alias %}{{ category.parent.name }}", {% endif %}"{{ category.name }}" {{ adv.Regions.pagetitle }} {{ adv.createDate|date("d.m.y") }}
+							в {{ adv.createDate|date('H:i') }} пользователем {{ adv.User.Realname | title }}.</p>                    
+					</div>	
+                {#<div class="clearfix hidden-xs"><div id="hypercomments_widget"></div>#}
+                {% include 'SiteFirstPageBundle:Default:similar_region.html.twig' %}
+                {% include 'SiteFirstPageBundle:Default:similar_area.html.twig' %}
+                {# Баннер #}
+                {% if banner_bottom and user.roles[1] is not defined %}
+                    <div class="clearfix padding-5 text-center banner" onclick="set_click({{ banner_bottom.id }})">
+                        <div style="width: {% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                            {{ banner_bottom.code|raw }}
+                        </div>
+                    </div><br>
+                {% endif %}
+                <h4 class="padding-5">Хотите разместить свое объявление{% if category.parentId %} в рубрику <b>{{ category.name }}</b>{% endif %}?</h4>
+                <p class="padding-5">Чтобы подать объявление в рубрику
+                    <b>{{ category.name }} {{ adv.Regions.pagetitle }}</b> необходимо заполнить простую форму
+                    размещения бесплатного объявления, выбрать регион <b>{{ adv.Regions.name }}</b>, рубрику
+                    <b>{{ category.name }}</b> придумать привлекательный заголовок и полный текст своего
+                    объявления, максимально заполнить характеристики и указать адекватную стоимость, свой e-mail
+                    и телефон. Добавьте фотографии — они помогут привлечь больше просмотров вашего объявления.
+                </p>
+                <p class="padding-5">
+                  <a class="btn btn-addnew" href="{{ path('add_adv_page', { region: top_panel.url_region }) }}"
+                    title="Подать объявление">Подать объявление</a>
+                 </p>
+            </div>        
+        </div> 
+        {# Правая колонка #}
+        <div class="col-md-3 padding-0 hidden-xs">
+
+            {# Инструменты модератора #}
+            {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_MODER") %}
+                <div class="col-sm-6 col-md-12 padding-5">
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">
+                            <strong><i class="fa fa-cogs"></i> Инструменты модератора</strong>
+                        </div>
+                        <div class="panel-body clearfix">
+                            <i class="fa fa-signal"></i>&nbsp; <a data-toggle="modal" data-target=".stat">Статистика</a><br>
+                            <i class="fa fa-eye" title="всего (сегодня)"></i> {{ adv.cnt }} ({{ adv.cntToday }}) <i
+                                    class="fa fa-phone" title="просмотров телефона"></i>{{ adv.cntTel }} <i
+                                    class="fa fa-skype" title="просмотров Skype"></i> {{ adv.cntSkype }} <i
+                                    class="fa fa-dribbble" title="просмотров сайта"></i> {{ adv.cntSite }}
+                            <hr>
+                            <i class="fa fa-check"></i>&nbsp; <a
+                                    href="{{ path('admin_admin_modered_from_site_page', { 'id' : adv.id, region: top_panel.url_region }) }}"
+                                    title="Одобрить">Одобрить объявление</a><br>
+                            <i class="fa fa-bullhorn"></i>&nbsp; <a
+                                    href="{{ path('admin_admin_digestadvpage', { 'id' : adv.id, region: top_panel.url_region }) }}"
+                                    title="В даджест">Опубликовать в дайджест</a>
+                            <hr>
+                            <i class="fa fa-times"></i>&nbsp; <a
+                                    href="{{ path('admin_admin_offadvpage', { 'id' : adv.id, region: top_panel.url_region }) }}"
+                                    title="Отклонить">Отклонить объявление</a><br>
+                            {% if is_granted("ROLE_ADMIN") %}
+                                <i class="fa fa-pencil"></i>&nbsp; <a
+                                    href="{{ path('edit_adv_page', { 'id' : adv.id, region: top_panel.url_region }) }}"
+                                    title="Редактировать как владелец">Редактировать как владелец</a><br>
+                                <i class="fa fa-pencil"></i>&nbsp; <a
+                                    href="{{ path('admin_admin_advdetailspage', { 'id' : adv.id, region: top_panel.url_region }) }}"
+                                    title="Редактировать в админке">Редактировать в админке</a><br>
+                                <i class="fa fa-user"></i>&nbsp; <a href="?_to_be_user={{ adv.User.email }}">Войти как
+                                владелец</a><br>
+                            {% endif %}
+                            <i class="fa fa-envelope-o"></i>&nbsp; <span class="link" data-toggle="modal"
+                                                                         data-target="#postAdminModal"
+                                                                         data-recipient="{{ adv.User.id }}"
+                                                                         data-adv="{{ adv.id }}"
+                                                                         title="Отправить письмо"> Сообщение</span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_MODER") or (user.id is defined and user.id == adv.userId) %}
+                {# Статистика объявления #}
+                <div class="modal fade stat" tabindex="-1" role="dialog" aria-labelledby="Stat"
+                     aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"><span
+                                            aria-hidden="true">&times;</span><span class="sr-only">Закрыть</span>
+                                </button>
+                                <h4 class="modal-title" id="ComplaneLabel"><i class="fa fa-signal"></i>&nbsp;Статистика
+                                </h4>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="clearfix">
+                                    <span>Всего просмотров: <strong>{{ adv.cnt }}</strong></span><br>
+                                    {% if adv.googleDate %}в Google: <strong>{{ adv.googleDate|date('d.m.Y') }}</strong>
+                                        <br>{% endif %}
+                                    {% if adv.yandexDate %}в Яндекс:
+                                        <strong>{{ adv.yandexDate|date('d.m.Y') }}</strong>{% endif %}
+                                </div>
+                                <div id="statistics"></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">
+                                    Закрыть
+                                </button>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {# Инструменты владельца объявления #}
+            {% if user.id is defined %}
+                {% if user.id == adv.userId %}
+                    <div class="col-sm-6 col-md-12 padding-5">
+                        <div class="panel panel-success">
+                            <div class="panel-heading">
+                                <strong><i class="fa fa-cogs"></i> Инструменты автора</strong>
+                            </div>
+                            <div class="panel-body clearfix">
+                                <i class="fa fa-signal"></i>&nbsp; <a data-toggle="modal"
+                                                                      data-target=".stat">Статистика</a><br><i
+                                        class="fa fa-eye" title="просмотров всего (сегодня)"></i> {{ adv.cnt }}
+                                ({{ adv.cntToday }}) <i
+                                        class="fa fa-phone" title="просмотров телефона"></i> {{ adv.cntTel }} <i
+                                        class="fa fa-skype" title="просмотров Skype"></i> {{ adv.cntSkype }} <i
+                                        class="fa fa-dribbble" title="просмотров сайта"></i> {{ adv.cntSite }}
+                                <hr>
+                                {% if adv.AdvPacketss.Data[0].PacketId != 3 and not adv.AdvPacketss.Data[0].Paid %}
+                                    <div class="text-center">
+                                        <b class="red">Внимание!</b><br> Выбранный пакет не оплачен<br><br>
+                                        <a class="btn btn-danger"
+                                           href="{{ path('paid_adv_page', { 'id' : adv.AdvPacketss.Data[0].id, region:top_panel.url_region }) }}"
+                                           title="Оплатить пакет">Оплатить пакет</a><br><br>
+                                        <small>Неоплаченные объявления не отображаются на сайте. Вы всегда можете
+                                            выбрать бесплатный вариант размещения.
+                                        </small>
+                                    </div>
+                                    <hr>
+                                {% else %}
+                                  {% if adv.AdvPacketss.Data[0].PacketId == 3 %}
+                                    {# Пакет VIP #}<a class="a_to_premium text-nowrap" data-id="{{ adv.id }}"
+                                                          title="Пакет VIP"><img width="16" height="16" class="use-up-adv"
+                                                                                     src="{{ asset('bundles/sitefirstpage/images/vip.png') }}"
+                                                                                     alt="Пакет VIP"
+                                                                                     title="Пакет VIP"> Пакет
+                                    VIP</a><br>
+                                    {# Пакет Турбо #}<a class="a_to_lite text-nowrap" data-id="{{ adv.id }}"
+                                                       title="Пакет Турбо"><img width="16" height="16" class="use-up-adv"
+                                                                               src="{{ asset('bundles/sitefirstpage/images/turbo.png') }}"
+                                                                               alt="Пакет Турбо" title="Пакет Турбо">
+                                    Пакет Турбо</a><br>
+                                    {# Поднять в ТОП #}<a class="a_to_top text-nowrap" data-toggle="modal"
+                                                          data-target="#topModal" data-id="{{ adv.id }}"
+                                                          title="Поднятие в ТОП"><img class="use-up-adv"
+                                                                                      src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}"
+                                                                                      alt="Поднятие в ТОП"
+                                                                                      title="Поднятие в ТОП"> Поднять в
+                                    ТОП</a><br>
+                                    {# Выделить цветом #}<a class="a_highlight text-nowrap" data-toggle="modal"
+                                                            data-target="#highlightModal" data-id="{{ adv.id }}"
+                                                            title="Выделить цветом"><img class="use-up-adv"
+                                                                                         src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}"
+                                                                                         alt="Выделение"
+                                                                                         title="Выделить цветом">
+                                    Выделить</a>
+                                    <hr>
+                                  {% endif %}
+                                {% endif %}
+                                <i class="fa fa-pencil-square-o"></i></span>&nbsp; <a
+                                        href="{{ path('edit_adv_page', { 'id' : adv.id, region: top_panel.url_region }) }}"
+                                        title="Редактировать">Редактировать</a><br>
+                                <i class="fa fa-refresh"></i>&nbsp; <a
+                                        href="{{ path('update_adv_page', { 'id' : adv.id, region: top_panel.url_region }) }}"
+                                        title="Обновить">Обновить</a>
+                                <hr>
+                                <i class="fa fa-trash-o"></i>&nbsp; <a
+                                        href="{{ path('delete_adv_page', { 'id' : adv.id, region: top_panel.url_region }) }}"
+                                        title="В архив">В архив</a>
+                            </div>
+                        </div>
+                    </div>
+                    {# Поднять в ТОП #}
+                    <div class="modal fade" id="topModal" role="dialog"
+                         aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <form class="form-horizontal" role="form" method="POST"
+                                      action="{{ path('adv_to_top_page', { region:top_panel.url_region }) }}">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Закрыть"><span
+                                                    aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title"><img class="use-up-adv"
+                                                                     src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}"
+                                                                     alt="Поднятие в ТОП" title="Поднятие в ТОП">
+                                            Поднять в ТОП</h4></div>
+                                    <div class="modal-body">
+                                        <div>Объявление один раз поднимется наверх в результатах поиска.</div>
+                                        <hr>
+                                        Стоимость: <strong>49 р.</strong><br><br>
+                                        <div id="form">
+                                            <input type="hidden" id="form_id" name="form[id]" value="">
+                                            <input type="hidden" id="form_sum" name="form[sum]" value="49">
+                                            <div class="padding-5">
+                                                <div id="form_paid_type" class="paid_checkbox">
+                                                    <input type="radio" id="form_paid_type_0" name="form[paid_type]"
+                                                           required="required"
+                                                           value="1"{% if app.user.UserAccounts[0].balance<49 %} disabled="disabled"{% else %} checked="checked"{% endif %}>&nbsp;
+                                                    <label for="form_paid_type_0" class="">из кошелька
+                                                        ( {{ app.user.UserAccounts[0].balance|number_format(0, '.', ' ') }} р. )</label><br>                                                    
+                                                </div>
+                                            </div>
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="btn btn-default"
+                                           href="{{ path('user_balance_page', { region: top_panel.url_region}) }}"
+                                           title="Пополнить баланс">Пополнить баланс</a>
+                                        <button type="submit"
+                                                id="form_save"{% if app.user.UserAccounts[0].balance<49 %} disabled="disabled"{% endif %}
+                                                name="form[save]" class="btn btn-success">Оплатить
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Выделить цветом #}
+                    <div class="modal fade" id="highlightModal" role="dialog"
+                         aria-labelledby="highlightModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-sm">
+                            <div class="modal-content">
+                                <form class="form-horizontal" role="form" method="POST"
+                                      action="{{ path('adv_highlight_page', { region:top_panel.url_region }) }}">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Закрыть"><span
+                                                    aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title"><img class="use-up-adv"
+                                                                     src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}"
+                                                                     alt="Выделить цветом" title="Выделить цветом">
+                                            Выделить цветом</h4></div>
+                                    <div class="modal-body">
+                                        <div>Объявление будет выделено цветом в результатах поиска на <strong>14
+                                                дней</strong>.
+                                        </div>
+                                        <hr>
+                                        Стоимость: <strong>49 р.</strong><br><br>
+                                        <div id="form">
+                                            <input type="hidden" id="forms_id" name="forms[id]" value="">
+                                            <input type="hidden" id="forms_sum" name="forms[sum]" value="49">
+                                            <div class="padding-5">
+                                                <div id="form_paid_type" class="paid_checkbox">
+                                                    <input type="radio" id="forms_paid_type_0" name="forms[paid_type]"
+                                                           required="required"
+                                                           value="1"{% if app.user.UserAccounts[0].balance<49 %} disabled="disabled"{% else %} checked="checked"{% endif %}>&nbsp;
+                                                    <label for="forms_paid_type_0" class="">из кошелька
+                                                        ( {{ app.user.UserAccounts[0].balance|number_format(0, '.', ' ') }} р. )</label><br>                                                    
+                                                </div>
+                                            </div>
+                                            <div></div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="btn btn-default"
+                                           href="{{ path('user_balance_page', { region: top_panel.url_region}) }}"
+                                           title="Пополнить баланс">Пополнить баланс</a>
+                                        <button type="submit"
+                                                id="form_save"{% if app.user.UserAccounts[0].balance<49 %} disabled="disabled"{% endif %}
+                                                name="form[save]" class="btn btn-success">Оплатить
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    {% if comments | length %}
+                        {# Комментарии #}
+                        <div class="col-sm-6 col-md-12 padding-5">
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <strong><i class="fa fa-comment-o"></i> Мои заметки</strong>
+                                </div>
+                                <div class="panel-body clearfix">
+                                    {% for comment in comments|reverse if comment %}
+                                        <div class="comment">
+                                            <strong>{{ comment.date|date("d.m.Y") }}</strong> - {{ comment.comment }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+
+            {# Вы смотрели #}
+            {% include 'SiteFirstPageBundle:Default:yadvs.html.twig' %}
+
+            {#<div class="col-sm-6 col-md-12 padding-5 clearfix"><br><div id="hypercomments_mix"></div></div>#}
+
+            {# Личный кабинет #}
+            {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+
+            {# Баннер в правой колонке #}
+            {% if banner_right and user.roles[1] is not defined %}
+                <div class="col-xs-12 padding-5 hidden-xs">
+                    <aside>
+                        <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+                            <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+                        </div>
+                    </aside>
+                </div>
+            {% endif %}
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/sitefirstpage/js/owl.carousel.js') }}"></script>
+    <script>
+        {% if adv.advImagess|length > 1 or adv.youtube %}
+        $(document).ready(function () {
+            $("#images").owlCarousel({
+                items: 1,
+                video: true,
+                nav: true,
+                lazyLoad: true,
+                navText: false,
+                loop: false
+            });
+        });
+        {% endif %}
+    </script>
+    <script src="{{ asset('bundles/sitefirstpage/js/functions.js') }}"></script>
+    <script src="//api-maps.yandex.ru/2.1/?lang=ru-RU&load=package.full" type="text/javascript"></script>
+    <script src="{{ asset('bundles/sitefirstpage/js/on_map.js') }}"></script>
+    <script src="{{ asset('bundles/sitefirstpage/js/lightgallery-all.min.js') }}"></script>
+    <script type="text/javascript">$(document).ready(function () {
+            if ($("#images").length) {
+                $("#images").lightGallery({selector: '.imagelightbox', thumbnail: false, hash: false});
+            }
+            if ($("#image_one").length) {
+                $("#image_one").lightGallery({selector: '.imagelightbox', thumbnail: false, hash: false});
+            }
+        });</script>
+    <script type="text/javascript" src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js" charset="utf-8"></script>
+    <script async type="text/javascript" src="//yastatic.net/share2/share.js" charset="utf-8"></script>
+    {#<div id="hypercomments_mix"></div>
+    <script type="text/javascript">
+        _hcwp = window._hcwp || [];
+        //_hcwp.push({widget:"Mixstream", widget_id:77729, filter:"last", limit:5});
+        _hcwp.push({widget: "Stream", widget_id: 77729});
+        (function () {
+            if ("HC_LOAD_INIT" in window)return;
+            HC_LOAD_INIT = true;
+            var lang = (navigator.language || navigator.systemLanguage || navigator.userLanguage || "en").substr(0, 2).toLowerCase();
+            var hcc = document.createElement("script");
+            hcc.type = "text/javascript";
+            hcc.async = true;
+            hcc.src = ("https:" == document.location.protocol ? "https" : "http") + "://w.hypercomments.com/widget/hc/77729/" + lang + "/widget.js";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hcc, s.nextSibling);
+        })();
+    </script>#}
+    {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_MODER") or (user.id is defined and user.id == adv.userId) %}
+        <script src="{{ asset('bundles/adminadmin/js/raphael-min.js') }}"></script>
+        <script src="{{ asset('bundles/adminadmin/js/morris.min.js') }}"></script>
+        <script>
+            $('.stat').on('shown.bs.modal', function () {
+                $(function () {
+                    Morris.Line({
+                        element: 'statistics',
+                        data: [
+                            {% for data in adv.stats if data %}
+                            {
+                                'period': "{{ data.statDate|date_modify("-1 day")|date('Y-m-d') }}",
+                                'clicks': {{ data.clicks }},
+                                'views': {{ data.shows }} },
+                            {% endfor %}
+                            {
+                                'period': "{{ "now"|date('Y-m-d') }}",
+                                'clicks': {{ adv.cntTelToday }},
+                                'views': {{ adv.cntToday }} }
+                        ],
+                        xkey: "period",
+                        ykeys: ['clicks', 'views'],
+                        labels: ['Кликов', 'Просмотров'],
+                        lineColors: ['#F44336', '#4CAF50'],
+                        resize: true
+                    });
+                });
+            });
+            $('.stat').on('hidden.bs.modal', function () {
+                $('#statistics').empty();
+            });
+        </script>
+    {% endif %}
+{% endblock %}

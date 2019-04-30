@@ -1,0 +1,21 @@
+{% extends 'AdminAdminBundle::mail.html.twig' %}
+{% block content_first %}
+  <font color="#222" face="Arial" size="3">
+    <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222 !important;line-height:22px;text-align:center;margin:0;" align="center">Здравствуйте, <strong>{{ username }}</strong>!<br>
+    Вы разместили на сайте MegaBob.ru свои объявления:<br><br>
+      {% for adv in advs if adv %}
+        <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="Перейти к объявлению">{{ adv.name }}</a><br>
+      {% endfor %}<br>
+      Срок размещения объявлений подошел к концу<br> и мы вынуждены сегодня отключить их показ.<br>
+    </p>
+  </font>
+{% endblock %}
+{% block content_second %}
+  <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222 !important;line-height:22px;text-align:center;margin:0;" align="center">                    
+  Однако, вы можете воспользоваться бесплатной услугой<br> продления показов объявлений.<br>&nbsp;<br>
+  Для этого необходимо перейти в <a href="{{ url('user_cabinet_page') }}" target="_blank" style="color:#0077cc;text-decoration:none;" title="Перейти в Личный кабинет">Личный кабинет</a><br> и обновить объявления еще на 1 год.<br>&nbsp;<br>
+  Продлить показы своих объявлений<br> также можно нажав на кнопку Обновить в любое время.
+  <br>&nbsp;<br>
+  <a href="{{ url('update_all_advs_from_mail_page', {user:email}) }}" target="_blank" style="color:#0275d8;text-decoration:none;background:#FFFFFF;border:1px solid #0275d8;padding:5px 15px;border-radius:6px;" title="Обновить в 1 клик">Обновить в 1 клик</a>
+  </p>
+{% endblock %}

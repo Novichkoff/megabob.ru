@@ -1,0 +1,121 @@
+{# Объявления компании #} 
+{% if adv.Shops %}
+  {% if adv.Shops.alias is defined %}
+    {% if adv.Shops.Advss|length > 1 %}
+      <hr>
+      <div class="adv_similar padding-5 clearfix">
+        <h3>Объявления компании <a href="{{ path('site_shop_advspage', { 'alias' : adv.Shops.alias, region: top_panel.url_region }) }}" title="Перейти к объявлениям компании">{{ adv.Shops.name }}</a></h3>
+        <table class="table advs-table">
+          {% for similar_adv in adv.Shops.Advss|slice(0, 6) if similar_adv %}
+            {% if similar_adv.id != adv.id %}
+              <tr>
+                <td{% if similar_adv.HlDate > date() %} class="premium_td"{% endif %}>					
+                  {% if similar_adv.UpDate|date() != similar_adv.CreateDate|date() %}<img class="use-up" src="{{ asset('bundles/sitefirstpage/images/up_top.png') }}" alt="Поднятие в ТОП" title="Использовано Поднятие в ТОП">{% endif %}
+                  {% if similar_adv.HlDate > date() %}<img class="use-highlight" src="{{ asset('bundles/sitefirstpage/images/highlight.png') }}" alt="Выделение" title="Использовано Выделение">{% endif %}
+                  <div class="col-xs-4 col-sm-2 padding-0 text-center adv-image">
+                    {% if similar_adv.AdvImagess[0] is defined %}								
+                      {% if similar_adv.AdvImagess[0] %}
+                        <a href="{{ path('site_adv_page', { 'id' : similar_adv.id, region: 'russia' }) }}" title="{{ similar_adv.name|slice(0, 1)|upper~similar_adv.name|slice(1) }}">
+                          <img src="{{ asset('images/a/images/') }}{{ similar_adv.AdvImagess[0].thumb }}"
+                             alt="{{ similar_adv.name|slice(0, 1)|upper~similar_adv.name|slice(1) }}"
+                             title="{{ similar_adv.name|slice(0, 1)|upper~similar_adv.name|slice(1) }}">
+                          {% if similar_adv.AdvImagess|length > 1 %}
+                            <span class="photo-count"><span title="{{ similar_adv.AdvImagess|length }} фото">{{ similar_adv.AdvImagess|length }}</span></span>
+                          {% endif %}
+                        </a>
+                      {% endif %}
+                    {% elseif similar_adv.Shops is defined and similar_adv.Shops.icon is defined and similar_adv.Shops.icon and similar_adv.userType == 2 %}
+                      <a href="{{ path('site_adv_page', { 'id' : similar_adv.id, region: 'russia' }) }}" title="{{ similar_adv.name|slice(0, 1)|upper~similar_adv.name|slice(1) }}">
+                        <img src="{{ asset('images/shops/images/') }}{{ similar_adv.Shops.icon }}"
+                          alt="{{ similar_adv.name|slice(0, 1)|upper~similar_adv.name|slice(1) }}"
+                          title="{{ similar_adv.name|slice(0, 1)|upper~similar_adv.name|slice(1) }}">
+                      </a>
+                    {% endif %}
+
+                    <div class="visible-xs text-center">
+                      <span class="line_price red">
+                        {% if similar_adv.AdvPrices|reverse[0] is defined %}						
+                          {% if similar_adv.Price > similar_adv.AdvPrices|reverse[0].priceOld %}
+                            <i class="fa fa-arrow-up fa-fw green" title="Цена была поднята {{ similar_adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                          {% else %}
+                            <i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ similar_adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                          {% endif %}
+                        {% endif %}
+                        {% if similar_adv.dogovor %}
+                          Договорная
+                        {% else %}
+                          {% if similar_adv.price %}
+                            {{ similar_adv.price|number_format(0, '.', ' ') }} <i>₽</i>
+                          {% else %}
+                            Бесплатно
+                          {% endif %}
+                        {% endif %}								
+                      </span><br>
+                      {% if similar_adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}
+                        Сегодня
+                      {% elseif similar_adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}
+                        Вчера
+                      {% else %}
+                        {{ similar_adv.publishDate|date("d.m.y") }}
+                      {% endif %}
+                      <br>в {{ similar_adv.publishDate|date("H:i") }}
+                    </div>
+                  </div>
+                  <div class="col-xs-8 col-sm-8 padding-5 adv-descr">						
+                    {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+                      {% if similar_adv.UserFavorites.Data[0] is defined and similar_adv.UserFavorites.Data[0].fosUserId == user.id %}
+                        <a class="red text-nowrap" id="fav_{{ similar_adv.id }}"
+                           onclick="delete_from_favorite({{ similar_adv.id }})"
+                           title="Удалить из избранного"><i class="fa fa-fw fa-bookmark"></i></a>
+                      {% else %}
+                        <a class="grey text-nowrap" id="fav_{{ similar_adv.id }}"
+                           onclick="add_to_favorite({{ similar_adv.id }})"
+                           title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o"></i></a>
+                      {% endif %}																
+                      {% if similar_adv.AdvCommentss.Data[0] is defined %}{% set found = false %}
+                        {% for comment in similar_adv.AdvCommentss.Data|reverse %}
+                          {% if not found %}
+                            {% if comment.FosUserId == app.user.id %}
+                              <i class="fa fa-bookmark sky" title="{{ comment.Comment }}"></i>
+                              {% set found = true %}
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
+                      {% endif %}
+                    {% else %}
+                      {% if top_panel.favorites is defined and similar_adv.id in top_panel.favorites %}
+                        <a class="red text-nowrap" id="fav_{{ similar_adv.id }}"
+                           onclick="delete_from_favorite_n({{ similar_adv.id }})"
+                           title="Удалить из избранного"><i class="fa fa-fw fa-bookmark"></i></a>
+                      {% else %}
+                        <a class="grey text-nowrap" id="fav_{{ similar_adv.id }}"
+                           onclick="add_to_favorite_n({{ similar_adv.id }})"
+                           title="Добавить в избранное"><i class="fa fa-fw fa-bookmark-o"></i></a>
+                      {% endif %}
+                    {% endif %}
+                    <a class="line-name{% if similar_adv.HlDate > date() %} premium{% endif %}" href="{{ path('site_adv_page', { 'id' : similar_adv.id, region: 'russia' }) }}" title="{{ similar_adv.name|slice(0, 1)|upper~similar_adv.name|slice(1) }}">{{ similar_adv.name|slice(0, 1)|upper~similar_adv.name|slice(1) }}</a>
+                    <br><span class="grey">{{ similar_adv.AdCategories.name }} {{ similar_adv.Regions.pagetitle }}</span><br>{{ similar_adv.description|slice(0, 1)|upper~similar_adv.description|slice(1)|truncate(150, true, ' ...') }}
+                    </div>
+                  <div class="hidden-xs col-sm-2 padding-0 text-center">
+                    <span class="line_price red">
+                      {% if similar_adv.AdvPrices|reverse[0] is defined %}						
+                        {% if similar_adv.Price > similar_adv.AdvPrices|reverse[0].priceOld %}
+                          <i class="fa fa-arrow-up fa-fw green" title="Цена была поднята {{ similar_adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                        {% else %}
+                          <i class="fa fa-arrow-down fa-fw red" title="Цена была снижена {{ similar_adv.AdvPrices|reverse[0].date|date('d.m.Y') }}"></i>
+                        {% endif %}
+                      {% endif %}
+                      {% if similar_adv.dogovor %}Договорная{% else %}{% if similar_adv.price %}{{ similar_adv.price|number_format(0, '.', ' ') }} <i>₽</i>{% else %}Бесплатно{% endif %}{% endif %}
+                    </span><br>
+                    {% if similar_adv.publishDate|date("d.m.y") == "now"|date("d.m.y") %}Сегодня{% elseif similar_adv.publishDate|date("d.m.y") == "now"|date_modify("-1 day")|date("d.m.y") %}Вчера{% else %}{{ similar_adv.publishDate|date("d.m.y") }}{% endif %} в {{ similar_adv.publishDate|date("H:i") }}
+                  </div>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </table>
+      </div>
+      <hr>
+    {% endif %} 
+  {% endif %}           
+{% endif %}

@@ -1,0 +1,56 @@
+parameters:
+    my_user_provider.class: Site\FirstPageBundle\Security\Core\User\FOSUBUserProvider
+    toppanel.class: Site\FirstPageBundle\Controller\TopPanel
+    getparams.class: Site\FirstPageBundle\Controller\GetParams
+    geodetect.class: Site\FirstPageBundle\Controller\GeoDetect
+    banner.class: Site\FirstPageBundle\Controller\Banner
+    mail_helper.class: Site\FirstPageBundle\Controller\MailHelper
+    mailer.class: Site\FirstPageBundle\Controller\Mailer
+    sitemap.listener.class: Site\FirstPageBundle\Controller\SitemapListener
+
+services:
+    my_user_provider:
+        class: "%my_user_provider.class%"
+        arguments: [@fos_user.user_manager,{facebook: FacebookId, vkontakte: VkontakteId, twitter: TwitterId, mailru: MailruId, odnoklassniki: OdnoklassnikiId, google: GoogleId}]
+    toppanel:
+        class: "%toppanel.class%"
+        arguments: [@service_container]    
+    get_params:
+                class: "%getparams.class%"
+                arguments: [@service_container]
+    geodetect:
+        class: "%geodetect.class%"
+        arguments: [@service_container]
+    banner:
+        class: "%banner.class%"
+        arguments: [@service_container]
+    mail_helper:
+            class: "%mail_helper.class%"
+            arguments: [@mailer]
+    my_mailer:
+            class: "%mailer.class%"
+            arguments: [@mailer]
+    my.sitemap.listener:
+            class: "%sitemap.listener.class%"
+            arguments: [@router]
+            tags: [{name: "presta.sitemap.listener"}]			
+    advs_feed:
+        class: Site\FirstPageBundle\Feed\AdvsFormatter
+        tags:
+            - { name: eko_feed.formatter, format: advs }
+        arguments: ["@translator"]
+    yandex.auto_feed:
+        class: Site\FirstPageBundle\Feed\AutoFormatter
+        tags:
+            - { name: eko_feed.formatter, format: auto }
+        arguments: ["@translator"]
+    yandex.realty_feed:
+        class: Site\FirstPageBundle\Feed\RealtyFormatter
+        tags:
+            - { name: eko_feed.formatter, format: realty }
+        arguments: ["@translator"]
+    yandex.vacancy_feed:
+        class: Site\FirstPageBundle\Feed\VacancyFormatter
+        tags:
+            - { name: eko_feed.formatter, format: vacancy }
+        arguments: ["@translator"]

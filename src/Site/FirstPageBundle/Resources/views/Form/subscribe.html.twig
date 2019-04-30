@@ -1,0 +1,54 @@
+{% block form_row %}
+    {% spaceless %}
+        {{ form_widget(form) }}
+    {% endspaceless %}
+{% endblock form_row %}
+
+{% block form_label %}
+    {% spaceless %}
+        {% if label is not sameas(false) %}
+            {% if not compound %}
+    {% set label_attr = label_attr|merge({'for': id}) %}
+{% endif %}
+            {% if label is empty %}
+    {% set label = name|humanize %}
+{% endif %}
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %} class="">{{ label }}</label>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_label %}
+
+{% block text_widget %}
+    {% spaceless %}        
+		<div class="form-group padding-0">
+				    <input class="form-control"
+                   type="{% if attr.class is defined %}{% if attr.class == 'coordinates' %}hidden{% endif %}{% else %}text{% endif %}"
+                   size="60" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}>				
+			</div>		
+    {% endspaceless %}
+{% endblock text_widget %}
+
+{% block choice_widget %}
+    {% spaceless %}
+        {% if expanded %}
+            <div class="padding-5">
+                {{ block('choice_widget_expanded') }}
+            </div>
+        {% else %}
+            <div class="padding-5">
+                {{ block('choice_widget_collapsed') }}
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock choice_widget %}
+
+{% block choice_widget_expanded %}
+    {% spaceless %}
+        <div {{ block('widget_container_attributes') }}>
+            {% for child in form %}
+                {{ form_widget(child) }}&nbsp;
+                {{ form_label(child) }}<br>
+            {% endfor %}
+        </div>
+    {% endspaceless %}
+{% endblock choice_widget_expanded %}

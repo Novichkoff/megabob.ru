@@ -1,0 +1,389 @@
+{% block form_row %}
+    {% spaceless %}
+        <div class="form-group form-site padding-0 clearfix">
+            {% if label != 'Я прочитал и согласен с правилами Claso' %}{{ form_label(form) }}{% endif %}
+            {{ form_widget(form) }}
+            {{ block('field_help') }}
+        </div>
+        {% if attr.class is defined %}
+            {% if attr.class == 'address' or attr.class == 'coordinates' %}
+                <div class="form-group form-site clearfix">
+                    <div class="col-sm-5 padding-5">
+                        <div class="alert alert-warning"><p class="text-center">Введите <strong>точный адрес</strong>
+                                или установите маркер и ваше объявление будет доступно на карте.</p><img
+                                    class="img-responsive img-thumbnail"
+                                    src="{{ asset('bundles/sitefirstpage/images/on_map.jpg') }}"
+                                    alt="Расположение на карте" title="Расположение на карте"></div>
+                    </div>
+                    <div class="col-sm-7 padding-5">						
+						<script type="text/javascript">
+              (function(fn){var d=document;(d.readyState=='loading')?d.addEventListener('DOMContentLoaded',fn):fn();})(function(){
+                            ymaps.ready(init);
+                            function getType (val) {
+                              if (typeof val === 'undefined') return 'undefined';
+                              if (typeof val === 'object' && !val) return 'null';
+                              return ({}).toString.call(val).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+                            }
+                            function init() {
+                                var fulladress = 'Россия';
+                                var area_id = document.getElementById('advs_area_id').value;
+                                if (area_id) {
+                                    var area = document.getElementById('advs_area_id').options[advs_area_id.selectedIndex].innerHTML;
+                                }
+                                if (document.getElementById('advs_region_id')) {
+                                    var city_id = document.getElementById('advs_region_id').value;
+                                }
+                                if (city_id) {
+                                    var city = document.getElementById('advs_region_id').options[advs_region_id.selectedIndex].innerHTML;
+                                }
+                                var adress = document.getElementById('{{ id }}').value;
+                                if (area_id) {
+                                    fulladress = fulladress + ' ' + area;
+                                }
+                                if (city_id) {
+                                    fulladress = fulladress + ' ' + city;
+                                }
+                                {% if attr.class == 'address' %}
+                                  if (adress) {
+                                      fulladress = fulladress + ' ' + adress;
+                                  }
+                                {% endif %}
+                                ymaps.geocode(fulladress, {results: 1}).then(function (res) {
+                                    var firstGeoObject = res.geoObjects.get(0),
+                                            myMap = new ymaps.Map("amap", {
+                                                center: firstGeoObject.geometry.getCoordinates(),
+                                                {% if attr.class == 'coordinates' %}type: 'yandex#hybrid', {% endif %}
+                                                zoom: 15,
+                                                behaviors: ['default', 'scrollZoom'],
+                                                controls: []
+                                            },{suppressMapOpenBlock: true});
+                                    $('#amap').data('map', myMap);
+                                    myMap.container.fitToViewport();
+                                    attachReverseGeocode(myMap);
+                                }, function (err) {
+                                    // Если геокодирование не удалось, сообщаем об ошибке.
+                                    alert(err.message);
+                                });
+                                function attachReverseGeocode(myMap) {
+                                    if (document.getElementById('{{ id }}').value) {
+                                        var area = document.getElementById('advs_area_id').options[advs_area_id.selectedIndex].innerHTML;
+                                        var area_id = document.getElementById('advs_area_id').value;
+                                        var city = document.getElementById('advs_region_id').options[advs_region_id.selectedIndex].innerHTML;
+                                        var city_id = document.getElementById('advs_region_id').value;
+                                        var adress = document.getElementById('{{ id }}').value;
+                                        if (area_id) {
+                                            var fulladress = area;
+                                        } else {
+                                            var fulladress = '';
+                                        }
+                                        if (city_id) {
+                                            fulladress = fulladress + ' ' + city;
+                                        }
+                                        if (adress) {
+                                            fulladress = fulladress + ' ' + adress;
+                                        }
+
+                                        ymaps.geocode(fulladress, {
+                                            results: 1
+                                        }).then(function (res) {
+                                            var firstGeoObject = res.geoObjects.get(0),
+                                                    coords = firstGeoObject.geometry.getCoordinates();
+                                            myMap.geoObjects
+                                                    .add(new ymaps.Placemark(coords, {}, {
+                                                        iconLayout: 'default#image',
+                                                        iconImageHref: '/images/placemark.png',
+                                                        iconImageSize: [50, 50],
+                                                        iconImageOffset: [-25, -50]
+                                                    }));
+                                        });
+                                    }
+                                    myMap.events.add('click', function (e) {
+                                        var coords = e.get('coords');										
+                                        ymaps.geocode(coords).then(function (res) {
+                                            var names = [];
+                                            res.geoObjects.each(function (obj) {
+                                                names.push(obj.properties.get('name'));
+                                            });
+                                            var firstGeoObject = res.geoObjects.get(0);
+                                            myMap.geoObjects.each(function (context) {
+                                                myMap.geoObjects.remove(context);
+                                            });
+                                            firstGeoObject.options.set({
+                                                iconLayout: 'default#image',
+                                                iconImageHref: '/images/placemark.png',
+                                                iconImageSize: [50, 50],
+                                                iconImageOffset: [-25, -50]
+                                            });
+
+                                            myMap.geoObjects.add(firstGeoObject);
+                                            {% if attr.class == 'address' %}document.getElementById('{{ id }}').value = names[0];
+                                            {% endif %}
+                                        });
+                                        {% if attr.class == 'coordinates' %}document.getElementById('{{ id }}').value = coords;
+                                        {% endif %}
+                                        document.getElementById('advs_coord').value = coords;
+                                    });
+                                }
+                            }
+                            function set_address(adress) {
+                                var area = document.getElementById('advs_area_id').options[advs_area_id.selectedIndex].innerHTML;
+                                var area_id = document.getElementById('advs_area_id').value;
+                                var city = document.getElementById('advs_region_id').options[advs_region_id.selectedIndex].innerHTML;
+                                var city_id = document.getElementById('advs_region_id').value;
+                                if (area_id) {
+                                    var fulladress = area;
+                                } else {
+                                    var fulladress = '';
+                                }
+                                if (city_id) {
+                                    fulladress = fulladress + ' ' + city;
+                                }
+                                if (adress) {
+                                    fulladress = fulladress + ' ' + adress;
+                                }
+                                ymaps.geocode(fulladress).then(function (res) {
+                                    placemark = new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates());
+                                    myMap = $('#amap').data('map');
+                                    myMap.geoObjects.each(function (context) {
+                                        myMap.geoObjects.remove(context);
+                                    });
+                                    myMap.setCenter(res.geoObjects.get(0).geometry.getCoordinates(), 17, {
+                                        checkZoomRange: true,
+                                        duration: 500
+                                    });
+                                    myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {}, {iconLayout: 'default#image',
+      iconImageHref: '/images/placemark.png',
+      iconImageSize: [50, 50],
+      iconImageOffset: [-25, -50]}));
+                                });
+                            }
+                          });
+                        </script>
+                        <div id="amap" class="img-thumbnail"></div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_row %}
+
+{% block field_help %}
+    {% if help %}
+        {# <div class="col-xs-4 field-help padding-0"><img src="{{ asset('bundles/sitefirstpage/images/question.png') }}" onmouseover="$('#help-{{ id }}').show();" onmouseout="$('#help-{{ id }}').hide();"><div id="help-{{ id }}" class="help clearfix">{{ help }}</div></div> #}
+    {% endif %}
+{% endblock %}
+
+{% block captcha_widget %}
+    {% spaceless %}
+        <div class="col-sm-7 padding-5">
+            <div class="col-xs-6 padding-0">
+                <input type="text"
+                       class="form-control captcha col-xs-6" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}/>
+			    {% if required %}<span class="glyphicon glyphicon-ok form-control-feedback check" aria-hidden="true"></span>{% endif %}
+            </div>
+            <div class="col-xs-6 padding-5" id="captcha_field">
+                <img src="{{ captcha_code }}" title="Введите код с картинки" alt="Защитный код"
+                     width="{{ captcha_width }}" height="{{ captcha_height }}"/>
+            </div>
+        </div>
+    {% endspaceless %}
+{% endblock %}
+
+{% block form_label %}
+    {% spaceless %}
+        {% if label is not sameas(false) %}
+            {% if not compound %}
+    {% set label_attr = label_attr|merge({'for': id}) %}
+{% endif %}
+            {% if label is empty %}
+    {% set label = name|humanize %}
+{% endif %}
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %} class="col-sm-5 control-label text-right" {% if help is defined %} title="{{ help }}"{% endif %}>{{ label|trans({}, 'FOSUserBundle') }}</label>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_label %}
+
+{% block text_widget %}
+    {% spaceless %}
+        <div class="col-sm-7 padding-5">
+            <input class="form-control"
+                   type="{% if attr.class is defined %}{% if attr.class == 'coordinates' %}hidden{% endif %}{% else %}text{% endif %}"
+                   size="60" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}{% if attr.class is defined %}{% if attr.class == 'address' %} onchange="set_address(this.value);"{% endif %}{% endif %}>
+            {% if attr.class is defined %}
+                {% if attr.class == 'coordinates' %}
+                    <span>Укажите расположение объекта на карте.</span>
+                {% endif %}
+            {% endif %}
+			{% if required %}<span class="glyphicon glyphicon-ok form-control-feedback check" aria-hidden="true"></span>{% endif %}
+        </div>
+    {% endspaceless %}
+{% endblock text_widget %}
+
+{% block datetime_widget %}
+    {% spaceless %}
+        <div class="col-sm-7 padding-5">
+            <input class="form-control" type="text"
+                   size="60" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}>
+        </div>
+    {% endspaceless %}
+{% endblock datetime_widget %}
+
+
+{% block file_widget %}
+    {% spaceless %}
+        <div class="upload btn btn-default" {% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}>
+            <span><i class="fa fa-plus fa-fw"></i> Загрузить изображение (мин.300x200)</span>
+            <input class="uploads" accept=".jpg,.png,.gif"
+                   type="file" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}
+                   onChange="imgUpload()">
+        </div>
+        <div class="upload_image_animation pull-right">
+            <img src="{{ asset('bundles/sitefirstpage/images/upload.gif') }}" alt="Загрузка изображения"
+                 title="Загрузка изображения">
+        </div>
+    {% endspaceless %}
+{% endblock file_widget %}
+
+{% block number_widget %}
+    {% spaceless %}
+        <div class="col-sm-7 padding-5">
+            <input class="form-control" type="text"
+                   size="60" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}>
+		    {% if required %}<span class="glyphicon glyphicon-ok form-control-feedback check" aria-hidden="true"></span>{% endif %}
+        </div>
+    {% endspaceless %}
+{% endblock number_widget %}
+
+{% block integer_widget %}
+    {% spaceless %}
+        <div class="col-sm-7 padding-5">
+            <input class="form-contro" type="text"
+                   size="60" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}>
+		    {% if required %}<span class="glyphicon glyphicon-ok form-control-feedback check" aria-hidden="true"></span>{% endif %}
+        </div>
+    {% endspaceless %}
+{% endblock integer_widget %}
+
+{% block textarea_widget %}
+    {% spaceless %}
+        <div class="col-sm-7 padding-5">
+            <textarea class="form-control" rows="6"
+                      cols="60" {{ block('widget_attributes') }}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}>{{ value }}</textarea>
+		    {% if required %}<span class="glyphicon glyphicon-ok form-control-feedback check" aria-hidden="true"></span>{% endif %}
+        </div>
+    {% endspaceless %}
+{% endblock textarea_widget %}
+
+{% block email_widget %}
+    {% spaceless %}
+        <div class="col-sm-7 padding-5">
+            <input class="form-control" type="email"
+                   size="60" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}>
+		    {% if required %}<span class="glyphicon glyphicon-ok form-control-feedback check" aria-hidden="true"></span>{% endif %}
+        </div>
+    {% endspaceless %}
+{% endblock email_widget %}
+
+{% block password_widget %}
+    {% spaceless %}
+        <div class="col-sm-7 padding-5">
+            <input class="form-control" type="password"
+                   size="60" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}>
+        </div>
+    {% endspaceless %}
+{% endblock password_widget %}
+
+{% block checkbox_widget %}
+    {% spaceless %}
+        {% if label != 'Я прочитал и согласен с правилами Claso' %}
+            <div class="col-sm-7 padding-5">
+                <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}/>
+            </div>
+        {% else %}
+            <div class="col-sm-7 col-sm-offset-5 padding-5">
+                <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %} />
+                <strong>{{ label|raw }}</strong>
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock checkbox_widget %}
+
+{% block submit_widget %}
+    {% spaceless %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <div class="col-xs-offset-5 col-sm-7 padding-5">
+            <button class="btn btn-primary"
+                    type="{{ type|default('submit') }}" {{ block('button_attributes') }}>{{ label|trans({}, translation_domain) }}</button>
+        </div>
+    {% endspaceless %}
+{% endblock submit_widget %}
+
+{% block form_errors %}
+    {% spaceless %}        
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block choice_widget %}
+    {% spaceless %}
+        {% if expanded %}
+            <div class="col-sm-7 padding-5">
+                {{ block('choice_widget_expanded') }}
+            </div>
+        {% else %}
+            <div class="col-sm-7 padding-5">
+                {{ block('choice_widget_collapsed') }}
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock choice_widget %}
+
+{% block choice_widget_expanded %}
+    {% spaceless %}
+        <div {{ block('widget_container_attributes') }}>
+            {% for child in form %}
+                {{ form_widget(child) }}
+                {{ form_label(child) }}<br>
+            {% endfor %}
+        </div>
+    {% endspaceless %}
+{% endblock choice_widget_expanded %}
+
+{% block choice_widget_collapsed %}
+    {% spaceless %}
+        {% if required and empty_value is none and not empty_value_in_choices %}
+            {% set required = false %}
+        {% endif %}
+        <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}{% if help is defined %} data-toggle="tooltip" data-placement="top" title="{{ help }}"{% endif %}>
+            {% if empty_value is not none %}
+                <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
+            {% endif %}
+            {% if preferred_choices|length > 0 %}
+                {% set options = preferred_choices %}
+                {{ block('choice_widget_options') }}
+                {% if choices|length > 0 and separator is not none %}
+                    <option disabled="disabled">{{ separator }}</option>
+                {% endif %}
+            {% endif %}
+            {% set options = choices %}
+            {{ block('choice_widget_options') }}
+        </select>
+		{% if required %}<span class="glyphicon glyphicon-ok form-control-feedback check" aria-hidden="true"></span>{% endif %}
+    {% endspaceless %}
+{% endblock choice_widget_collapsed %}
+
+{% block choice_widget_options %}
+    {% spaceless %}
+        {% for group_label, choice in options %}
+            {% if choice is iterable %}
+                <optgroup label="{{ group_label|trans({}, translation_domain) }}">
+                    {% set options = choice %}
+                    {{ block('choice_widget_options') }}
+                </optgroup>
+            {% else %}
+                <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
+            {% endif %}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock choice_widget_options %}

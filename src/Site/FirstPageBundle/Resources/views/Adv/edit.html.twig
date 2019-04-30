@@ -1,0 +1,161 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% form_theme form 'SiteFirstPageBundle:Form:add.html.twig' %}
+{% use 'SimpleThingsFormExtraBundle:Form:field_type_help.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}    
+    <script src="//api-maps.yandex.ru/2.1/?lang=ru-RU&load=package.full" type="text/javascript"></script>
+    <script src="{{ asset('bundles/sitefirstpage/js/inputmask.js') }}" type="text/javascript"></script>
+    <script>
+      $(':input').inputmask();
+      function set_address(adress) {
+        var area = document.getElementById('advs_area_id').options[advs_area_id.selectedIndex].innerHTML;
+        var area_id = document.getElementById('advs_area_id').value;
+        var city = document.getElementById('advs_region_id').options[advs_region_id.selectedIndex].innerHTML;
+        var city_id = document.getElementById('advs_region_id').value;
+        if (area_id) {
+            var fulladress = area;
+        } else {
+            var fulladress = '';
+        }
+        if (city_id) {
+            fulladress = fulladress + ' ' + city;
+        }
+        if (adress) {
+            fulladress = fulladress + ' ' + adress;
+        }
+        ymaps.geocode(fulladress).then(function (res) {
+            placemark = new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates());
+            myMap = $('#amap').data('map');
+            myMap.geoObjects.each(function (context) {
+                myMap.geoObjects.remove(context);
+            });
+            myMap.setCenter(res.geoObjects.get(0).geometry.getCoordinates(), 17, {
+                checkZoomRange: true,
+                duration: 500
+            });
+            myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {}, {iconLayout: 'default#image',
+      iconImageHref: '/images/placemark.png',
+      iconImageSize: [50, 50],
+      iconImageOffset: [-25, -50]}));
+        });
+      }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="clearfix">
+
+        {% trans_default_domain 'FOSUserBundle' %}
+
+        {% if form %}
+            <div class="col-md-9 padding-5">
+                <h1>Редактирование объявления</h1>
+
+                {% for flashMessage in app.session.flashbag.get('noticesite') %}
+                    <div class="alert alert-success alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                    class="sr-only">Закрыть</span></button>
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+                {% for flashMessage in app.session.flashbag.get('alertsite') %}
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                                    class="sr-only">Закрыть</span></button>
+                        {{ flashMessage|raw }}
+                    </div>
+                {% endfor %}
+
+                <div class="alert alert-info" role="alert"><p><strong>Важно!</strong> Все объявления проходят проверку. Не подавайте объявлений нарушаюших
+                    <a href="/pages/rules" title="Правила {{ top_panel.settings.name }}" target="_blank">правила {{ top_panel.settings.name }}</a> или действующее
+                    законодательство РФ. Поля отмеченные зеленым цветом обязательны для заполнения!</p>
+				<p>Указывайте только реальную цену <strong>в рублях</strong> - если вы хотите <strong>подать объявление бесплатно</strong>, укажите цену <strong>0</strong>.</p></div>
+        
+                <div id="add_adv" class="clearfix">
+                    <form class="padding-0 clearfix" id="add_adv_form" role="form" method="POST" {{ form_enctype(form) }}>
+                        {{ form_errors(form) }}
+                        {{ form_row(form.id) }}                        
+                        {{ form_row(form.enabled) }}
+                        <br>
+                        {{ form_row(form.name) }}
+                        {% if form.shop_id is defined %}{{ form_row(form.shop_id) }}{% endif %}
+                        {{ form_row(form.phone) }}
+						{{ form_row(form.skype) }}
+                        {{ form_row(form.category_id) }}
+                        <div id="area">
+                            {% if form.area_id is defined %}{{ form_row(form.area_id) }}{% endif %}
+                        </div>
+                        <div id="town">
+                            {% if form.region_id is defined %}{{ form_row(form.region_id) }}{% endif %}
+                        </div>
+                        {{ form_row(form.description) }}
+						{{ form_row(form.site) }}
+                        {{ form_row(form.price) }}
+                        {{ form_row(form.dogovor) }}
+                        {{ form_row(form.torg) }}
+                        <div class="form-group form-site">
+                            {{ form_label(form.image) }}
+                            {% if images %}
+                                <div class="col-sm-7 adv_images padding-5 clearfix">                                    
+									{{ form_widget(form.image) }}<br>
+                                    {% for image in images %}
+                                        <div class="upload_img">
+                                            <img id="img_{{ image.id }}"
+                                                 src="/images/a/images/{{ image.path }}?timestamp={{ "now"|date("His") }}">
+                                            <span class="image_delete link" onclick="imgDelete({{ image.id }})"
+                                                  title="удалить изображение"><i class="fa fa-trash-o"></i></span>
+                                            {% if image.tempId != 0 %}<span class="image_rotate link"
+                                                                            onclick="imgRotate({{ image.id }})"
+                                                                            title="повернуть изображение"><i class="fa fa-repeat"></i></span>{% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+						{{ form_row(form.youtube) }}
+                        {{ form_rest(form) }}                        
+                        <div class="form-group form-site clearfix">
+                            <div class="col-sm-offset-5 col-sm-7 padding-5">
+                                <button type="submit" class="btn btn-add" id="advs_save">Сохранить изменения</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Правая сторона страницы -->
+            <div class="col-md-3 padding-5">
+              <div class="col-sm-6 col-md-12 padding-5 clearfix">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <strong><i class="fa fa-fw fa-info"></i> Помощь</strong>
+                    </div>
+                    <div class="panel-body">
+                        <h2>Как правильно подать бесплатное объявление</h2>                        
+                        Чтобы объявление, которое Вы подаете, появилось на сайте, соблюдайте следующие правила:
+                        <ul>
+                          <li>название объявления должно начинаться с заглавной буквы, быть кратким и понятным и точно
+                            отражать его содержание;
+                          </li>
+                          <li>название и описание не должно состоять только из заглавных букв;</li>
+                          <li>описание должно быть максимально полным, как минимум 200 символов;</li>
+                          <li>не указывайте в описании номера телефонов или адреса веб-сайтов - они будут удалены
+                            автоматически;
+                          </li>
+                          <li>добавьте изображения или фотографии, такие объявления пользуются большей
+                            популярностью;
+                          </li>
+                          <li>указывайте как можно больше характеристик вашего объекта, товара или услуги.</li>
+                        </ul>
+                    </div>
+                </div>
+              </div>               
+
+              {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}

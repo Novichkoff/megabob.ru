@@ -1,0 +1,141 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title category.pagetitle %}
+
+    {% block content %}
+        <div class="container clearfix">
+            <!-- Баннер под поиском -->
+            {% if banner_search %}
+                <div class="adv_inside clearfix">
+                    <div style="width: {{ banner_search.width }}px; margin: 0 auto; text-align: center;">
+                        {{ banner_search.code|raw }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="advs_categories">
+
+                <!-- Объявления -->
+                <div class="advs">
+
+                    <!-- Настройка вида -->
+                    <div class="advs_view clearfix">
+                        <div class="col-xs-2 view">
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{view:'grid'}).done(function(){location.reload();});"
+                               class="link{% if view == 'grid' %} active_view{% endif %}" title="Плитка"><img
+                                        src="{{ asset('bundles/sitefirstpage/images/view_grid.png') }}" title="Плитка"
+                                        alt="Плитка"></a>
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{view:'line'}).done(function(){location.reload();});"
+                               class="link{% if view == 'line' %} active_view{% endif %}" title="Список"><img
+                                        src="{{ asset('bundles/sitefirstpage/images/view_line.png') }}" title="Список"
+                                        alt="Список"></a>
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{view:'list'}).done(function(){location.reload();});"
+                               class="link{% if view == 'list' %} active_view{% endif %}" title="Таблица"><img
+                                        src="{{ asset('bundles/sitefirstpage/images/view_list.png') }}" title="Таблица"
+                                        alt="Таблица"></a>
+                        </div>
+                        <div class="col-xs-3 type">
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{type:'all'}).done(function(){location.reload();});"
+                               class="link{% if type == 'all' %} active_type{% endif %}" title="Все">Все</a>
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{type:'company'}).done(function(){location.reload();});"
+                               class="link{% if type == 'company' %} active_type{% endif %}" title="Список">Компании</a>
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{type:'private'}).done(function(){location.reload();});"
+                               class="link{% if type == 'private' %} active_type{% endif %}" title="Таблица">Частные</a>
+                        </div>
+                        <div class="col-xs-3 onpage">
+                            <span>Выводить по: </span>
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{onpage:'20'}).done(function(){location.reload();});"
+                               class="link{% if onpage == '20' %} active_onpage{% endif %}" title="20">20</a>
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{onpage:'40'}).done(function(){location.reload();});"
+                               class="link{% if onpage == '40' %} active_onpage{% endif %}" title="40">40</a>
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{onpage:'60'}).done(function(){location.reload();});"
+                               class="link{% if onpage == '60' %} active_onpage{% endif %}" title="60">60</a>
+                        </div>
+                        <div class="col-xs-4 view text-right">
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{new:'1'}).done(function(){location.reload();});"
+                               class="link{% if new == '1' %} active_new{% endif %}" title="сегодня">сегодня</a>,
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{new:'3'}).done(function(){location.reload();});"
+                               class="link{% if new == '3' %} active_new{% endif %}" title="3 дня">3 дня</a>,
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{new:'7'}).done(function(){location.reload();});"
+                               class="link{% if new == '7' %} active_new{% endif %}" title="7 дней">7 дней</a>,
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{new:'10'}).done(function(){location.reload();});"
+                               class="link{% if new == '10' %} active_new{% endif %}" title="10 дней">10 дней</a>,
+                            <a onclick="$('.loading').show();$.get('{{ path('get_params') }}',{new:'1000'}).done(function(){location.reload();});"
+                               class="link{% if new == '1000' %} active_new{% endif %}" title="все">все</a>
+                        </div>
+                    </div>
+
+                    <!-- Название категории, количество объявлений и переход по страницам -->
+                    <div class="category_childs">
+
+                        <div class="navigation">
+                            {{ knp_pagination_render(advs) }}
+                        </div>
+
+                        <span>Объекты {{ (advs.getItemNumberPerPage*(advs.getCurrentPageNumber-1))+1 }}
+                            - {% if advs.getCurrentPageNumber*advs.getItemNumberPerPage < advs.getTotalItemCount %}{{ advs.getCurrentPageNumber*advs.getItemNumberPerPage }}{% else %}{{ advs.getTotalItemCount }}{% endif %}
+                            из {{ advs.getTotalItemCount }}</span>
+
+                    </div>
+
+                    {% embed "SiteFirstPageBundle:Default:"~view~".html.twig" %}{% endembed %}
+
+                </div>
+
+                <!-- Правая сторона страницы -->
+                <div class="right_side">
+                    {# VIP #}
+                    {% for vip_adv in vip_advs if vip_adv %}
+                        <div class="panel panel-danger">
+                            <div class="panel-heading">
+                                <strong>{{ vip_adv.name }}</strong>
+                            </div>
+                            <div class="panel-body">
+                                {% if vip_adv.AdvImagess.Data[0] is defined %}
+                                    <a href="{{ path('site_adv_page', { 'id' : vip_adv.id }) }}">
+                                        <img class="img-responsive"
+                                             src="{{ asset('images/advs/images/') }}{{ vip_adv.AdvImagess.Data[0].mediumThumb }}"
+                                             alt="{{ vip_adv.name }}" title="{{ vip_adv.name }}">
+                                    </a>
+                                {% endif %}
+                                {{ vip_adv.description }}
+                            </div>
+                            <div class="panel-footer clearfix">
+                                <strong class="grid_price">{% if vip_adv.dogovor %}Договорная{% else %}{% if vip_adv.price %}{{ vip_adv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</strong>
+                                <a href="{{ path('site_adv_page', { 'id' : vip_adv.id }) }}"
+                                   class="btn btn-danger btn-xs pull-right">Перейти</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <script type="text/javascript" src="//vk.com/js/api/openapi.js?116"></script>
+
+                    {# VK Widget #}
+                    <div id="vk_groups"></div>
+                    <script type="text/javascript">
+                        VK.Widgets.Group("vk_groups", {
+                            mode: 2,
+                            height: "200",
+                            color1: 'FFFFFF',
+                            color2: '000000',
+                            color3: '000000'
+                        }, 84997978);
+                    </script>
+
+                    {# Баннер в правой колонке #}
+                    {% if banner_right and user.roles[1] is not defined %}
+                        <aside>
+                            <div class="adv_right">
+                                <div style="width: {{ banner_right.width }}px; margin: 0 auto;">
+                                    {{ banner_right.code|raw }}
+                                </div>
+                            </div>
+                        </aside>
+                    {% endif %}
+
+                </div>
+                <div class="clearfix"></div>
+
+            </div>
+        </div>
+    {% endblock %}

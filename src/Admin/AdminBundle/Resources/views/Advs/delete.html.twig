@@ -1,0 +1,25 @@
+{% extends 'AdminAdminBundle::mail.html.twig' %}
+{% block content_first %}
+  <font color="#222" face="Arial" size="3">
+    <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222 !important;line-height:22px;text-align:center;margin:0;" align="center">Здравствуйте, <strong>{{ username }}</strong>!<br>
+    Вы разместили на сайте MegaBob.ru свои объявления:<br><br>
+      {% for adv in advs if adv %}
+        <a href="{{ url('site_adv_page', { category: adv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: adv.AdCategories.alias, id: adv.id, alias: adv.alias, region: adv.Regions.alias }) }}" title="Перейти к объявлению">{{ adv.name }}</a><br>
+      {% endfor %}<br>
+      Объявления уже неактивны более месяца<br> и будут сегодня автоматически помещены в архив.<br>
+    </p>
+  </font>
+{% endblock %}
+{% block content_second %}
+  <p style="font-size:16px;font-family:Arial,Tahoma,Verdana,sans-serif;color:#222 !important;line-height:22px;text-align:center;margin:0;" align="center">                    
+    Если ваши объявления все еще является актуальным<br>
+    и вы хотели бы восстановить их показ на сайте,<br>
+    предлагаем вам воспользоваться бесплатной услугой<br> продления показов объявлений.<br>&nbsp;<br>
+    Для этого необходимо перейти в <a href="{{ url('user_cabinet_page') }}" target="_blank" style="color:#0077cc;text-decoration:none;" title="Перейти в Личный кабинет">Личный кабинет</a><br> и включить объявления еще на 1 год.<br>&nbsp;<br>
+    Продлить показы своих объявлений<br> также можно нажав на кнопку Обновить в любое время.<br>&nbsp;<br>
+    Если ваши объявления потеряли актуальность<br>
+    и вы согласны с их перемещением в архив, просто игнорируйте это сообщение<br>
+    и ваши объявления будут автоматически помещены в архив.
+    <br>&nbsp;<br>
+  </p>
+{% endblock %}

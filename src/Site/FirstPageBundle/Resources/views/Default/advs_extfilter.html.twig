@@ -1,0 +1,20 @@
+{% form_theme extfilter 'SiteFirstPageBundle:Default:extfilter.html.twig' %}
+<form id="extfilter_form" action="{{ path('site_find_page') }}" class="form-horizontal" role="form"
+      method="GET" {{ form_enctype(extfilter) }}>
+    <div class="filter_params clearfix col-lg-3 col-md-4 col-xs-6 col-sm-6 padding-5">
+        <div class="filter_input"> {{ form_widget(extfilter.pp_from) }}{{ form_widget(extfilter.pp_to) }}
+            <div class="do">до</div>
+        </div>
+        {{ form_label(extfilter.pp_from) }}
+    </div>
+    {{ form_rest(extfilter) }}
+    <div class="filter_submit">
+        <button type="button" onclick="$('#extfilter_form .selsel').select2('data', null);">Сброс</button>
+        <button type="submit">Найти</button>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#extfilter_form .selsel").select2();
+        });
+    </script>
+</form>

@@ -1,0 +1,87 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block title page.title~' - Полезная информация' %}
+{% block metatitle page.title~' - Полезная информация' %}
+{% block description page.description %}
+{% block keywords page.title~',полезная информация' %}
+{% block canonical %}{{ url('site_pages_page', {'alias' : page.alias} ) }}{% endblock%}
+{% block metaimage %}{% if page.icon %}{{ top_panel.settings.url }}{{ asset('images/pages/images/') }}{{ page.icon }}{% else %}{{ top_panel.settings.url }}{{ asset('images/logo.png') }}{% endif %}{% endblock %}
+
+{% block content %}
+    <div id="fb-root"></div>
+
+	<div class="clearfix">
+        
+        <div class="col-md-9 padding-5" id="main"> 
+        {# Баннер под поиском #}
+          {% if banner_search and user.roles[1] is not defined %}
+            <div class="clearfix padding-5 text-center" onclick="set_click({{ banner_search.id }})">
+              <div style="{% if banner_search.width %}width: {{ banner_search.width }}px;{% endif %} margin: 0 auto; text-align: center;">{{ banner_search.code|raw }}</div>
+            </div><br>
+          {% endif %}        
+          {# Хлебные крошки #}
+          <div class="clearfix" xmlns:v="http://rdf.data-vocabulary.org/#">
+            <ol class="breadcrumb" itemprop="breadcrumb">
+              <li typeof="v:Breadcrumb">
+                <a href="{{ path('site_first_page_homepage') }}"
+                   title="Главная"
+                   rel="v:url"
+                   property="v:title">Все объявления</a>
+              </li>
+              <li typeof="v:Breadcrumb">{{ page.title }}</li>            
+            </ol>      
+          </div>
+          <div itemscope="" itemtype="http://schema.org/NewsArticle" data-twttr-rendered="true">
+            <h1 itemprop="name">{{ page.title }}</h1>
+            {% if page.icon %}
+                <meta itemprop="image" content="{{ top_panel.settings.url }}{{ asset('images/pages/images/') }}{{ page.icon }}">
+                <div class="clearfix"><img class="img-responsive" src="{{ asset('images/pages/images/') }}{{ page.icon }}"
+                     alt="{{ page.title }}" title="{{ page.title }}"></div>
+            {% endif %}
+            <p class="lead" itemprop="headline description">{{ page.description }}</p>
+        <div itemprop="articleBody">{{ page.content|raw }}</div>
+<hr>        
+        <span class="pull-right">Просмотров: {{ page.viewed }}</span>
+        Автор: <span itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            <span itemprop="name">{{ top_panel.settings.name }}</span>
+          </span>			
+        <br><br>
+        <div class="pull-right">Опубликовано: <time itemprop="datePublished" datetime="{{ page.updatedAt|date }}">{{ page.updatedAt|date('d.m.Y') }}</time></div>
+      </div>
+			{# Блок "Поделиться" #}            
+      <div class="ya-share2" data-services="vkontakte,facebook,odnoklassniki,moimir,gplus,twitter,viber,whatsapp,skype,telegram"></div><br>
+      {# Баннер #}
+        {% if banner_bottom and user.roles[1] is not defined %}
+          <div class="clearfix padding-5 text-center banner" onclick="set_click({{ banner_bottom.id }})">
+            <div style="width: {% if banner_bottom.width %}{{ banner_bottom.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+              {{ banner_bottom.code|raw }}
+            </div>
+          </div>
+        {% endif %}
+        </div>
+
+        <div class="col-md-3 padding-5 hidden-xs hidden-sm">            
+            {# Вы смотрели #}
+        {% include 'SiteFirstPageBundle:Default:yadvs.html.twig' %}
+      
+        {# Личный кабинет #}
+        {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+			{# Баннер в правой колонке #}
+        {% if banner_right and user.roles[1] is not defined %}
+          <div class="col-xs-12 padding-5 hidden-xs">
+          <aside>
+            <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+              <div style="width: {{ banner_right.width }}px; margin: 0 auto;">{{ banner_right.code|raw }}</div>
+            </div>
+          </aside></div>
+        {% endif %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}	
+	<script type="text/javascript" src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js" charset="utf-8"></script>
+    <script async type="text/javascript" src="//yastatic.net/share2/share.js" charset="utf-8"></script>
+{% endblock %}

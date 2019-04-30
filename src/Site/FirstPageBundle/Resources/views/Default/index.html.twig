@@ -1,0 +1,115 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% block canonical %}{{ url('site_first_page_homepage',{region: top_panel.url_region}) }}{% endblock%}
+{% block title %}{{ top_panel.settings.title }}{% if top_panel.net_town %} {{ top_panel.net_town }}{% endif %}{% endblock %}
+{% block description %}Все объявления {% if top_panel.net_town %}{{ top_panel.net_town }}{% endif %}. {{ top_panel.settings.description }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}{% endblock %}
+{% block DublinCore %}
+<!-- Dublin Core -->
+    <meta name="DC.title" content="{{ top_panel.settings.title }}{% if top_panel.net_town %} {{ top_panel.net_town }}{% endif %}" />
+    <meta name="DC.contributor" content="Объявления, подать объявление" />
+    <meta name="DC.creator" content="{{ top_panel.settings.title }}{{ top_panel.settings.name }}" />
+    <meta name="DC.date" content="2017-09-01" />
+    <meta name="DC.description" content="{{ top_panel.settings.description }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}" />
+    <meta name="DC.format" content="text/html" />
+
+    <meta name="DC.identifier" content="{{ top_panel.settings.url }}" />
+    <meta name="DC.language" content="ru-Ru" />
+    <meta name="DC.publisher" content="Объявления, подать объявление" />
+    <meta name="DC.rights" content="Copyright (c) 2017 by {{ top_panel.settings.name }}" />
+    <meta name="DC.subject" content="Объявления, подать объявление, бесплатные объявления {% if top_panel.net_town %}{{ top_panel.net_town }}{% endif %}" />
+    
+{% endblock %}
+
+{% block pre_content %}
+  <div class="cpage"><div class="container">
+  <div class="clearfix">
+    <h1 class="text-center padding-5 first_page_h1">{{ top_panel.settings.title }}{% if top_panel.net_town %} <span class="text-nowrap">{{ top_panel.net_town }}</span>{% endif %}</h1>
+  </div>
+  {% if not top_panel.current_region %}
+      <div class="padding-5 text-center clearfix">
+          <button class="btn btn-region btn-lg" type="button" data-toggle="collapse" data-target="#towns_areas" aria-expanded="false" aria-controls="towns_areas"><img width="20" height="20" src="/images/location.svg" alt="Местоположение" title="Местоположение"> Выберите {% if top_panel.current_area %}город{% else %}регион{% endif %}</button>
+      </div>
+        <div class="clearfix regions_on_main text-right">
+            <div class="collapse" id="towns_areas">
+                {% if top_panel.current_area %}{% set items = top_panel.area_regions %}{% else %}{% set items = top_panel.areas %}{% endif %}
+                <div class="clearfix col-xs-12 col-md-6 padding-0">
+                    {% set cnnt=0 %}{% set cnntt=0 %}
+                    {% for item in items if item %}
+                    {% if cnnt==6 %}</div><div class="clearfix">{% set cnnt=1 %}
+                {% else %}{% set cnnt=cnnt+1 %}
+                {% endif %}
+                {% if cnntt==3 %}</div><div class="clearfix col-xs-12 col-md-6 padding-0">{% set cnntt=1 %}
+                    {% else %}{% set cnntt=cnntt+1 %}
+                    {% endif %}
+                    <div class="col-xs-12 col-sm-4 clearfix text-left padding-5">
+                        <div class="clearfix text-left">
+                            <a class="item clearfix" rel="nofollow" href="{{ url('site_first_page_homepage',{region: item.alias}) }}" title="Объявления {{ item.pagetitle }}">{{ item.name }}</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+  {% endif %}
+  <div class="clearfix">      
+            <div class="clearfix categories_on_main text-right">
+                <div class="clearfix">
+                    <div class="clearfix col-xs-12 col-md-6 padding-0">
+                      {% set cnnt=0 %}{% set cnntt=0 %}
+                      {% for category in top_panel.main_categories if category %}
+                        {% if cnnt==4 %}</div><div class="clearfix">{% set cnnt=1 %}
+                        {% else %}{% set cnnt=cnnt+1 %}
+                        {% endif %}
+                        {% if cnntt==2 %}</div><div class="clearfix col-xs-12 col-md-6 padding-0">{% set cnntt=1 %}
+                        {% else %}{% set cnntt=cnntt+1 %}
+                        {% endif %}                          
+                          <div class="col-xs-12 col-sm-6 clearfix text-left padding-5">
+                            <div class="clearfix text-center">
+                              <a class="item clearfix" rel="nofollow" href="{{ path('site_category_page', { category: category.alias, region: top_panel.url_region }) }}" title="{{ category.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">
+                                <img src="/images/categories/{{ category.icon }}" alt="Рубрика {{ category.name }}" title="{{ category.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}"><h3>{{ category.name }}</h3>
+                              </a>
+                            </div>
+                            <div class="subcategory hidden-xs">
+                              {% for subcategory in category.AdChildss if subcategory %}<a rel="nofollow" class="link" href="{{ path('site_category_page', { category: category.alias, subcategory: subcategory.alias, region: top_panel.url_region }) }}" title="{{ subcategory.name }}{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">{{ subcategory.name }}</a>{% endfor %}
+                            </div>
+                          </div>                          
+                      {% endfor %}                        
+                    </div>
+                </div>
+            </div>
+        </div>
+  </div></div>
+{% endblock %}
+{% block content %}	
+</div></div></div>
+  <div class="ipage"><div class="container"><div><div>
+    <div class="catallog">
+        {# Инфо сайта #}
+        <div class="site-info hidden-xs">
+          <div class="clearfix site-description padding-5"><br>
+            <div class="clearfix padding-5 text-left">
+					<h2>Доска объявлений{% if top_panel.net_town %} {{ top_panel.net_town }}{% endif %}</h2>
+					<p>На нашей Доске объявлений найдётся всё! Вы можете разместить объявление на любую тему, включая недвижимость, транспорт, поиск работы и предложение услуг, личные вещи и знакомства. Здесь принимаются объявления от частных лиц и компаний абсолютно бесплатно и на долгое время.</p>
+					<h3>Как подать объявление{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}?</h3>
+					<p>На Доске бесплатных объявлений{% if top_panel.net_town %} {{ top_panel.net_town }}{% endif %} <b>{{ top_panel.settings.name }}</b> тысячи людей ежедневно продают и покупают самые разные
+					вещи: объекты недвижимости, транспортные средства, бытовую технику, мебель, электронику, ноутбуки и компьютеры,
+					фотоаппараты и смартфоны, одежду и обувь, детские вещи и игрушки, кошек, собак и других животных,
+					журналы и книги, велосипеды, музыкальные инструменты и еще много всего интересного. Также на нашей доске объявлений предлагают и
+					находят самые различные услуги от частных лиц и компаний{% if top_panel.net_town %} {{ top_panel.net_town }}{% endif %}:
+					ремонт, строительство, транспортировка грузов, услуги массажистов и спа-салонов, парикмахеров и стилиста, кредитование и
+					юридическая помощь, а также многое другое.</p>
+					<p><a class="btn btn-addnew" href="{{ path('add_adv_page', { region: top_panel.url_region }) }}" title="Подать объявление{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}">Подать объявление</a></p>
+          <p><strong>Подать объявление{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %}</strong> на <a href="{{ top_panel.settings.url }}" title="{{ top_panel.settings.title }}"><strong>{{ top_panel.settings.name }}</strong></a> через интернет
+          очень просто. Чтобы разместить свое объявление на нашей доске{% if top_panel.in_town %} {{ top_panel.in_town }}{% endif %} выберите{% if not top_panel.in_town %} регион и город,{% endif %}
+          рубрику в которой хотите представить товар, объект или услугу, напишите короткий и привлекающий внимание заголовок и как можно более полное описание своего объявления, укажите адекватную цену
+          товара, объекта или услуги, свой e-mail и телефон (можно также добавить свой Skype). Обязательно дополните объявление несколькими фотографиями — они привлекают больше внимания и помогут быстрее продать ваш товар, объект или услугу. Самые интересные объявления мы разместим на наших страницах в социальных сетях.</p>
+          <script src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js"></script>
+          <script src="//yastatic.net/share2/share.js"></script>
+          <div class="ya-share2 pull-right" data-services="vkontakte,facebook,odnoklassniki,moimir,twitter"></div>					
+          <h4>Все объявления находят на {{ top_panel.settings.name }}!</h4>
+                </div>				
+            </div>
+        </div>
+        <div class="homescreen periodical-popup"><i class="periodical-popup_close homescreen_close"></i><div class="homescreen_title">Быстрый доступ к&nbsp;{{ top_panel.settings.name }}</div><div class="homescreen_add-icon-title">Нажмите&nbsp;<div class="homescreen_add-icon"></div>&nbsp;и выберите</div>На экран «Домой»<div class="homescreen_tail"></div></div>
+    </div>
+    </div>
+{% endblock %}

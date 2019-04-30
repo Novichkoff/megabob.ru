@@ -1,0 +1,105 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/sitefirstpage/js/functions.js') }}"></script>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('bundles/sitefirstpage/css/owl.carousel.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/sitefirstpage/css/print.css') }}" rel="stylesheet">
+{% endblock %}
+
+
+{% block content %}
+  <div class="clearfix">
+    <div class="col-md-9 padding-5 clearfix">
+        <div class="clearfix">
+            {% for flashMessage in app.session.flashbag.get('noticesite') %}
+				<div class="alert alert-success alert-dismissible" role="alert">
+					<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+								class="sr-only">Закрыть</span></button>
+					{{ flashMessage|raw }}
+				</div>
+			{% endfor %}
+			{% for flashMessage in app.session.flashbag.get('alertsite') %}
+				<div class="alert alert-danger alert-dismissible" role="alert">
+					<button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+								class="sr-only">Закрыть</span></button>
+					{{ flashMessage|raw }}
+				</div>
+			{% endfor %}
+			{# Хлебные крошки #}                
+                <div class="clearfix padding-5">
+                    <ol class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">
+                        <li>
+                            <a href="{{ path('site_first_page_homepage') }}"
+                               title="Главная"
+                               rel="v:url"
+                               property="v:title">Все объявления</a>
+                        </li>
+                        <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+                          <a itemscope itemtype="http://schema.org/Thing" itemprop="item" 
+                            href="{{ path('site_first_page_homepage', { region: top_panel.url_region }) }}"
+                            title="Все объявления{% if top_panel.in_town %} {{ top_panel.net_town }}{% endif %}"><span itemprop="name">{{ top_panel.current_region }}</span></a>
+                          <meta itemprop="position" content="1" />
+                        </li>                        
+                        <li class="active">Ошибка</li>
+                    </ol>
+                </div>    
+                        
+			
+			<div class="clearfix text-center">
+				<img src="{{ asset('bundles/sitefirstpage/images/error_sign.jpg') }}" alt="Ошибка" title="Ошибка"><br>
+				<h3 class="red"><strong>Внимание!</strong><br> Вы перешли по ссылке недействительного объявления<br> или данное объявление утратило свою актуальность и было удалено.</h3>
+				<h4>Воспользуйтесь поиском чтобы найти интересующее вас объявление.</h4>
+			</div><br>
+              
+			
+              
+              
+              <div class="clearfix padding-0">
+              {# Баннер под поиском #}
+                {% if banner_search and user.roles[1] is not defined %}
+                    <div class="clearfix padding-0 text-center banner" onclick="set_click({{ banner_search.id }})">
+                        <div style="width: {% if banner_search.width %}{{ banner_search.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+                            {{ banner_search.code|raw }}
+                        </div>
+                    </div>
+                {% endif %}
+                <br>                
+                <h3>Хотите разместить свое объявление?</h3>
+                <p>Вы можете разместить свое объявление на нашем сайте совершенно <strong>бесплатно</strong> всего за 1 минуту. <br>Перейдите на страницу подачи объявления, заполните несложную форму, выберите и загрузите лучшие из имеющихся у вас фотографий - и всё! Ваше объявление сразу же окажется в ТОПе на сайте среди других объявлений. Не упускайте такую возможность!</p>
+                <a class="btn btn-addnew" href="{{ path('add_adv_page') }}" title="Подать объявление бесплатно">Подать объявление</a><br><br>
+                <p>На нашем сайте продают и покупают самые разные товары, объекты и услуги: комнаты и квартиры, гаражи и места в паркинге, земельные участки и дома, дачи, коттеджи, таунхаусы, мотоциклы и автомобили, бытовую технику и мебель, электронику, ноутбуки и компьютеры, фотоаппараты и телефоны, обувь и одежду, кошек и собак, журналы и книги, велосипеды, музыкальные инструменты и многое другое.<p>                
+                <h4>Ждем ваших объявлений на нашем сайте.</h4>
+              </div>
+			  
+              
+            </div>
+          
+        </div>
+
+        {# Правая колонка #}
+        <div class="col-md-3 padding-5">
+		
+            {% include 'SiteFirstPageBundle:Default:cabinet.html.twig' %}
+            
+            {# Баннер в правой колонке #}
+            {% if banner_right and user.roles[1] is not defined %}
+    <aside>
+        <div class="adv_right" onclick="set_click({{ banner_right.id }})">
+            <div style="width: {{ banner_right.width }}px; margin: 0 auto;">
+                {{ banner_right.code|raw }}
+            </div>
+        </div>
+    </aside>
+{% endif %}
+
+        </div>
+        <div class="clearfix"></div>
+
+    </div>
+  </div>
+{% endblock %}

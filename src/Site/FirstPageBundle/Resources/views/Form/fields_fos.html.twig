@@ -1,0 +1,198 @@
+{% block form_label %}
+    {% spaceless %}
+        {% if label is not sameas(false) %}
+            {% if not compound %}
+    {% set label_attr = label_attr|merge({'for': id}) %}
+{% endif %}
+            {% if label is empty %}
+    {% set label = name|humanize %}
+{% endif %}
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %} class="col-sm-3 control-label">{{ label|trans({}, 'FOSUserBundle') }}</label>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_label %}
+
+{% block text_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+            <input type="text"
+                   size="50" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}>
+        </div>
+    {% endspaceless %}
+{% endblock text_widget %}
+
+{% block number_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+            <input type="text"
+                   size="50" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}>
+        </div>
+    {% endspaceless %}
+{% endblock number_widget %}
+
+{% block file_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+          <div class="fileUpload btn btn-default">
+              <span>Выбрать файл</span>
+              <input type="file" class="upload"
+                   {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}>
+          </div>            
+        </div>
+    {% endspaceless %}
+{% endblock file_widget %}
+
+{% block integer_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+            <input type="text"
+                   size="50" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}>
+        </div>
+    {% endspaceless %}
+{% endblock integer_widget %}
+
+{% block textarea_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+            <textarea class="form-control" rows="4" cols="50" {{ block('widget_attributes') }}>{{ value }}</textarea>
+        </div>
+    {% endspaceless %}
+{% endblock textarea_widget %}
+
+{% block email_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+            <input class="form-control" type="email"
+                   size="50" {{ block('widget_attributes') }} {% if value is defined %} value="{{ value }}"{% endif %}">
+        </div>
+    {% endspaceless %}
+{% endblock email_widget %}
+
+{% block password_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+            <input class="form-control" type="password"
+                   size="50" {{ block('widget_attributes') }} {% if value is defined %} value="{{ value }}"{% endif %}">
+        </div>
+    {% endspaceless %}
+{% endblock password_widget %}
+
+{% block captcha_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+            <div class="col-xs-6 padding-0">
+                <input type="text"
+                       class="form-control captcha" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+            </div>
+            <div class="col-xs-6 padding-0" id="captcha_field">
+                <img src="{{ captcha_code }}" title="captcha" width="{{ captcha_width }}"
+                     height="{{ captcha_height }}"/>
+            </div>
+        </div>
+    {% endspaceless %}
+{% endblock %}
+
+{% block checkbox_widget %}
+    {% spaceless %}
+        <div class="col-sm-9">
+            <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+        </div>
+    {% endspaceless %}
+{% endblock checkbox_widget %}
+
+{% block form_row %}
+    {% spaceless %}
+        {{ form_errors(form) }}
+        <div class="form-group form-site">
+            {{ form_label(form) }}
+            {{ form_widget(form) }}
+        </div>
+    {% endspaceless %}
+{% endblock form_row %}
+
+{% block submit_widget %}
+    {% spaceless %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <div class="col-xs-offset-3 col-sm-9">
+            <button type="{{ type|default('submit') }}" {{ block('button_attributes') }}>{{ label|trans({}, translation_domain) }}</button>
+        </div>
+    {% endspaceless %}
+{% endblock submit_widget %}
+
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for error in errors %}
+                        <li>{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{% block choice_widget %}
+    {% spaceless %}
+        {% if expanded %}
+            <div class="col-sm-9">
+                {{ block('choice_widget_expanded') }}
+            </div>
+        {% else %}
+            <div class="col-sm-9">
+                {{ block('choice_widget_collapsed') }}
+            </div>
+        {% endif %}
+    {% endspaceless %}
+{% endblock choice_widget %}
+
+{% block choice_widget_expanded %}
+    {% spaceless %}
+        <div {{ block('widget_container_attributes') }}>
+            {% for child in form %}
+                {{ form_widget(child) }}
+                {{ form_label(child) }}
+            {% endfor %}
+        </div>
+    {% endspaceless %}
+{% endblock choice_widget_expanded %}
+
+{% block choice_widget_collapsed %}
+    {% spaceless %}
+        {% if required and empty_value is none and not empty_value_in_choices %}
+            {% set required = false %}
+        {% endif %}
+        <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %} style="width: 100%">
+            {% if empty_value is not none %}
+                <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
+            {% endif %}
+            {% if preferred_choices|length > 0 %}
+                {% set options = preferred_choices %}
+                {{ block('choice_widget_options') }}
+                {% if choices|length > 0 and separator is not none %}
+                    <option disabled="disabled">{{ separator }}</option>
+                {% endif %}
+            {% endif %}
+            {% set options = choices %}
+            {{ block('choice_widget_options') }}
+        </select>
+    {% endspaceless %}
+{% endblock choice_widget_collapsed %}
+
+{% block choice_widget_options %}
+    {% spaceless %}
+        {% for group_label, choice in options %}
+            {% if choice is iterable %}
+                <optgroup label="{{ group_label|trans({}, translation_domain) }}">
+                    {% set options = choice %}
+                    {{ block('choice_widget_options') }}
+                </optgroup>
+            {% else %}
+                <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ choice.label|trans({}, translation_domain) }}</option>
+            {% endif %}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock choice_widget_options %}

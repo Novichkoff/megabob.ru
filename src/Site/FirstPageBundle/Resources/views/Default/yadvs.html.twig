@@ -1,0 +1,22 @@
+{# Вы смотрели #}{% if yadvs is defined %}{% if yadvs|length %}
+    <div class="col-sm-6 col-md-12 padding-5 clearfix">
+    <div class="panel panel-default">
+        <div class="panel-heading"><a class="btn btn-default btn-xs pull-right"
+                                      href="{{ path('site_clear_history_page') }}" title="Очистить">Очистить</a><strong><i
+                        class="fa fa-clock-o"></i> Вы смотрели</strong></div>
+        <div class="panel-body">{% for yadv in yadvs|reverse|slice(0, 3) if yadv %}
+                <div class="clearfix">
+                <div class="col-xs-6 padding-0"><a
+                            href="{{ path('site_adv_page', { category: yadv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: yadv.AdCategories.alias, id: yadv.id, alias: yadv.alias, region: yadv.Regions.alias }) }}">{% if yadv.AdvImagess.Data[0] is defined %}
+                            <img class="img-responsive"
+                                 src="{{ asset('images/a/images/') }}{{ yadv.AdvImagess.Data[0].thumb }}"
+                                 alt="{{ yadv.name }}" title="{{ yadv.name }}">{% else %}<img class="img-responsive"
+                                                                                              src="{{ asset('/images/no_image.png') }}"
+                                                                                              alt="Нет картинки"
+                                                                                              title="Нет картинки">{% endif %}
+                    </a></div>
+                <div class="col-xs-6 padding-5"><span><a
+                                href="{{ path('site_adv_page', { category: yadv.AdCategories.AdCategoriesRelatedByParentId.alias, subcategory: yadv.AdCategories.alias, id: yadv.id, alias: yadv.alias, region: yadv.Regions.alias }) }}">{{ yadv.name }}</a></span><br><strong
+                            class="grid_price red">{% if yadv.dogovor %}Договорная{% else %}{% if yadv.price %}{{ yadv.price|number_format(0, '.', ' ') }} р.{% else %}Бесплатно{% endif %}{% endif %}</strong></div></div><hr>{% endfor %}
+        </div>
+    </div></div>{% endif %}{% endif %}

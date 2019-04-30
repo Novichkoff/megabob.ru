@@ -1,0 +1,99 @@
+<div class="padding-0 clearfix">
+    <div class="clearfix">
+        <div class="red-text padding-0">
+            <img width="25" height="25" src="/images/location.svg" alt="{{ adv.Regions.name }}" title="{{ adv.Regions.name }}"> 
+            <a href="{{ path('site_first_page_homepage', { 'region' : adv.Regions.alias }) }}"
+                    title="Перейти к объявлениям {{ adv.Regions.pagetitle }}"><b>{{ adv.Regions.name }}</b></a>
+            <small class="text-nowrap">({{ adv.Regions.Areas.name }})</small>
+        </div>
+        <div class="red-text padding-0 clearfix">
+            <img width="25" height="25" src="/images/user2.svg" alt="Автор объявления" title="Автор объявления"> 
+            <a href="{{ path('site_user_advs_page', { 'user_id' : adv.User.id }) }}"
+               title="Перейти к объявлениям пользователя {{ adv.User.Realname | title }}"><b>{{ adv.User.Realname | title }}</b></a>
+            {% if adv.User.emailConfirm %} <img width="15" height="15" src="/images/confirm.svg" alt="Подтвержденный Email" title="Подтвержденный Email">{% endif %}
+            {% if adv.User.createDate %}<small class="text-nowrap grey">на сайте с {{ adv.User.createDate|date('d.m.Y') }}</small>{% endif %}
+        </div>
+        {% if adv.Shops %}
+            <div class="red-text padding-0 clearfix">
+                <img width="25" height="25" src="/images/business.svg" alt="Компания" title="Компания"> 
+                {% if adv.Shops.alias is defined %}
+                    <a href="{{ path('site_shop_advspage', { 'alias' : adv.Shops.alias, region: top_panel.url_region }) }}"
+                        title="Перейти к объявлениям компании">{{ adv.Shops.name }}</a>
+                {% elseif adv.companyName %}
+                    {{ adv.companyName }}
+                {% endif %}
+            </div>
+        {% endif %}        
+        <div class="clearfix col-sm-12 padding-0">
+            <div class="red-text col-sm-12 padding-0 form-group">
+                <div class="btn btn-default form-control" onclick="get_phone({{ adv.id }});" title="Показать телефон">
+                    <img width="20" height="20" src="/images/phone.svg" alt="Телефон" title="Телефон"> 
+                    {% if user.roles[1] is defined %}
+                        {% if user.roles[1] == 'ROLE_SUPER_ADMIN' or user.roles[1] == 'ROLE_MODER' %}
+                            {{ adv.phone }}
+                        {% else %}
+                            <span id="phone">Показать телефон</span>
+                        {% endif %}
+                    {% else %}
+                        <span id="phone">Показать телефон</span>
+                    {% endif %}
+                </div>
+                <p class="on_claso hide">Пожалуйста, скажите автору что нашли это объявление на сайте <b>{{ top_panel.settings.name }}</b></p>
+            </div>
+            {% if adv.User.emailConfirm and adv.User.emailStatus %}
+                <div class="red-text col-sm-12 padding-0 form-group">
+                    <div class="btn btn-default form-control" data-toggle="modal" data-target="#postModal"
+                         data-recipient="{{ adv.User.id }}" data-adv="{{ adv.id }}" title="Отправить сообщение">
+                        <img width="20" height="20" src="/images/email.svg" alt="Сообщение" title="Сообщение"> 
+                        {% if user.roles[1] is defined %}
+                            {% if user.roles[1] == 'ROLE_SUPER_ADMIN' or user.roles[1] == 'ROLE_MODER' %}
+                                {{ adv.User.email }}
+                            {% else %}
+                                <span>Отправить сообщение</span>
+                            {% endif %}
+                        {% else %}
+                            <span>Отправить сообщение</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if adv.skype %}
+                <div class="red-text col-sm-12 padding-0 form-group">
+                    <div class="btn btn-default form-control" onclick="get_skype({{ adv.id }});" title="Показать Skype">
+                        <img width="20" height="20" src="/images/skype.svg" alt="Skype" title="Skype">
+                        {% if user.roles[1] is defined %}
+                            {% if user.roles[1] == 'ROLE_SUPER_ADMIN' or user.roles[1] == 'ROLE_MODER' %}
+                                {{ adv.skype }}
+                            {% else %}
+                                <span id="skype">Показать Skype</span>
+                            {% endif %}
+                        {% else %}
+                            <span id="skype">Показать Skype</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}            
+        </div>
+        {% if adv.site %}
+            <div class="clearfix col-sm-12 padding-0">
+                <div class="red-text col-sm-12 padding-0 form-group">
+                    <div class="btn btn-default form-control" onclick="get_site_adv({{ adv.id }});"
+                         title="Перейти на сайт">                        
+                        <img width="20" height="20" src="/images/www.svg" alt="Сайт" title="Сайт">
+                        {% if user.roles[1] is defined %}
+                            {% if user.roles[1] == 'ROLE_SUPER_ADMIN' or user.roles[1] == 'ROLE_MODER' %}
+                                <a href="{{ adv.site }}">{{ adv.site }}</a>
+                            {% else %}
+                                <span id="site">Перейти на сайт</span>
+                            {% endif %}
+                        {% else %}
+                            <span id="site">Перейти на сайт</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    {# Блок "Поделиться" #}            
+    <div class="ya-share2 text-center" data-services="vkontakte,facebook,odnoklassniki,moimir,twitter"></div>
+</div>

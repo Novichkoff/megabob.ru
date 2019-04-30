@@ -1,0 +1,65 @@
+{# Баннер под поиском #}
+{#{% if banner_search and user.roles[1] is not defined %}
+    <div class="clearfix padding-5 text-center banner" onclick="set_click({{ banner_search.id }})">
+        <div style="width: {% if banner_search.width %}{{ banner_search.width }}px{% else %}100%{% endif %}; margin: 0 auto; text-align: center;">
+            {{ banner_search.code|raw }}
+        </div><br>
+    </div>
+{% endif %}#}
+{% for flashMessage in app.session.flashbag.get('notice1') %}
+    <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                    class="sr-only">Закрыть</span></button>
+        {{ flashMessage }}
+    </div>
+{% endfor %}
+{% if not user.emailConfirm %}
+    <div class="alert alert-warning alert-dismissible" role="alert">
+        <strong>Внимание!</strong> Вам необходимо подтвердить ваш email.<br>Перейдите по ссылке в приветственном письме или отправьте ссылку повторно.<br>До тех пор вам недоступно получение сообщений от посетителей сайта.
+		<a class="btn btn-xs btn-danger pull-right" href="{{ path('email_confirm_send_page', { id: app.user.id }) }}">Отправить ссылку</a>
+    </div>
+{% endif %}
+
+{#
+{% if not user.facebookId and not user.twitterId and not user.vkontakteId and not user.odnoklassnikiId %}
+    <div class="alert alert-warning alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span
+                    class="sr-only">Закрыть</span></button>
+        {% block hwi_oauth_content %}
+            {% if error is defined and error %}
+                <div class="alert alert-danger">
+                    <span>{{ error }}</span>
+                </div>
+            {% endif %}
+            <strong>Внимание!</strong> Привяжите ваш аккаунт из социальной сети для входа на сайт в один клик. Это займет 1 секунду!<br>
+            {% for owner in hwi_oauth_resource_owners() %}
+                <a href="{{ hwi_oauth_login_url(owner) }}"><img class="autorization_social" width="30" height="30"
+                                                                src="{{ asset('bundles/sitefirstpage/images/'~owner | trans({}, 'HWIOAuthBundle')~'.png') }}"></a>
+            {% endfor %}
+        {% endblock hwi_oauth_content %}
+    </div>
+{% endif %}
+#}
+<ul class="nav nav-tabs">	
+	<li{% if app.request.attributes.get('_route') == 'user_cabinet_page' %} class="active"{% endif %}><a
+				href="{{ path('user_cabinet_page') }}"><img width="20" height="20" src="/images/profile.svg" alt="Профиль" title="Профиль"> <b>Профиль</b></a></li>
+	<li{% if app.request.attributes.get('_route') == 'user_balance_page' %} class="active"{% endif %}><a
+				href="{{ path('user_balance_page', { region: top_panel.url_region }) }}"><img width="20" height="20" src="/images/wallet.svg" alt="Кошелек" title="Кошелек"> <b>Кошелек</b></a></li>
+  {% set msg_cnt = 0 %}
+  {% if user.UserMessagess|length %}    
+    {% for msg in user.UserMessagess %}
+      {% if not msg.viewed %}{% set msg_cnt = msg_cnt+1 %}{% endif %}
+    {% endfor %}
+  {% endif %}
+	<li{% if app.request.attributes.get('_route') == 'user_favorites_page' %} class="active"{% endif %}><a
+                href="{{ path('user_favorites_page', { region: top_panel.url_region }) }}"><img width="20" height="20" src="/images/bookmark.svg" alt="Избранное" title="Избранное"> <b>Избранное</b>{% if user.UserFavorites|length %} <span class="label label-primary">{{ user.UserFavorites|length}}</span>{% endif %}</a></li>
+  
+	<li{% if app.request.attributes.get('_route') == 'user_advs_page' %} class="active"{% endif %}><a
+                href="{{ path('user_advs_page', { region: top_panel.url_region }) }}"><img width="20" height="20" src="/images/ob.svg" alt="Объявления" title="Объявления"> <b>Объявления</b>{% if user.Advss|length %} <span class="label label-primary">{{ user.Advss|length}}</span>{% endif %}</a></li>
+	{% if user.Shopss|length %}
+	<li{% if app.request.attributes.get('_route') == 'user_companies_page' %} class="active"{% endif %}><a
+                href="{{ path('user_companies_page', { region: top_panel.url_region }) }}"><img width="20" height="20" src="/images/business.svg" alt="Компании" title="Компании"> <b>Компании</b>{% if user.Shopss|length %} <span class="label label-primary">{{ user.Shopss|length}}</span>{% endif %}</a></li>
+	{% endif %}
+  <li{% if app.request.attributes.get('_route') == 'user_messages_page' %} class="active"{% endif %}><a
+				href="{{ path('user_messages_page', { region: top_panel.url_region }) }}"><img width="20" height="20" src="/images/messages.svg" alt="Сообщения" title="Сообщения"> <b>Сообщения</b>{% if msg_cnt %} <span class="label label-danger">{{ msg_cnt }}</span>{% endif %}</a></li>      
+</ul>

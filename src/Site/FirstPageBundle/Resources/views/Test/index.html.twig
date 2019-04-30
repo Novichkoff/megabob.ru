@@ -1,0 +1,67 @@
+{% extends 'SiteFirstPageBundle::layout.html.twig' %}
+{% block content %}
+    <div class="clearfix">
+		<h1>Тестовая страница</h1>
+		{% if not top_panel.current_area %}
+			<div class="clearfix areas_tabs">
+				<ul class="nav nav-tabs nav-justified" role="tablist">
+					<li class="active"><a href="#west" aria-controls="west" role="tab" data-toggle="tab">Запад</a></li>
+					<li><a href="#east" aria-controls="east" role="tab" data-toggle="tab">Восток</a></li>
+				  </ul>
+				<div class="tab-content">
+					<div role="tabpanel" class="tab-pane active clearfix" id="west">
+						<div class="col-sm-7 padding-5">
+							<div class="hidden-xs">
+								<div>
+									<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 500 500" id="map_west"></svg>
+								</div>
+							</div>
+						</div>
+						<div class="col-sm-5 padding-5">
+							<div class="clearfix town_rr">
+								<div class="clearfix text-left towns" id="west_names"></div>
+							</div>
+						</div>
+					</div>
+					<div role="tabpanel" class="tab-pane clearfix" id="east">
+						<div class="col-sm-3 padding-5">
+							<div class="clearfix town_rr">
+								<div class="clearfix text-left towns_s" id="east_names"></div>
+							</div>
+						</div>
+						<div class="col-sm-9 padding-5">
+							<div class="hidden-xs">
+								<div>
+									<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="250 0 800 600" id="map_east"></svg>
+								</div>
+							</div>
+						</div>						
+					</div>
+				</div>				
+			</div>
+		{% endif %}
+	</div>        
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+	<script>
+		var path1 = names1 = names2 = '';
+		var path2 = '<path onclick="get_page(\'/moskva\')" d="m 131.37415,256.65025 -2.95954,-0.98652 -3.94606,0.98652 -0.98651,3.94605 0.98651,2.95955 3.94606,1.97303 2.95954,-1.97303 1.97303,-2.95955 -1.97303,-3.94605 z" fill="#d9534f" stroke="#fff" stroke-width="1"><title>Москва</title></path><path onclick="get_page(\'/sankt-peterburg\')" d="m 136.30673,181.67516 -2.95955,-0.98651 -3.94605,0.98651 -0.98652,3.94606 0.98652,2.95954 3.94605,1.97303 2.95955,-1.97303 1.97302,-2.95954 -1.97302,-3.94606 z" fill="#d9534f" stroke="#fff" stroke-width="1"><title>Санкт-Петербург</title></path>';
+		$.ajax({
+		url : "/all_areas_map",		
+		success : function (data) {
+				$.each(data[2], function(index, value) {					
+					path2 += '<path onclick="get_page(\'/'+value.alias+'\')" onmouseover="set_a('+value.id+')" onmouseout="unset_a('+value.id+')" id="img_area_'+value.id+'" d="'+value.path+'" fill="#5cb85c" stroke="#fff" stroke-width="1"><title>'+value.name+'</title></path>';
+					names2 += '<div class="padding-5"><span class="link" id="a_area_'+value.id+'" data-id="'+value.id+'" onclick="get_page(\'/'+value.alias+'\')" title="Объявления '+value.pagetitle+'">'+value.name+'</span></div>';
+				});
+				$('#map_west').html(path2);$('#west_names').html(names2);
+				$.each(data[1], function(index, value) {					
+					path1 += '<path onclick="get_page(\'/'+value.alias+'\')" onmouseover="set_a('+value.id+')" onmouseout="unset_a('+value.id+')" id="img_area_'+value.id+'" d="'+value.path+'" fill="#5cb85c" stroke="#fff" stroke-width="1"><title>'+value.name+'</title></path>';
+					names1 += '<div class="padding-5"><span class="link" id="a_area_'+value.id+'" data-id="'+value.id+'" onclick="get_page(\'/'+value.alias+'\')" title="Объявления '+value.pagetitle+'">'+value.name+'</span></div>';
+				});
+				$('#map_east').html(path1);$('#east_names').html(names1);				
+			}
+		});
+	</script>
+{% endblock %}
